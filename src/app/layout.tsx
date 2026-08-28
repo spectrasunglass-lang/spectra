@@ -1,17 +1,18 @@
 import type { Metadata } from "next";
 import { Quicksand } from "next/font/google";
-import Navbar from "@/components/Navbar";
 import "./globals.css";
 
 const quicksand = Quicksand({
   variable: "--font-quicksand",
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "SPECTRA",
-  description: "SPECTRA Luxury Eyewear & Lifestyle",
+  title: "SPECTRA — See Beyond Limits",
+  description:
+    "SPECTRA luxury eyewear. Crafted for visionaries. Designed to stand apart.",
 };
 
 export default function RootLayout({
@@ -22,11 +23,10 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${quicksand.variable} ${quicksand.className} h-full antialiased dark`}
+      className={`${quicksand.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-[#0a0a0a] text-neutral-100 font-sans">
-        <Navbar />
-        <main className="flex-1">{children}</main>
+      <body className="h-full font-sans">
+        {children}
       </body>
     </html>
   );
