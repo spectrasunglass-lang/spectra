@@ -80,7 +80,7 @@ export default function StatusBadge({ status }: StatusBadgeProps) {
   const c = config[status] ?? config.draft;
   return (
     <span
-      className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold border ${c.bg} ${c.text} ${c.border}`}
+      className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-sm text-[11px] font-semibold border ${c.bg} ${c.text} ${c.border}`}
     >
       <span className={`w-1.5 h-1.5 rounded-full ${c.dot}`} />
       {c.label}

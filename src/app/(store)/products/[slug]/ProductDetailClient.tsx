@@ -20,6 +20,7 @@ import {
 interface ProductData {
   id: string;
   name: string;
+  slug?: string | null;
   subtitle?: string | null;
   description?: string | null;
   price: number;
@@ -53,9 +54,10 @@ export default function ProductDetailClient({ product }: { product: ProductData 
     addItem({
       id: product.id,
       name: product.name,
+      slug: product.slug || product.id,
       price: Number(product.price),
       image_url: product.image_url,
-      quantity: 1,
+      subtitle: product.subtitle || "",
     });
     setAdded(true);
     setTimeout(() => setAdded(false), 2500);

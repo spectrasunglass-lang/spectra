@@ -5,7 +5,7 @@ import React, { createContext, useContext, useEffect, useState, useCallback } fr
 export interface CartItem {
   id: string;
   name: string;
-  subtitle: string;
+  subtitle?: string;
   price: number;
   image_url: string | null;
   slug: string;
