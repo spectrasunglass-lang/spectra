@@ -1,0 +1,229 @@
+"use client";
+
+import React, { useState } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { ArrowRight, Check, Mail, Phone } from "lucide-react";
+
+export default function Footer() {
+  const [email, setEmail] = useState("");
+  const [subscribed, setSubscribed] = useState(false);
+
+  const handleSubscribe = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) return;
+    setSubscribed(true);
+    setTimeout(() => {
+      setEmail("");
+      setSubscribed(false);
+    }, 4000);
+  };
+
+  return (
+    <footer className="relative bg-[#070707] text-white border-t border-white/[0.08] overflow-hidden">
+      {/* Top Gold Hairline */}
+      <div className="h-[2px] w-full bg-gradient-to-r from-transparent via-[#c8874a] to-transparent" />
+
+      {/* Main Footer Container */}
+      <div className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 pt-16 pb-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 lg:gap-8 pb-14 border-b border-white/[0.06]">
+          
+          {/* Brand & Newsletter Column */}
+          <div className="lg:col-span-2 space-y-6">
+            <Link href="/" className="inline-block hover:opacity-80 transition-opacity">
+              <Image
+                src="/logo/logo.png"
+                alt="SPECTRA"
+                width={150}
+                height={40}
+                className="h-8 w-auto object-contain brightness-0 invert"
+                priority
+              />
+            </Link>
+
+            <p className="text-neutral-400 text-[13px] leading-relaxed max-w-sm">
+              Crafted for visionaries. Designed to stand apart. Luxury handcrafted eyewear combining timeless aesthetics with precision optical performance.
+            </p>
+
+            {/* Newsletter Subscription */}
+            <div className="pt-2">
+              <p className="text-[11px] font-bold tracking-[0.2em] uppercase text-white mb-2.5">
+                Join The Inner Circle
+              </p>
+              <p className="text-[12px] text-neutral-500 mb-3.5">
+                Subscribe for exclusive private releases, bespoke drops, and VIP previews.
+              </p>
+
+              {subscribed ? (
+                <div className="flex items-center gap-2 bg-[#c8874a]/15 border border-[#c8874a]/30 text-[#e5a872] px-4 py-3 rounded-xl text-[12px] font-bold">
+                  <Check size={16} />
+                  Welcome to SPECTRA. You are now on the VIP list.
+                </div>
+              ) : (
+                <form onSubmit={handleSubscribe} className="flex items-center gap-2">
+                  <div className="relative flex-1">
+                    <input
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="Enter your email address"
+                      required
+                      className="w-full bg-[#121212] border border-white/[0.1] rounded-xl px-4 py-3 text-[12.5px] text-white placeholder-neutral-500 focus:outline-none focus:border-[#c8874a] transition-colors"
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    className="bg-[#c8874a] hover:bg-[#b87840] text-white px-5 py-3 rounded-xl text-[12px] font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all shadow-md shadow-[#c8874a]/20 flex-shrink-0 cursor-pointer"
+                  >
+                    Subscribe
+                    <ArrowRight size={14} />
+                  </button>
+                </form>
+              )}
+            </div>
+          </div>
+
+          {/* Shop Column */}
+          <div className="space-y-4">
+            <h4 className="text-[11px] font-bold tracking-[0.25em] uppercase text-[#c8874a]">
+              Shop Collections
+            </h4>
+            <ul className="space-y-2.5 text-[12.5px]">
+              {[
+                { name: "New Arrivals", href: "/new-arrivals" },
+                { name: "Men's Sunglasses", href: "/men" },
+                { name: "Women's Sunglasses", href: "/women" },
+                { name: "Polarized Lenses", href: "/polarized" },
+                { name: "All Sunglasses", href: "/sunglasses" },
+                { name: "Luxury Gift Sets", href: "/gifts" },
+              ].map((link) => (
+                <li key={link.name}>
+                  <Link
+                    href={link.href}
+                    className="text-neutral-400 hover:text-white hover:translate-x-1 transition-all inline-block duration-200"
+                  >
+                    {link.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Customer Care Column */}
+          <div className="space-y-4">
+            <h4 className="text-[11px] font-bold tracking-[0.25em] uppercase text-[#c8874a]">
+              Client Concierge
+            </h4>
+            <ul className="space-y-2.5 text-[12.5px]">
+              {[
+                { name: "Track Your Order", href: "/cart" },
+                { name: "Complimentary Shipping", href: "/about" },
+                { name: "14-Day Returns & Exchange", href: "/about" },
+                { name: "Lens Care & Warranty", href: "/about" },
+                { name: "Authenticity Guarantee", href: "/about" },
+                { name: "FAQ & Assistance", href: "/contact" },
+              ].map((link) => (
+                <li key={link.name}>
+                  <Link
+                    href={link.href}
+                    className="text-neutral-400 hover:text-white hover:translate-x-1 transition-all inline-block duration-200"
+                  >
+                    {link.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Maison & Contact Column */}
+          <div className="space-y-4">
+            <h4 className="text-[11px] font-bold tracking-[0.25em] uppercase text-[#c8874a]">
+              The Maison
+            </h4>
+            <ul className="space-y-2.5 text-[12.5px]">
+              {[
+                { name: "Our Heritage & Story", href: "/about" },
+                { name: "Optical Craftsmanship", href: "/about" },
+                { name: "Contact Concierge", href: "/contact" },
+                { name: "Admin Portal", href: "/admin" },
+              ].map((link) => (
+                <li key={link.name}>
+                  <Link
+                    href={link.href}
+                    className="text-neutral-400 hover:text-white hover:translate-x-1 transition-all inline-block duration-200"
+                  >
+                    {link.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+
+            {/* Direct Contact */}
+            <div className="pt-2 space-y-2 text-[12px] text-neutral-400">
+              <div className="flex items-center gap-2">
+                <Mail size={13} className="text-[#c8874a]" />
+                <a href="mailto:concierge@spectrasunglass.com" className="hover:text-white transition-colors">
+                  concierge@spectrasunglass.com
+                </a>
+              </div>
+              <div className="flex items-center gap-2">
+                <Phone size={13} className="text-[#c8874a]" />
+                <a href="tel:+919876543210" className="hover:text-white transition-colors">
+                  +91 98765 43210
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom Bar: Copyright & Payment Badges */}
+        <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-neutral-500">
+          <div className="flex items-center gap-6">
+            <p>&copy; {new Date().getFullYear()} SPECTRA Eyewear. All rights reserved.</p>
+            <div className="hidden sm:flex items-center gap-4">
+              <Link href="/about" className="hover:text-neutral-300 transition-colors">Privacy Policy</Link>
+              <span>•</span>
+              <Link href="/about" className="hover:text-neutral-300 transition-colors">Terms of Service</Link>
+            </div>
+          </div>
+
+          {/* Social Links & Payment Pill */}
+          <div className="flex items-center gap-4">
+            <a
+              href="https://instagram.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-8 h-8 rounded-lg bg-[#141414] border border-white/[0.08] flex items-center justify-center text-neutral-400 hover:text-white hover:border-[#c8874a]/50 transition-colors"
+              aria-label="Instagram"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect width="20" height="20" x="2" y="2" rx="5" ry="5"/>
+                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+                <line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/>
+              </svg>
+            </a>
+            <a
+              href="https://facebook.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-8 h-8 rounded-lg bg-[#141414] border border-white/[0.08] flex items-center justify-center text-neutral-400 hover:text-white hover:border-[#c8874a]/50 transition-colors"
+              aria-label="Facebook"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
+              </svg>
+            </a>
+
+            <div className="flex items-center gap-1.5 px-3 py-1 bg-[#121212] border border-white/[0.06] rounded-lg text-[10px] text-neutral-400 font-bold uppercase tracking-wider">
+              <span>UPI</span>
+              <span>•</span>
+              <span>CARDS</span>
+              <span>•</span>
+              <span>NET BANKING</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+  );
+}
