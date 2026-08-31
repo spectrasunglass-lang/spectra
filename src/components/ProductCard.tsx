@@ -31,6 +31,7 @@ export interface ProductCardProps {
   shape?: string;
   category?: string;
   product?: Product;
+  variant?: "default" | "classic";
 }
 
 export function ProductCard(props: ProductCardProps) {
@@ -47,6 +48,7 @@ export function ProductCard(props: ProductCardProps) {
     category: props.category,
   };
 
+  const variant = props.variant || "default";
   const { addItem } = useCart();
   const [added, setAdded] = useState(false);
 
@@ -65,11 +67,100 @@ export function ProductCard(props: ProductCardProps) {
     setTimeout(() => setAdded(false), 2000);
   };
 
-  // Determine badge text and background
+  const discount =
+    p.compare_price && p.compare_price > p.price
+      ? Math.round(((p.compare_price - p.price) / p.compare_price) * 100)
+      : null;
+
+  // ── CLASSIC / OLD STYLE (Used in New Arrivals) ──
+  if (variant === "classic") {
+    return (
+      <Link href={`/products/${p.slug}`} className="group block h-full">
+        <div className="relative flex flex-col h-full overflow-hidden rounded-sm bg-white border border-neutral-200/80 hover:border-[#c8874a]/60 hover:shadow-xl hover:shadow-black/[0.06]">
+          {/* Product Image Area */}
+          <div className="relative aspect-square w-full bg-white overflow-hidden flex items-center justify-center p-6">
+            {p.image_url ? (
+              <Image
+                src={p.image_url}
+                alt={p.name}
+                fill
+                sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                className="object-contain p-4 transition-transform duration-500 group-hover:scale-105"
+              />
+            ) : (
+              <div className="flex items-center justify-center w-full h-full bg-neutral-50 text-neutral-300">
+                <ShoppingBag size={36} />
+              </div>
+            )}
+
+            {/* Badges */}
+            <div className="absolute top-3 left-3 flex items-center gap-1.5 z-10">
+              {p.is_new && (
+                <span className="text-[9px] font-bold tracking-[0.15em] px-2 py-0.5 bg-[#c8874a] text-white rounded-sm uppercase shadow-sm">
+                  NEW
+                </span>
+              )}
+              {discount && (
+                <span className="text-[9px] font-bold px-2 py-0.5 bg-red-600 text-white rounded-sm shadow-sm">
+                  -{discount}%
+                </span>
+              )}
+            </div>
+
+            {/* Add to Cart slide-up button on hover */}
+            <div className="absolute inset-x-0 bottom-0 translate-y-full group-hover:translate-y-0 transition-transform duration-300 z-20">
+              <button
+                onClick={handleAddToCart}
+                className={`w-full py-3 flex items-center justify-center gap-2 text-[11px] font-bold tracking-wider uppercase transition-all duration-200 shadow-md ${
+                  added
+                    ? "bg-emerald-600 text-white"
+                    : "bg-[#0a0a0a] text-white hover:bg-[#c8874a]"
+                }`}
+              >
+                {added ? (
+                  <>
+                    <Check size={14} /> Added to Cart!
+                  </>
+                ) : (
+                  <>
+                    <ShoppingBag size={14} /> Add to Cart
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+
+          {/* Product Details */}
+          <div className="p-4 flex flex-col flex-1 justify-between bg-white">
+            <div>
+              <h3 className="text-[13px] font-bold text-neutral-900 truncate group-hover:text-[#c8874a] transition-colors uppercase tracking-wide">
+                {p.name}
+              </h3>
+              <p className="text-[11px] text-neutral-500 mt-0.5 truncate">
+                {p.subtitle || "Handcrafted Luxury"}
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2 mt-3 pt-2 border-t border-neutral-100/80">
+              <span className="text-[14px] font-bold text-neutral-900">
+                ₹{p.price.toLocaleString("en-IN")}
+              </span>
+              {p.compare_price && p.compare_price > p.price && (
+                <span className="text-[12px] text-neutral-400 line-through">
+                  ₹{p.compare_price.toLocaleString("en-IN")}
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
+      </Link>
+    );
+  }
+
+  // ── DEFAULT / SUNGLASS-HUT STYLE (Used in All Products and Collections) ──
   const isLowStock = !p.is_new && p.compare_price && p.compare_price > p.price;
   const isNew = Boolean(p.is_new);
 
-  // Determine top category / shape label (e.g. OVAL / M, RECTANGLE / M)
   const tagLabel = p.shape
     ? `${p.shape.toUpperCase()} / M`
     : p.category

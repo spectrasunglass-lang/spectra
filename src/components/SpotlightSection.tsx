@@ -3,7 +3,6 @@
 import React, { useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ChevronLeft, ChevronRight, ArrowUpRight } from "lucide-react";
 import { SpotlightCard, SpotlightHeading } from "@/types/campaign";
 
 interface SpotlightSectionProps {
@@ -30,18 +29,8 @@ export default function SpotlightSection({
     heading.subtitle ||
     "Explore signature handcrafted silhouettes captured in our latest visual concepts.";
 
-  const handleScroll = (direction: "left" | "right") => {
-    if (scrollContainerRef.current) {
-      const scrollAmount = 340;
-      scrollContainerRef.current.scrollBy({
-        left: direction === "left" ? -scrollAmount : scrollAmount,
-        behavior: "smooth",
-      });
-    }
-  };
-
   return (
-    <section className="bg-white py-14 md:py-20 border-b border-neutral-100 overflow-hidden select-none">
+    <section className="bg-white py-14 md:py-20 overflow-hidden select-none">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Header row */}
@@ -56,26 +45,6 @@ export default function SpotlightSection({
               </p>
             )}
           </div>
-
-          {/* Navigation Controls */}
-          {activeCards.length > 1 && (
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => handleScroll("left")}
-                aria-label="Previous story"
-                className="w-8 h-8 rounded-full border border-neutral-200 bg-white hover:bg-neutral-100 text-neutral-700 hover:text-black flex items-center justify-center transition-all shadow-sm active:scale-95 cursor-pointer"
-              >
-                <ChevronLeft size={16} />
-              </button>
-              <button
-                onClick={() => handleScroll("right")}
-                aria-label="Next story"
-                className="w-8 h-8 rounded-full border border-neutral-200 bg-white hover:bg-neutral-100 text-neutral-700 hover:text-black flex items-center justify-center transition-all shadow-sm active:scale-95 cursor-pointer"
-              >
-                <ChevronRight size={16} />
-              </button>
-            </div>
-          )}
         </div>
 
         {/* Scrollable Story Cards Track (Up to 8+ scrollable items, hidden scrollbar) */}
@@ -117,14 +86,6 @@ export default function SpotlightSection({
                     )}
                   </div>
                 )}
-
-                {/* Bottom CTA Pill on Hover */}
-                <div className="absolute bottom-6 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0 z-10">
-                  <span className="inline-flex items-center gap-1.5 bg-white/95 backdrop-blur-md text-neutral-900 text-[10.5px] font-bold tracking-[0.2em] uppercase px-4 py-2 rounded-full shadow-xl border border-white">
-                    Explore Drop
-                    <ArrowUpRight size={13} className="text-[#c8874a]" />
-                  </span>
-                </div>
               </Link>
             );
           })}

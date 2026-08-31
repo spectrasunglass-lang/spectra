@@ -24,8 +24,9 @@ export default function RootLayout({
     <html
       lang="en"
       className={`${quicksand.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
-      <body className="h-full font-sans">
+      <body className="h-full font-sans" suppressHydrationWarning>
         {children}
       </body>
     </html>
