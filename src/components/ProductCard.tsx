@@ -202,27 +202,27 @@ export function ProductCard(props: ProductCardProps) {
             </div>
           ) : null}
 
-          {/* Bottom Variant / Carousel Indicator Dots */}
-          <div className="absolute bottom-2.5 inset-x-0 flex items-center justify-center gap-1 pointer-events-none">
-            <span className="w-3.5 h-[3px] rounded-full bg-[#d27558]" />
-            <span className="w-[3.5px] h-[3.5px] rounded-full bg-neutral-300" />
-            <span className="w-[3.5px] h-[3.5px] rounded-full bg-neutral-300" />
-            <span className="w-[3.5px] h-[3.5px] rounded-full bg-neutral-300" />
-            <span className="w-[3.5px] h-[3.5px] rounded-full bg-neutral-300" />
+          {/* Add to Cart slide-up button on hover */}
+          <div className="absolute inset-x-0 bottom-0 translate-y-full group-hover:translate-y-0 transition-transform duration-300 z-20">
+            <button
+              onClick={handleAddToCart}
+              className={`w-full py-2.5 sm:py-3 flex items-center justify-center gap-2 text-[10.5px] sm:text-[11px] font-bold tracking-wider uppercase transition-all duration-200 shadow-md ${
+                added
+                  ? "bg-emerald-600 text-white"
+                  : "bg-[#0a0a0a] text-white hover:bg-[#c8874a]"
+              }`}
+            >
+              {added ? (
+                <>
+                  <Check size={14} /> Added to Cart!
+                </>
+              ) : (
+                <>
+                  <ShoppingBag size={14} /> Add to Cart
+                </>
+              )}
+            </button>
           </div>
-
-          {/* Quick Add To Cart Floating Action (Bottom Right) */}
-          <button
-            onClick={handleAddToCart}
-            aria-label="Add to cart"
-            className={`absolute bottom-2.5 right-2.5 z-10 w-7 h-7 rounded-full flex items-center justify-center transition-all cursor-pointer shadow-sm ${
-              added
-                ? "bg-emerald-600 text-white"
-                : "bg-black/5 hover:bg-black text-neutral-500 hover:text-white backdrop-blur-sm"
-            }`}
-          >
-            {added ? <Check size={12} className="stroke-[2.5]" /> : <ShoppingBag size={12} />}
-          </button>
         </div>
 
         {/* Product Details Section Below Image */}

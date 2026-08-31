@@ -15,15 +15,17 @@ import {
   LogOut,
   ExternalLink,
   Sparkles,
+  Shapes,
 } from "lucide-react";
 
 const navItems = [
-  { label: "Dashboard", href: "/admin", icon: LayoutDashboard, exact: true },
-  { label: "Products", href: "/admin/products", icon: Package, exact: false },
-  { label: "Orders", href: "/admin/orders", icon: ShoppingBag, exact: false },
-  { label: "Campaigns", href: "/admin/campaigns", icon: Sparkles, exact: false },
-  { label: "Media", href: "/admin/media", icon: ImageIcon, exact: false },
-  { label: "Settings", href: "/admin/settings", icon: Settings, exact: false },
+  { label: "Dashboard",  href: "/admin",            icon: LayoutDashboard, exact: true  },
+  { label: "Products",   href: "/admin/products",   icon: Package,         exact: false },
+  { label: "Orders",     href: "/admin/orders",     icon: ShoppingBag,     exact: false },
+  { label: "Campaigns",  href: "/admin/campaigns",  icon: Sparkles,        exact: false },
+  { label: "Categories", href: "/admin/categories", icon: Shapes,          exact: false },
+  { label: "Media",      href: "/admin/media",      icon: ImageIcon,       exact: false },
+  { label: "Settings",   href: "/admin/settings",   icon: Settings,        exact: false },
 ];
 
 export default function AdminSidebar() {
