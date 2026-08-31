@@ -53,6 +53,7 @@ export default async function Home() {
         "story_image",
         "spotlight_stories",
         "spotlight_heading",
+        "category_shapes",
       ]),
   ]);
 
@@ -109,14 +110,27 @@ export default async function Home() {
     try {
       const parsed = JSON.parse(settingsMap.spotlight_stories);
       if (Array.isArray(parsed)) spotlightCards = parsed;
-    } catch {}
+    } catch { }
   }
 
   let spotlightHeading: SpotlightHeading = {};
   if (settingsMap.spotlight_heading) {
     try {
       spotlightHeading = JSON.parse(settingsMap.spotlight_heading);
-    } catch {}
+    } catch { }
+  }
+
+  // Build slug → image_url map from admin-managed category_shapes JSON
+  const categoryIconUrls: Record<string, string> = {};
+  if (settingsMap.category_shapes) {
+    try {
+      const cats = JSON.parse(settingsMap.category_shapes);
+      if (Array.isArray(cats)) {
+        cats.forEach((c: { slug?: string; image_url?: string }) => {
+          if (c.slug && c.image_url) categoryIconUrls[c.slug] = c.image_url;
+        });
+      }
+    } catch { }
   }
 
   return (
@@ -125,9 +139,9 @@ export default async function Home() {
       <HeroSection slides={heroSlides} />
 
       {/* 2. Shop By Shape */}
-      <ShopByShapeSection />
+      <ShopByShapeSection iconUrls={categoryIconUrls} />
 
-  
+
 
       {/* 4. New Arrivals */}
       <NewArrivalsSection products={newArrivals} />
@@ -135,7 +149,7 @@ export default async function Home() {
       {/* 5. Our Story */}
       <OurStorySection storyImageUrl={storyImage} />
 
-          {/* 3. Editorial Spotlight / Campaigns Section */}
+      {/* 3. Editorial Spotlight / Campaigns Section */}
       <SpotlightSection cards={spotlightCards} heading={spotlightHeading} />
 
       {/* 6. All Products (Initial 8, scroll loads next 8) */}
