@@ -62,11 +62,11 @@ export default function StatsCard({
 
   return (
     <div
-      className={`relative overflow-hidden rounded-2xl border p-5 flex flex-col gap-4 transition-all duration-300 hover:shadow-xl hover:shadow-black/50 hover:-translate-y-0.5 ${v.wrapper} ${v.border}`}
+      className={`relative overflow-hidden rounded-sm border p-5 flex flex-col gap-4 transition-all duration-300 hover:shadow-xl hover:shadow-black/50 hover:-translate-y-0.5 ${v.wrapper} ${v.border}`}
     >
       {/* Top row */}
       <div className="flex items-start justify-between">
-        <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${v.iconBg}`}>
+        <div className={`w-10 h-10 rounded-sm flex items-center justify-center flex-shrink-0 ${v.iconBg}`}>
           <span className={v.iconColor}>{icon}</span>
         </div>
         {change !== undefined && (

@@ -102,7 +102,7 @@ export default function SettingsPage() {
         </div>
         <button
           onClick={loadSettings}
-          className="w-9 h-9 flex items-center justify-center rounded-xl border border-white/[0.08] bg-[#161616] hover:bg-[#202020] text-white/60 hover:text-white transition-colors"
+          className="w-9 h-9 flex items-center justify-center rounded-sm border border-white/[0.08] bg-[#161616] hover:bg-[#202020] text-white/60 hover:text-white transition-colors"
           title="Reload from database"
         >
           <RefreshCw size={14} />
@@ -190,7 +190,7 @@ export default function SettingsPage() {
 
         {/* Error */}
         {error && (
-          <div className="bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3 text-[12px] text-red-400">{error}</div>
+          <div className="bg-red-500/10 border border-red-500/20 rounded-sm px-4 py-3 text-[12px] text-red-400">{error}</div>
         )}
 
         {/* Save */}
@@ -198,7 +198,7 @@ export default function SettingsPage() {
           <button
             type="submit"
             disabled={saving || saved}
-            className={`inline-flex items-center gap-2 px-6 py-3.5 rounded-xl text-[13px] font-bold transition-all duration-200 shadow-md ${
+            className={`inline-flex items-center gap-2 px-6 py-3.5 rounded-sm text-[13px] font-bold transition-all duration-200 shadow-md ${
               saved ? "bg-emerald-600 text-white shadow-emerald-900/30" : "bg-[#c8874a] hover:bg-[#b87840] text-white shadow-[#c8874a]/20"
             } disabled:opacity-70`}
           >
@@ -213,7 +213,7 @@ export default function SettingsPage() {
 // ── Shared helpers ──────────────────────────────────────────────────────────────
 function Section({ title, icon, children }: { title: string; icon: React.ReactNode; children: React.ReactNode }) {
   return (
-    <div className="bg-[#111111] rounded-2xl border border-white/[0.07] p-6 space-y-5 shadow-xl shadow-black/40">
+    <div className="bg-[#111111] rounded-sm border border-white/[0.07] p-6 space-y-5 shadow-xl shadow-black/40">
       <div className="flex items-center gap-2.5 border-b border-white/[0.06] pb-4">
         <span className="text-[#c8874a]">{icon}</span>
         <h2 className="text-[14px] font-bold text-white">{title}</h2>
@@ -234,12 +234,12 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 
 function IconInput({ icon, children }: { icon: React.ReactNode; children: React.ReactNode }) {
   return (
-    <div className="flex items-center rounded-xl border border-white/[0.08] bg-[#161616] focus-within:border-[#c8874a] overflow-hidden transition-colors">
+    <div className="flex items-center rounded-sm border border-white/[0.08] bg-[#161616] focus-within:border-[#c8874a] overflow-hidden transition-colors">
       <span className="px-3.5 py-2.5 bg-[#121212] border-r border-white/[0.08]">{icon}</span>
       {children}
     </div>
   );
 }
 
-const inputCls = "w-full px-3.5 py-2.5 rounded-xl border border-white/[0.08] focus:border-[#c8874a] focus:outline-none text-[13px] text-white placeholder-white/30 bg-[#161616] transition-colors";
-const selectCls = "w-full px-3.5 py-2.5 rounded-xl border border-white/[0.08] focus:border-[#c8874a] focus:outline-none text-[13px] text-white bg-[#161616] transition-colors cursor-pointer";
+const inputCls = "w-full px-3.5 py-2.5 rounded-sm border border-white/[0.08] focus:border-[#c8874a] focus:outline-none text-[13px] text-white placeholder-white/30 bg-[#161616] transition-colors";
+const selectCls = "w-full px-3.5 py-2.5 rounded-sm border border-white/[0.08] focus:border-[#c8874a] focus:outline-none text-[13px] text-white bg-[#161616] transition-colors cursor-pointer";

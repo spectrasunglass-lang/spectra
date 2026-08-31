@@ -104,7 +104,7 @@ export default function OrdersPage() {
               <button
                 key={s}
                 onClick={() => setStatusFilter(s)}
-                className={`px-3 py-1.5 rounded-full text-[11px] font-bold capitalize border transition-colors ${
+                className={`px-3 py-1.5 rounded-sm text-[11px] font-bold capitalize border transition-colors ${
                   statusFilter === s
                     ? "border-[#c8874a] bg-[#c8874a]/15 text-[#c8874a]"
                     : "border-white/[0.08] text-white/50 hover:border-white/[0.2] hover:text-white"
@@ -116,7 +116,7 @@ export default function OrdersPage() {
           </div>
           <button
             onClick={fetchOrders}
-            className="w-9 h-9 flex items-center justify-center rounded-xl border border-white/[0.08] bg-[#161616] hover:bg-[#202020] text-white/60 hover:text-white transition-colors"
+            className="w-9 h-9 flex items-center justify-center rounded-sm border border-white/[0.08] bg-[#161616] hover:bg-[#202020] text-white/60 hover:text-white transition-colors"
             title="Refresh"
           >
             <RefreshCw size={14} className={loading ? "animate-spin" : ""} />
@@ -125,8 +125,8 @@ export default function OrdersPage() {
       </div>
 
       {/* Toolbar */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 bg-[#111111] rounded-2xl border border-white/[0.07] px-5 py-4 shadow-xl shadow-black/40">
-        <div className="flex items-center gap-2 bg-[#161616] border border-white/[0.08] rounded-xl px-3.5 py-2.5 w-full sm:w-80 focus-within:border-[#c8874a] focus-within:bg-[#1a1a1a] transition-all">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 bg-[#111111] rounded-sm border border-white/[0.07] px-5 py-4 shadow-xl shadow-black/40">
+        <div className="flex items-center gap-2 bg-[#161616] border border-white/[0.08] rounded-sm px-3.5 py-2.5 w-full sm:w-80 focus-within:border-[#c8874a] focus-within:bg-[#1a1a1a] transition-all">
           <Search size={14} className="text-white/40 flex-shrink-0" />
           <input
             type="text"
@@ -141,7 +141,7 @@ export default function OrdersPage() {
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value as OrderStatus | "all")}
-            className="text-[12px] font-semibold text-white bg-[#161616] border border-white/[0.08] rounded-xl px-3 py-2.5 outline-none focus:border-[#c8874a] transition-colors cursor-pointer"
+            className="text-[12px] font-semibold text-white bg-[#161616] border border-white/[0.08] rounded-sm px-3 py-2.5 outline-none focus:border-[#c8874a] transition-colors cursor-pointer"
           >
             {statusOptions.map((o) => (
               <option key={o.value} value={o.value} className="bg-[#181818] text-white">
@@ -153,7 +153,7 @@ export default function OrdersPage() {
       </div>
 
       {/* Orders Table */}
-      <div className="bg-[#111111] rounded-2xl border border-white/[0.07] overflow-hidden shadow-xl shadow-black/40">
+      <div className="bg-[#111111] rounded-sm border border-white/[0.07] overflow-hidden shadow-xl shadow-black/40">
         {loading ? (
           <div className="flex items-center justify-center py-20 gap-3">
             <Loader2 size={20} className="animate-spin text-[#c8874a]" />
@@ -161,7 +161,7 @@ export default function OrdersPage() {
           </div>
         ) : filtered.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 gap-4">
-            <div className="w-16 h-16 rounded-2xl bg-[#161616] border border-white/[0.06] flex items-center justify-center">
+            <div className="w-16 h-16 rounded-sm bg-[#161616] border border-white/[0.06] flex items-center justify-center">
               <ShoppingBag size={28} className="text-white/20" />
             </div>
             <div className="text-center">
@@ -238,7 +238,7 @@ export default function OrdersPage() {
                                   key={s}
                                   onClick={(e) => { e.stopPropagation(); updateStatus(order.id, s); }}
                                   disabled={updatingId === order.id}
-                                  className="px-3.5 py-2 text-[11px] font-bold capitalize rounded-xl border border-[#c8874a]/40 text-[#c8874a] hover:bg-[#c8874a] hover:text-white hover:border-[#c8874a] transition-all flex items-center gap-1.5 disabled:opacity-50"
+                                  className="px-3.5 py-2 text-[11px] font-bold capitalize rounded-sm border border-[#c8874a]/40 text-[#c8874a] hover:bg-[#c8874a] hover:text-white hover:border-[#c8874a] transition-all flex items-center gap-1.5 disabled:opacity-50"
                                 >
                                   {updatingId === order.id && <Loader2 size={11} className="animate-spin" />}
                                   Mark as {s}

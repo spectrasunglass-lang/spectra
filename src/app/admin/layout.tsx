@@ -20,7 +20,7 @@ export default function AdminLayout({
       {/* Main Content Area */}
       <div className="flex flex-col flex-1 min-w-0 overflow-hidden bg-[#080808]">
         <AdminHeader />
-        <main className="flex-1 overflow-y-auto p-6 lg:p-8 bg-[#0a0a0a]">
+        <main className="flex-1 overflow-y-auto no-scrollbar p-6 lg:p-8 bg-[#0a0a0a]">
           {children}
         </main>
       </div>

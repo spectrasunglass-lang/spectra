@@ -73,7 +73,7 @@ export default function HeroSection({
 
   return (
     <section
-      className="relative w-full min-h-[85vh] sm:min-h-[75vh] md:min-h-[56vw] lg:min-h-[640px] xl:min-h-[720px] bg-[#0a0a0a] overflow-hidden flex flex-col justify-end md:justify-center group/hero select-none"
+      className="relative w-full min-h-[calc(100dvh-60px)] sm:min-h-[calc(100dvh-64px)] bg-[#0a0a0a] overflow-hidden flex flex-col justify-end md:justify-center group/hero select-none"
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
@@ -149,39 +149,6 @@ export default function HeroSection({
         </>
       )}
 
-      {/* Vertical Connected Slide Number Line (Exact Match to Design) */}
-      {totalSlides > 1 && (
-        <div className="absolute left-6 lg:left-10 top-1/2 -translate-y-1/2 z-20 hidden md:flex flex-col items-center">
-          {slideList.map((_, i) => (
-            <React.Fragment key={i}>
-              <button
-                onClick={() => setActiveSlide(i)}
-                aria-label={`Slide ${i + 1}`}
-                className="py-1 cursor-pointer group flex items-center"
-              >
-                <span
-                  className={`text-[10px] font-bold tracking-widest transition-all duration-300 ${
-                    activeSlide === i
-                      ? "text-white scale-110"
-                      : "text-white/30 group-hover:text-white/70"
-                  }`}
-                >
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-              </button>
-
-              {/* Vertical connecting line */}
-              {i < slideList.length - 1 && (
-                <div
-                  className={`w-[1.5px] h-7 transition-colors duration-300 ${
-                    activeSlide === i ? "bg-[#c8874a]" : "bg-white/15"
-                  }`}
-                />
-              )}
-            </React.Fragment>
-          ))}
-        </div>
-      )}
 
       {/* Hero content */}
       <div className="relative z-20 w-full max-w-7xl mx-auto px-5 sm:px-10 lg:px-20 pb-14 pt-20 md:py-20">
@@ -257,32 +224,6 @@ export default function HeroSection({
               aria-label={`Go to slide ${i + 1}`}
               className="relative h-1.5 rounded-full overflow-hidden transition-all duration-200 bg-white/25 cursor-pointer"
               style={{ width: activeSlide === i ? "24px" : "6px" }}
-            >
-              {activeSlide === i && (
-                <span
-                  key={activeSlide}
-                  className="absolute inset-0 bg-[#c8874a] rounded-full animate-slide-progress"
-                  style={{
-                    animationDuration: `${autoSlideInterval}ms`,
-                    animationTimingFunction: "linear",
-                  }}
-                />
-              )}
-            </button>
-          ))}
-        </div>
-      )}
-
-      {/* Desktop Bottom Progress Bars */}
-      {totalSlides > 1 && (
-        <div className="absolute bottom-8 left-20 z-20 hidden md:flex items-center gap-3">
-          {slideList.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => setActiveSlide(i)}
-              aria-label={`Go to slide ${i + 1}`}
-              className="relative h-1 rounded-full overflow-hidden transition-all duration-200 bg-white/25 hover:bg-white/40 cursor-pointer"
-              style={{ width: activeSlide === i ? "40px" : "14px" }}
             >
               {activeSlide === i && (
                 <span

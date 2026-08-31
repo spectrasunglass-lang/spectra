@@ -31,7 +31,7 @@ export default async function AdminDashboard() {
     { data: chartData },
   ] = await Promise.all([
     supabase.from("products").select("*", { count: "exact", head: true }),
-    supabase.from("orders").select("amount, status, created_at"),
+    supabase.from("orders").select("amount, status, created_at, customer_email"),
     supabase
       .from("orders")
       .select("id, customer_name, customer_email, product_name, amount, status, created_at")
@@ -101,7 +101,7 @@ export default async function AdminDashboard() {
         </div>
         <Link
           href="/admin/products/new"
-          className="inline-flex items-center gap-2 bg-[#c8874a] hover:bg-[#b87840] text-white text-[12px] font-bold px-4 py-2.5 rounded-xl transition-all duration-200 shadow-lg shadow-[#c8874a]/20"
+          className="inline-flex items-center gap-2 bg-[#c8874a] hover:bg-[#b87840] text-white text-[12px] font-bold px-4 py-2.5 rounded-sm transition-all duration-200 shadow-lg shadow-[#c8874a]/20"
         >
           <Plus size={14} />
           Add Product
@@ -118,13 +118,13 @@ export default async function AdminDashboard() {
       {/* Chart + Quick Actions */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Revenue Chart */}
-        <div className="lg:col-span-2 bg-[#111111] rounded-2xl border border-white/[0.07] p-6 shadow-xl shadow-black/40">
+        <div className="lg:col-span-2 bg-[#111111] rounded-sm border border-white/[0.07] p-6 shadow-xl shadow-black/40">
           <div className="flex items-center justify-between mb-6">
             <div>
               <h2 className="text-[15px] font-bold text-white">Revenue Overview</h2>
               <p className="text-[12px] text-white/40 mt-0.5">Last 7 days revenue performance</p>
             </div>
-            <div className="flex items-center gap-1.5 text-[11px] font-bold text-[#c8874a] bg-[#c8874a]/10 border border-[#c8874a]/20 px-2.5 py-1.5 rounded-full">
+            <div className="flex items-center gap-1.5 text-[11px] font-bold text-[#c8874a] bg-[#c8874a]/10 border border-[#c8874a]/20 px-2.5 py-1.5 rounded-sm">
               <TrendingUp size={11} />
               Live data
             </div>
@@ -137,7 +137,7 @@ export default async function AdminDashboard() {
                   <div className="w-full flex flex-col justify-end" style={{ height: "112px" }}>
                     <div
                       title={fmt(val)}
-                      className="w-full rounded-t-lg bg-gradient-to-t from-[#8c5626] to-[#c8874a] opacity-80 hover:opacity-100 transition-opacity cursor-pointer shadow-sm shadow-[#c8874a]/20"
+                      className="w-full rounded-t-sm bg-gradient-to-t from-[#8c5626] to-[#c8874a] opacity-80 hover:opacity-100 transition-opacity cursor-pointer shadow-sm shadow-[#c8874a]/20"
                       style={{ height: `${Math.max(pct, 6)}%` }}
                     />
                   </div>
@@ -154,7 +154,7 @@ export default async function AdminDashboard() {
         </div>
 
         {/* Quick Actions */}
-        <div className="bg-[#111111] rounded-2xl border border-white/[0.07] p-6 flex flex-col gap-3 shadow-xl shadow-black/40">
+        <div className="bg-[#111111] rounded-sm border border-white/[0.07] p-6 flex flex-col gap-3 shadow-xl shadow-black/40">
           <h2 className="text-[15px] font-bold text-white mb-2">Quick Actions</h2>
           {[
             { label: "Add New Product", href: "/admin/products/new", icon: <Package size={15} />, desc: "Create product listing" },
@@ -164,9 +164,9 @@ export default async function AdminDashboard() {
             <Link
               key={a.href}
               href={a.href}
-              className="flex items-center gap-3 p-3.5 rounded-xl border border-white/[0.06] bg-[#161616] hover:border-[#c8874a]/40 hover:bg-[#1a1a1a] transition-all group"
+              className="flex items-center gap-3 p-3.5 rounded-sm border border-white/[0.06] bg-[#161616] hover:border-[#c8874a]/40 hover:bg-[#1a1a1a] transition-all group"
             >
-              <div className="w-9 h-9 rounded-xl bg-[#222222] text-[#c8874a] flex items-center justify-center flex-shrink-0 group-hover:bg-[#c8874a] group-hover:text-white transition-colors">
+              <div className="w-9 h-9 rounded-sm bg-[#222222] text-[#c8874a] flex items-center justify-center flex-shrink-0 group-hover:bg-[#c8874a] group-hover:text-white transition-colors">
                 {a.icon}
               </div>
               <div className="flex-1 min-w-0">
@@ -182,7 +182,7 @@ export default async function AdminDashboard() {
       {/* Recent Orders + Top Products */}
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
         {/* Recent Orders */}
-        <div className="lg:col-span-3 bg-[#111111] rounded-2xl border border-white/[0.07] overflow-hidden shadow-xl shadow-black/40">
+        <div className="lg:col-span-3 bg-[#111111] rounded-sm border border-white/[0.07] overflow-hidden shadow-xl shadow-black/40">
           <div className="flex items-center justify-between px-6 py-4 border-b border-white/[0.06]">
             <h2 className="text-[15px] font-bold text-white">Recent Orders</h2>
             <Link href="/admin/orders" className="text-[11px] font-bold text-[#c8874a] hover:underline flex items-center gap-1">
@@ -191,7 +191,7 @@ export default async function AdminDashboard() {
           </div>
           {!recentOrders || recentOrders.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-14 gap-3">
-              <div className="w-12 h-12 rounded-2xl bg-[#161616] border border-white/[0.06] flex items-center justify-center">
+              <div className="w-12 h-12 rounded-sm bg-[#161616] border border-white/[0.06] flex items-center justify-center">
                 <ShoppingBag size={20} className="text-white/30" />
               </div>
               <p className="text-[13px] font-semibold text-white/40">No orders yet</p>
@@ -234,7 +234,7 @@ export default async function AdminDashboard() {
         </div>
 
         {/* Top Products */}
-        <div className="lg:col-span-2 bg-[#111111] rounded-2xl border border-white/[0.07] overflow-hidden shadow-xl shadow-black/40">
+        <div className="lg:col-span-2 bg-[#111111] rounded-sm border border-white/[0.07] overflow-hidden shadow-xl shadow-black/40">
           <div className="flex items-center justify-between px-6 py-4 border-b border-white/[0.06]">
             <h2 className="text-[15px] font-bold text-white">Top Products</h2>
             <Link href="/admin/products" className="text-[11px] font-bold text-[#c8874a] hover:underline flex items-center gap-1">
@@ -243,7 +243,7 @@ export default async function AdminDashboard() {
           </div>
           {!topProducts || topProducts.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-14 gap-3">
-              <div className="w-12 h-12 rounded-2xl bg-[#161616] border border-white/[0.06] flex items-center justify-center">
+              <div className="w-12 h-12 rounded-sm bg-[#161616] border border-white/[0.06] flex items-center justify-center">
                 <Package size={20} className="text-white/30" />
               </div>
               <p className="text-[13px] font-semibold text-white/40">No products yet</p>
@@ -259,7 +259,7 @@ export default async function AdminDashboard() {
                 return (
                   <div key={i} className="flex items-center gap-3 px-5 py-3.5 hover:bg-white/[0.02] transition-colors">
                     <span className="text-[11px] font-bold text-white/30 w-4">{i + 1}</span>
-                    <div className="w-8 h-8 rounded-lg bg-[#1a1a1a] flex-shrink-0 overflow-hidden relative border border-white/[0.06]">
+                    <div className="w-8 h-8 rounded-sm bg-[#1a1a1a] flex-shrink-0 overflow-hidden relative border border-white/[0.06]">
                       {p?.image_url && (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img src={p.image_url} alt={p?.name} className="w-full h-full object-contain p-1" />

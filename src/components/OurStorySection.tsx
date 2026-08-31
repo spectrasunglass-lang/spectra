@@ -9,36 +9,33 @@ interface OurStorySectionProps {
 
 export default function OurStorySection({ storyImageUrl }: OurStorySectionProps) {
   return (
-    <section className="bg-[#0a0a0a] py-14 md:py-20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
+    <section className="bg-[#0a0a0a] py-14 md:py-24 border-b border-white/[0.06]">
+      <div className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 items-center">
           {/* Text content */}
-          <div>
-            <p className="section-label mb-4">Our Story</p>
-            <h2 className="text-white font-bold uppercase leading-[1.05] mb-5">
-              <span className="block text-3xl sm:text-4xl md:text-5xl tracking-tight">
+          <div className="w-full max-w-xl lg:max-w-2xl">
+            <p className="section-label mb-4 text-[#c8874a] text-[11px] font-bold tracking-[0.3em] uppercase">
+              Our Story
+            </p>
+            <h2 className="text-white text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold uppercase leading-[1.05] mb-5 tracking-tight">
                 BUILT TO
-              </span>
-              <span className="block text-3xl sm:text-4xl md:text-5xl tracking-tight">
                 BE SEEN
-              </span>
+             
             </h2>
-            <p className="text-neutral-400 text-sm md:text-[15px] leading-relaxed mb-6 max-w-md">
+            <p className="text-neutral-300 text-sm md:text-[16px] leading-relaxed mb-7 ">
               SPECTRA is more than eyewear.
-              <br />
+           
               It&apos;s a mindset.
-              <br />
-              Confidence in every detail.
-              <br />
+                Confidence in every detail.
+           
               Clarity in every view.
             </p>
             <Link
               href="/about"
-              className="inline-flex items-center gap-2 text-[11px] font-bold tracking-[0.2em] uppercase"
-              style={{ color: "#c8874a" }}
+              className="inline-flex items-center gap-2 text-[11px] font-bold tracking-[0.2em] uppercase text-[#c8874a] hover:text-[#d4956a] transition-colors group"
             >
               DISCOVER OUR JOURNEY
-              <ArrowRight className="w-3.5 h-3.5" />
+              <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
 

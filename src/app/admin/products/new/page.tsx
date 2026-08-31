@@ -81,7 +81,7 @@ export default function NewProductPage() {
       <div className="flex items-center gap-4">
         <Link
           href="/admin/products"
-          className="w-10 h-10 rounded-xl bg-[#141414] border border-white/[0.08] flex items-center justify-center hover:bg-[#1a1a1a] hover:border-[#c8874a]/40 transition-colors text-white/70 hover:text-white"
+          className="w-10 h-10 rounded-sm bg-[#141414] border border-white/[0.08] flex items-center justify-center hover:bg-[#1a1a1a] hover:border-[#c8874a]/40 transition-colors text-white/70 hover:text-white"
         >
           <ArrowLeft size={16} />
         </Link>
@@ -99,7 +99,7 @@ export default function NewProductPage() {
         {/* Left: Main fields */}
         <div className="lg:col-span-2 space-y-5">
           {/* Basic Info Card */}
-          <div className="bg-[#111111] rounded-2xl border border-white/[0.07] p-6 space-y-5 shadow-xl shadow-black/40">
+          <div className="bg-[#111111] rounded-sm border border-white/[0.07] p-6 space-y-5 shadow-xl shadow-black/40">
             <h2 className="text-[14px] font-bold text-white border-b border-white/[0.06] pb-4">
               Product Information
             </h2>
@@ -129,7 +129,7 @@ export default function NewProductPage() {
             </FormField>
 
             <FormField label="URL Slug">
-              <div className="flex items-center rounded-xl border border-white/[0.08] bg-[#161616] focus-within:border-[#c8874a] overflow-hidden transition-colors">
+              <div className="flex items-center rounded-sm border border-white/[0.08] bg-[#161616] focus-within:border-[#c8874a] overflow-hidden transition-colors">
                 <span className="px-3.5 text-[12px] text-white/40 bg-[#121212] border-r border-white/[0.08] py-2.5 select-none">
                   /products/
                 </span>
@@ -155,13 +155,13 @@ export default function NewProductPage() {
           </div>
 
           {/* Pricing Card */}
-          <div className="bg-[#111111] rounded-2xl border border-white/[0.07] p-6 space-y-5 shadow-xl shadow-black/40">
+          <div className="bg-[#111111] rounded-sm border border-white/[0.07] p-6 space-y-5 shadow-xl shadow-black/40">
             <h2 className="text-[14px] font-bold text-white border-b border-white/[0.06] pb-4">
               Pricing
             </h2>
             <div className="grid grid-cols-2 gap-4">
               <FormField label="Selling Price (₹)" required>
-                <div className="flex items-center rounded-xl border border-white/[0.08] bg-[#161616] focus-within:border-[#c8874a] overflow-hidden transition-colors">
+                <div className="flex items-center rounded-sm border border-white/[0.08] bg-[#161616] focus-within:border-[#c8874a] overflow-hidden transition-colors">
                   <span className="px-3.5 py-2.5 text-[13px] text-[#c8874a] bg-[#121212] border-r border-white/[0.08] font-bold">
                     ₹
                   </span>
@@ -178,7 +178,7 @@ export default function NewProductPage() {
                 </div>
               </FormField>
               <FormField label="Compare Price (₹)">
-                <div className="flex items-center rounded-xl border border-white/[0.08] bg-[#161616] focus-within:border-[#c8874a] overflow-hidden transition-colors">
+                <div className="flex items-center rounded-sm border border-white/[0.08] bg-[#161616] focus-within:border-[#c8874a] overflow-hidden transition-colors">
                   <span className="px-3.5 py-2.5 text-[13px] text-white/40 bg-[#121212] border-r border-white/[0.08]">
                     ₹
                   </span>
@@ -197,7 +197,7 @@ export default function NewProductPage() {
           </div>
 
           {/* Organisation Card */}
-          <div className="bg-[#111111] rounded-2xl border border-white/[0.07] p-6 space-y-5 shadow-xl shadow-black/40">
+          <div className="bg-[#111111] rounded-sm border border-white/[0.07] p-6 space-y-5 shadow-xl shadow-black/40">
             <h2 className="text-[14px] font-bold text-white border-b border-white/[0.06] pb-4">
               Organisation
             </h2>
@@ -235,7 +235,7 @@ export default function NewProductPage() {
         {/* Right: Image + Status */}
         <div className="space-y-5">
           {/* Product Image */}
-          <div className="bg-[#111111] rounded-2xl border border-white/[0.07] p-6 space-y-4 shadow-xl shadow-black/40">
+          <div className="bg-[#111111] rounded-sm border border-white/[0.07] p-6 space-y-4 shadow-xl shadow-black/40">
             <h2 className="text-[14px] font-bold text-white border-b border-white/[0.06] pb-4">
               Product Image
             </h2>
@@ -249,19 +249,19 @@ export default function NewProductPage() {
           </div>
 
           {/* Status & Flags */}
-          <div className="bg-[#111111] rounded-2xl border border-white/[0.07] p-6 space-y-5 shadow-xl shadow-black/40">
+          <div className="bg-[#111111] rounded-sm border border-white/[0.07] p-6 space-y-5 shadow-xl shadow-black/40">
             <h2 className="text-[14px] font-bold text-white border-b border-white/[0.06] pb-4">
               Status & Flags
             </h2>
 
             <FormField label="Visibility">
-              <div className="flex items-center gap-1 bg-[#161616] p-1 rounded-xl border border-white/[0.06]">
+              <div className="flex items-center gap-1 bg-[#161616] p-1 rounded-sm border border-white/[0.06]">
                 {(["active", "draft"] as const).map((s) => (
                   <button
                     key={s}
                     type="button"
                     onClick={() => set("status", s)}
-                    className={`flex-1 py-2 text-[11px] font-bold rounded-lg capitalize transition-all ${
+                    className={`flex-1 py-2 text-[11px] font-bold rounded-sm capitalize transition-all ${
                       form.status === s
                         ? "bg-[#c8874a] text-white shadow-sm"
                         : "text-white/40 hover:text-white"
@@ -301,7 +301,7 @@ export default function NewProductPage() {
 
           {/* Error */}
           {error && (
-            <div className="bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3 text-[12px] text-red-400 font-medium">
+            <div className="bg-red-500/10 border border-red-500/20 rounded-sm px-4 py-3 text-[12px] text-red-400 font-medium">
               {error}
             </div>
           )}
@@ -310,7 +310,7 @@ export default function NewProductPage() {
           <button
             type="submit"
             disabled={saving || saved}
-            className={`w-full flex items-center justify-center gap-2 py-3.5 rounded-xl text-[13px] font-bold transition-all duration-200 shadow-lg ${
+            className={`w-full flex items-center justify-center gap-2 py-3.5 rounded-sm text-[13px] font-bold transition-all duration-200 shadow-lg ${
               saved
                 ? "bg-emerald-600 text-white shadow-emerald-900/30"
                 : "bg-[#c8874a] hover:bg-[#b87840] text-white shadow-[#c8874a]/20"
@@ -336,7 +336,7 @@ export default function NewProductPage() {
 
           <Link
             href="/admin/products"
-            className="w-full flex items-center justify-center py-2.5 rounded-xl text-[12px] font-semibold text-white/40 hover:text-white hover:bg-white/[0.04] transition-colors"
+            className="w-full flex items-center justify-center py-2.5 rounded-sm text-[12px] font-semibold text-white/40 hover:text-white hover:bg-white/[0.04] transition-colors"
           >
             Cancel
           </Link>
@@ -368,7 +368,7 @@ function FormField({
 }
 
 const inputCls =
-  "w-full px-3.5 py-2.5 rounded-xl border border-white/[0.08] focus:border-[#c8874a] focus:outline-none text-[13px] text-white placeholder-white/30 bg-[#161616] transition-colors";
+  "w-full px-3.5 py-2.5 rounded-sm border border-white/[0.08] focus:border-[#c8874a] focus:outline-none text-[13px] text-white placeholder-white/30 bg-[#161616] transition-colors";
 
 const selectCls =
-  "w-full px-3.5 py-2.5 rounded-xl border border-white/[0.08] focus:border-[#c8874a] focus:outline-none text-[13px] text-white bg-[#161616] transition-colors cursor-pointer";
+  "w-full px-3.5 py-2.5 rounded-sm border border-white/[0.08] focus:border-[#c8874a] focus:outline-none text-[13px] text-white bg-[#161616] transition-colors cursor-pointer";

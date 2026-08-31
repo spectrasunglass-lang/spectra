@@ -69,7 +69,7 @@ export default function ImageUpload({
 
   if (value) {
     return (
-      <div className="relative group rounded-2xl overflow-hidden border border-white/[0.08] bg-[#161616]">
+      <div className="relative group rounded-sm overflow-hidden border border-white/[0.08] bg-[#161616]">
         <div className="relative aspect-square bg-[#f5f0eb]">
           <Image
             src={value}
@@ -79,7 +79,7 @@ export default function ImageUpload({
           />
         </div>
         <div className="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2.5">
-          <label className="cursor-pointer bg-[#c8874a] hover:bg-[#b87840] text-white text-[11px] font-bold px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors shadow-md">
+          <label className="cursor-pointer bg-[#c8874a] hover:bg-[#b87840] text-white text-[11px] font-bold px-3 py-1.5 rounded-sm flex items-center gap-1.5 transition-colors shadow-md">
             <Upload size={12} />
             Replace
             <input
@@ -93,7 +93,7 @@ export default function ImageUpload({
             <button
               type="button"
               onClick={onRemove}
-              className="bg-red-500 hover:bg-red-600 text-white text-[11px] font-bold px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors shadow-md"
+              className="bg-red-500 hover:bg-red-600 text-white text-[11px] font-bold px-3 py-1.5 rounded-sm flex items-center gap-1.5 transition-colors shadow-md"
             >
               <X size={12} />
               Remove
@@ -113,7 +113,7 @@ export default function ImageUpload({
         }}
         onDragLeave={() => setDragging(false)}
         onDrop={onDrop}
-        className={`flex flex-col items-center justify-center gap-3 border-2 border-dashed rounded-2xl aspect-square cursor-pointer transition-all duration-200 ${
+        className={`flex flex-col items-center justify-center gap-3 border-2 border-dashed rounded-sm aspect-square cursor-pointer transition-all duration-200 ${
           dragging
             ? "border-[#c8874a] bg-[#c8874a]/10 scale-[1.01]"
             : "border-white/[0.1] bg-[#141414] hover:border-[#c8874a]/60 hover:bg-[#181818]"
@@ -128,7 +128,7 @@ export default function ImageUpload({
           </>
         ) : (
           <>
-            <div className="w-12 h-12 rounded-xl bg-[#201c18] border border-[#c8874a]/30 flex items-center justify-center">
+            <div className="w-12 h-12 rounded-sm bg-[#201c18] border border-[#c8874a]/30 flex items-center justify-center">
               <ImagePlus size={22} className="text-[#c8874a]" />
             </div>
             <div className="text-center px-4">

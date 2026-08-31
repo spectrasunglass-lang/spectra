@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowRight, Check, Mail, Phone, ShieldCheck, Truck, RefreshCw } from "lucide-react";
+import { ArrowRight, Check, Mail, Phone } from "lucide-react";
 
 export default function Footer() {
   const [email, setEmail] = useState("");
@@ -172,39 +172,6 @@ export default function Footer() {
                   +91 98765 43210
                 </a>
               </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Value Highlights */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 py-8 border-b border-white/[0.06] text-neutral-300">
-          <div className="flex items-center gap-3.5">
-            <div className="w-10 h-10 rounded-xl bg-[#141414] border border-white/[0.08] flex items-center justify-center text-[#c8874a] flex-shrink-0">
-              <Truck size={18} />
-            </div>
-            <div>
-              <p className="text-[12px] font-bold text-white uppercase tracking-wider">Complimentary Express</p>
-              <p className="text-[11px] text-neutral-500">Free delivery on all pan-India orders</p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3.5">
-            <div className="w-10 h-10 rounded-xl bg-[#141414] border border-white/[0.08] flex items-center justify-center text-[#c8874a] flex-shrink-0">
-              <RefreshCw size={18} />
-            </div>
-            <div>
-              <p className="text-[12px] font-bold text-white uppercase tracking-wider">14-Day Seamless Returns</p>
-              <p className="text-[11px] text-neutral-500">Hassle-free pickup and full refund</p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3.5">
-            <div className="w-10 h-10 rounded-xl bg-[#141414] border border-white/[0.08] flex items-center justify-center text-[#c8874a] flex-shrink-0">
-              <ShieldCheck size={18} />
-            </div>
-            <div>
-              <p className="text-[12px] font-bold text-white uppercase tracking-wider">Certified 100% UV Protection</p>
-              <p className="text-[11px] text-neutral-500">Optically superior TAC polarized lenses</p>
             </div>
           </div>
         </div>

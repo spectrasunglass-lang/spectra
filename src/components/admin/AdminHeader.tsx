@@ -9,6 +9,7 @@ const breadcrumbMap: Record<string, string> = {
   "/admin/products": "Products",
   "/admin/products/new": "Add Product",
   "/admin/orders": "Orders",
+  "/admin/campaigns": "Campaigns",
   "/admin/media": "Media",
   "/admin/settings": "Settings",
 };
@@ -18,7 +19,7 @@ export default function AdminHeader() {
   const crumb = breadcrumbMap[pathname] ?? "Admin";
 
   return (
-    <header className="h-[60px] flex-shrink-0 flex items-center justify-between px-6 bg-[#0c0c0c] border-b border-white/[0.06] z-10">
+    <header className="h-[64px] flex-shrink-0 flex items-center justify-between px-6 bg-[#0c0c0c] border-b border-white/[0.06] z-10">
       {/* Left: Breadcrumb */}
       <div className="flex items-center gap-2">
         <span className="text-[11px] text-white/30 font-medium uppercase tracking-widest">
@@ -33,7 +34,7 @@ export default function AdminHeader() {
       {/* Right: Search + Notifications + Avatar */}
       <div className="flex items-center gap-3">
         {/* Search */}
-        <div className="hidden sm:flex items-center gap-2 bg-[#161616] border border-white/[0.08] rounded-xl px-3 py-2 w-56 group focus-within:border-[#c8874a] focus-within:bg-[#1a1a1a] transition-all">
+        <div className="hidden sm:flex items-center gap-2 bg-[#161616] border border-white/[0.08] rounded-sm px-3 py-2 w-56 group focus-within:border-[#c8874a] focus-within:bg-[#1a1a1a] transition-all">
           <Search size={14} className="text-white/40 group-focus-within:text-[#c8874a] flex-shrink-0 transition-colors" />
           <input
             type="text"
@@ -43,7 +44,7 @@ export default function AdminHeader() {
         </div>
 
         {/* Notifications */}
-        <button className="relative w-9 h-9 flex items-center justify-center rounded-xl bg-[#161616] hover:bg-[#202020] border border-white/[0.08] transition-colors text-white/60 hover:text-white">
+        <button className="relative w-9 h-9 flex items-center justify-center rounded-sm bg-[#161616] hover:bg-[#202020] border border-white/[0.08] transition-colors text-white/60 hover:text-white">
           <Bell size={16} />
           <span className="absolute top-2 right-2 w-2 h-2 bg-[#c8874a] rounded-full ring-2 ring-[#0c0c0c]" />
         </button>

@@ -37,7 +37,15 @@ export default function Navbar() {
     };
   }, [isMenuOpen]);
 
-  const mainNavItems = [
+  const desktopNavItems = [
+    { name: "HOME", href: "/" },
+    { name: "MEN", href: "/men" },
+    { name: "WOMEN", href: "/women" },
+    { name: "SUNGLASSES", href: "/sunglasses" },
+  ];
+
+  const allNavItems = [
+    { name: "HOME", href: "/" },
     { name: "NEW ARRIVALS", href: "/new-arrivals" },
     { name: "MEN", href: "/men" },
     { name: "WOMEN", href: "/women" },
@@ -59,22 +67,22 @@ export default function Navbar() {
       <header
         className={`sticky top-0 z-40 w-full transition-all duration-300 ${
           scrolled
-            ? "bg-[#0a0a0a]/98 backdrop-blur-xl border-b border-white/[0.06] shadow-2xl shadow-black/50"
-            : "bg-[#0a0a0a]/95 backdrop-blur-md border-b border-neutral-800/60"
+            ? "bg-[#0a0a0a]/98 backdrop-blur-xl shadow-2xl shadow-black/50"
+            : "bg-[#0a0a0a]/95 backdrop-blur-md"
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="relative flex items-center justify-between h-[60px] sm:h-[64px]">
+          <div className="relative flex items-center justify-between h-[60px] sm:h-20">
 
-            {/* Left Area: Hamburger on mobile, Logo on desktop */}
-            <div className="flex items-center gap-4">
+            {/* Left Area: Menubar button + Desktop Logo */}
+            <div className="flex items-center gap-3 sm:gap-4">
               <button
                 type="button"
                 onClick={() => setIsMenuOpen(true)}
-                className="md:hidden text-neutral-300 hover:text-white p-1 -ml-1 rounded transition-colors cursor-pointer"
+                className="text-neutral-300 hover:text-white p-1.5 -ml-1.5 rounded-sm hover:bg-white/[0.06] transition-colors cursor-pointer flex items-center gap-2 group"
                 aria-label="Open navigation menu"
               >
-                <Menu className="w-5 h-5 stroke-[1.5]" />
+                <Menu className="w-5 h-5 stroke-[1.5] group-hover:scale-110 transition-transform" />
               </button>
 
               {/* Desktop Logo (hidden on mobile) */}
@@ -104,55 +112,58 @@ export default function Navbar() {
               </Link>
             </div>
 
-            {/* Center Nav (desktop only) */}
-            <nav className="hidden md:flex items-center gap-7 lg:gap-9">
-              {mainNavItems.map((item) => (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className="text-[10px] lg:text-[11px] font-semibold tracking-[0.2em] text-neutral-300 hover:text-white transition-colors duration-200 uppercase py-1 relative group"
+            {/* Right Area: Nav links (desktop) + Action icons */}
+            <div className="flex items-center gap-6 sm:gap-8 text-neutral-300">
+              {/* Desktop Nav (MEN, WOMEN, SUNGLASSES) */}
+              <nav className="hidden md:flex items-center gap-6 lg:gap-8">
+                {desktopNavItems.map((item) => (
+                  <Link
+                    key={item.name}
+                    href={item.href}
+                    className="text-[10.5px] lg:text-[11.5px] font-semibold tracking-[0.22em] text-neutral-300 hover:text-white transition-colors duration-200 uppercase py-1 relative group"
+                  >
+                    {item.name}
+                    <span className="absolute bottom-0 left-0 w-0 h-[1.5px] bg-[#c8874a] transition-all duration-300 group-hover:w-full" />
+                  </Link>
+                ))}
+              </nav>
+
+              {/* Action icons */}
+              <div className="flex items-center gap-3 sm:gap-4">
+                {/* Search */}
+                <button
+                  type="button"
+                  onClick={() => setIsSearchOpen(true)}
+                  className="hover:text-white p-1 transition-colors cursor-pointer group relative"
+                  aria-label="Search"
                 >
-                  {item.name}
-                  <span className="absolute bottom-0 left-0 w-0 h-[1.5px] bg-[#c8874a] transition-all duration-300 group-hover:w-full" />
+                  <Search className="w-[17px] h-[17px] stroke-[1.5] group-hover:scale-110 transition-transform" />
+                </button>
+
+                {/* Wishlist */}
+                <Link
+                  href="/wishlist"
+                  className="hover:text-white p-1 transition-colors group"
+                  aria-label="Wishlist"
+                >
+                  <Heart className="w-[17px] h-[17px] stroke-[1.5] group-hover:scale-110 transition-transform" />
                 </Link>
-              ))}
-            </nav>
 
-            {/* Right icons */}
-            <div className="flex items-center gap-3 sm:gap-4 text-neutral-300">
-              {/* Search */}
-              <button
-                type="button"
-                onClick={() => setIsSearchOpen(true)}
-                className="hover:text-white p-1 transition-colors cursor-pointer group relative"
-                aria-label="Search"
-              >
-                <Search className="w-[17px] h-[17px] stroke-[1.5] group-hover:scale-110 transition-transform" />
-              </button>
-
-              {/* Wishlist */}
-              <Link
-                href="/wishlist"
-                className="hover:text-white p-1 transition-colors group"
-                aria-label="Wishlist"
-              >
-                <Heart className="w-[17px] h-[17px] stroke-[1.5] group-hover:scale-110 transition-transform" />
-              </Link>
-
-              {/* Cart */}
-              <button
-                type="button"
-                onClick={openCart}
-                className="hover:text-white p-1 transition-colors relative group cursor-pointer"
-                aria-label="Shopping Cart"
-              >
-                <ShoppingBag className="w-[17px] h-[17px] stroke-[1.5] group-hover:scale-110 transition-transform" />
-                {cartCount > 0 && (
-                  <span className="absolute -top-1 -right-1.5 bg-[#c8874a] text-white text-[9px] font-bold h-4 min-w-4 px-0.5 rounded-full flex items-center justify-center leading-none animate-in zoom-in duration-200">
-                    {cartCount}
-                  </span>
-                )}
-              </button>
+                {/* Cart */}
+                <button
+                  type="button"
+                  onClick={openCart}
+                  className="hover:text-white p-1 transition-colors relative group cursor-pointer"
+                  aria-label="Shopping Cart"
+                >
+                  <ShoppingBag className="w-[17px] h-[17px] stroke-[1.5] group-hover:scale-110 transition-transform" />
+                  {cartCount > 0 && (
+                    <span className="absolute -top-1 -right-1.5 bg-[#c8874a] text-white text-[9px] font-bold h-4 min-w-4 px-0.5 rounded-full flex items-center justify-center leading-none animate-in zoom-in duration-200">
+                      {cartCount}
+                    </span>
+                  )}
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -194,22 +205,22 @@ export default function Navbar() {
             </button>
           </div>
 
-          {/* Mobile search */}
+          {/* Mobile/Desktop search */}
           <div className="px-5 py-3 border-b border-neutral-800/60">
             <button
               onClick={() => { setIsMenuOpen(false); setIsSearchOpen(true); }}
-              className="w-full flex items-center gap-3 bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-3 text-[12px] text-neutral-400 hover:text-white hover:border-white/[0.15] transition-all"
+              className="w-full flex items-center gap-3 bg-white/[0.04] border border-white/[0.08] rounded-sm px-4 py-3 text-[12px] text-neutral-400 hover:text-white hover:border-white/[0.15] transition-all"
             >
               <Search size={14} />
               Search sunglasses...
             </button>
           </div>
 
-          {/* Nav Links */}
-          <nav className="flex-1 overflow-y-auto px-5 py-6 space-y-6">
+          {/* Nav Links (All Sections) */}
+          <nav className="flex-1 overflow-y-auto no-scrollbar px-5 py-6 space-y-6">
             <div className="space-y-1">
-              <p className="text-[9px] font-bold text-neutral-500 tracking-[0.3em] uppercase pb-2">Shop</p>
-              {mainNavItems.map((item) => (
+              <p className="text-[9px] font-bold text-neutral-500 tracking-[0.3em] uppercase pb-2">All Sections</p>
+              {allNavItems.map((item) => (
                 <Link
                   key={item.name}
                   href={item.href}
@@ -243,7 +254,7 @@ export default function Navbar() {
           <div className="px-5 py-4 border-t border-neutral-800/80 space-y-3">
             <button
               onClick={() => { setIsMenuOpen(false); openCart(); }}
-              className="w-full flex items-center justify-center gap-2 bg-[#c8874a] text-white text-[11px] font-bold py-3 rounded-xl tracking-wide hover:bg-[#b87840] transition-colors"
+              className="w-full flex items-center justify-center gap-2 bg-[#c8874a] text-white text-[11px] font-bold py-3 rounded-sm tracking-wide hover:bg-[#b87840] transition-colors"
             >
               <ShoppingBag size={14} />
               Cart

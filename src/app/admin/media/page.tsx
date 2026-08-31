@@ -2,8 +2,9 @@
 
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { Loader2, CheckCircle2, Trash2, Image as ImageIcon, RefreshCw, Monitor, Smartphone } from "lucide-react";
+import { Loader2, CheckCircle2, Trash2, Image as ImageIcon, RefreshCw, Monitor, Smartphone, Sparkles } from "lucide-react";
 import ImageUpload from "@/components/admin/ImageUpload";
 
 interface SlideConfig {
@@ -128,7 +129,7 @@ export default function MediaPage() {
   ) => {
     const value = images[key];
     return (
-      <div className="flex-1 bg-[#161616] border border-white/[0.06] rounded-xl p-4 flex flex-col justify-between space-y-3">
+      <div className="flex-1 bg-[#161616] border border-white/[0.06] rounded-sm p-4 flex flex-col justify-between space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             {device === "desktop" ? (
@@ -141,7 +142,7 @@ export default function MediaPage() {
           {value && (
             <button
               onClick={() => handleRemove(key)}
-              className="p-1 rounded-lg hover:bg-red-500/10 text-white/40 hover:text-red-400 transition-colors"
+              className="p-1 rounded-sm hover:bg-red-500/10 text-white/40 hover:text-red-400 transition-colors"
               title="Remove image"
             >
               <Trash2 size={13} />
@@ -152,13 +153,11 @@ export default function MediaPage() {
         {value ? (
           <div className="space-y-2">
             <div
-              className={`relative w-full ${
-                device === "desktop" ? "aspect-video" : "aspect-[4/5]"
-              } bg-[#0e0e0e] rounded-lg overflow-hidden border border-white/[0.08]`}
+              className="relative w-full h-[220px] bg-[#0e0e0e] rounded-sm overflow-hidden border border-white/[0.08]"
             >
               <Image src={value} alt={label} fill className="object-cover" />
               <label className="absolute inset-0 flex items-center justify-center bg-black/0 hover:bg-black/60 transition-colors cursor-pointer group">
-                <span className="opacity-0 group-hover:opacity-100 transition-opacity bg-[#c8874a] text-white text-[11px] font-bold px-3 py-1.5 rounded-lg flex items-center gap-1.5 shadow-lg">
+                <span className="opacity-0 group-hover:opacity-100 transition-opacity bg-[#c8874a] text-white text-[11px] font-bold px-3 py-1.5 rounded-sm flex items-center gap-1.5 shadow-lg">
                   <ImageIcon size={12} />
                   Replace
                 </span>
@@ -185,7 +184,7 @@ export default function MediaPage() {
             </div>
             <div className="flex items-center justify-between text-[10px] text-white/40">
               <span className="truncate max-w-[140px]">{value}</span>
-              <span className="text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded-full">
+              <span className="text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded-sm">
                 Live ✓
               </span>
             </div>
@@ -219,9 +218,16 @@ export default function MediaPage() {
           </p>
         </div>
         <div className="flex items-center gap-2">
+          <Link
+            href="/admin/campaigns"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-sm text-[12px] font-bold border border-white/[0.08] bg-[#161616] hover:bg-[#202020] text-white/80 hover:text-white transition-colors"
+          >
+            <Sparkles size={13} className="text-[#c8874a]" />
+            <span>Spotlight Campaigns</span>
+          </Link>
           <button
             onClick={loadImages}
-            className="w-9 h-9 flex items-center justify-center rounded-xl border border-white/[0.08] bg-[#161616] hover:bg-[#202020] text-white/60 hover:text-white transition-colors"
+            className="w-9 h-9 flex items-center justify-center rounded-sm border border-white/[0.08] bg-[#161616] hover:bg-[#202020] text-white/60 hover:text-white transition-colors"
             title="Refresh"
           >
             <RefreshCw size={14} className={loading ? "animate-spin" : ""} />
@@ -229,7 +235,7 @@ export default function MediaPage() {
           <button
             onClick={handleSaveAll}
             disabled={saving || saved}
-            className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-[12px] font-bold transition-all duration-200 shadow-md ${
+            className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-sm text-[12px] font-bold transition-all duration-200 shadow-md ${
               saved
                 ? "bg-emerald-600 text-white"
                 : "bg-[#c8874a] hover:bg-[#b87840] text-white shadow-[#c8874a]/20"
@@ -251,13 +257,13 @@ export default function MediaPage() {
       </div>
 
       {error && (
-        <div className="bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3 text-[12px] text-red-400">
+        <div className="bg-red-500/10 border border-red-500/20 rounded-sm px-4 py-3 text-[12px] text-red-400">
           {error}
         </div>
       )}
 
       {loading ? (
-        <div className="bg-[#111111] rounded-2xl border border-white/[0.07] flex items-center justify-center py-24 gap-3">
+        <div className="bg-[#111111] rounded-sm border border-white/[0.07] flex items-center justify-center py-24 gap-3">
           <Loader2 size={20} className="animate-spin text-[#c8874a]" />
           <p className="text-[13px] text-white/40">Loading media slots...</p>
         </div>
@@ -267,7 +273,7 @@ export default function MediaPage() {
           {heroSlides.map((slide) => (
             <div
               key={slide.id}
-              className="bg-[#111111] rounded-2xl border border-white/[0.07] p-6 space-y-4 shadow-xl shadow-black/40"
+              className="bg-[#111111] rounded-sm border border-white/[0.07] p-6 space-y-4 shadow-xl shadow-black/40"
             >
               <div className="border-b border-white/[0.06] pb-3 flex items-center justify-between">
                 <div>
@@ -278,7 +284,7 @@ export default function MediaPage() {
                     Separate image variants for Desktop and Mobile viewports
                   </p>
                 </div>
-                <span className="text-[11px] font-bold text-[#c8874a] bg-[#c8874a]/10 border border-[#c8874a]/20 px-2.5 py-1 rounded-full">
+                <span className="text-[11px] font-bold text-[#c8874a] bg-[#c8874a]/10 border border-[#c8874a]/20 px-2.5 py-1 rounded-sm">
                   Slide {slide.id}
                 </span>
               </div>
@@ -306,7 +312,7 @@ export default function MediaPage() {
           ))}
 
           {/* Story Image */}
-          <div className="bg-[#111111] rounded-2xl border border-white/[0.07] p-6 space-y-4 shadow-xl shadow-black/40">
+          <div className="bg-[#111111] rounded-sm border border-white/[0.07] p-6 space-y-4 shadow-xl shadow-black/40">
             <div className="border-b border-white/[0.06] pb-3">
               <h3 className="text-[15px] font-bold text-white">
                 Our Story — Brand Image
