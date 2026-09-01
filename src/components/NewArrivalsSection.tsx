@@ -9,7 +9,7 @@ interface NewArrivalsSectionProps {
 
 export default function NewArrivalsSection({ products }: NewArrivalsSectionProps) {
   return (
-    <section className="bg-white py-14 md:py-20 border-b border-neutral-100">
+    <section className="bg-white py-7 md:py-20 border-b border-neutral-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header row */}
         <div className="flex items-center justify-between mb-8 md:mb-12">
@@ -32,7 +32,7 @@ export default function NewArrivalsSection({ products }: NewArrivalsSectionProps
 
         {/* Product grid */}
         {products.length > 0 ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5 md:gap-8">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-3">
             {products.map((product) => (
               <ProductCard key={product.id} product={product} variant="classic" />
             ))}

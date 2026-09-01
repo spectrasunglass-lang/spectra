@@ -68,7 +68,7 @@ export default async function MenPage() {
         </div>
 
         {products.length > 0 ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5 md:gap-7 pt-8">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-3 pt-8">
             {products.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}

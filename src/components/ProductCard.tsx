@@ -75,8 +75,8 @@ export function ProductCard(props: ProductCardProps) {
   // ── CLASSIC / OLD STYLE (Used in New Arrivals) ──
   if (variant === "classic") {
     return (
-      <Link href={`/products/${p.slug}`} className="group block h-full">
-        <div className="relative flex flex-col h-full overflow-hidden rounded-sm bg-white border border-neutral-200/80 hover:border-[#c8874a]/60 hover:shadow-xl hover:shadow-black/[0.06]">
+      <Link href={`/products/${p.slug}`} className="group block h-full border">
+        <div className="relative flex flex-col border border-gray-200 h-full overflow-hidden rounded-md bg-white ">
           {/* Product Image Area */}
           <div className="relative aspect-square w-full bg-white overflow-hidden flex items-center justify-center p-6">
             {p.image_url ? (
@@ -96,7 +96,7 @@ export function ProductCard(props: ProductCardProps) {
             {/* Badges */}
             <div className="absolute top-3 left-3 flex items-center gap-1.5 z-10">
               {p.is_new && (
-                <span className="text-[9px] font-bold tracking-[0.15em] px-2 py-0.5 bg-[#c8874a] text-white rounded-sm uppercase shadow-sm">
+                <span className="text-[9px] font-bold tracking-[0.15em] px-2 py-0.5 bg-[#c8874a] text-white rounded-sm uppercase ">
                   NEW
                 </span>
               )}
@@ -136,12 +136,14 @@ export function ProductCard(props: ProductCardProps) {
               <h3 className="text-[13px] font-bold text-neutral-900 truncate group-hover:text-[#c8874a] transition-colors uppercase tracking-wide">
                 {p.name}
               </h3>
-              <p className="text-[11px] text-neutral-500 mt-0.5 truncate">
-                {p.subtitle || "Handcrafted Luxury"}
-              </p>
+              {p.subtitle ? (
+                <p className="text-[11px] text-neutral-500 mt-0.5 truncate">
+                  {p.subtitle}
+                </p>
+              ) : null}
             </div>
 
-            <div className="flex items-center gap-2 mt-3 pt-2 border-t border-neutral-100/80">
+            <div className="flex items-center gap-2 mt-2.5">
               <span className="text-[14px] font-bold text-neutral-900">
                 ₹{p.price.toLocaleString("en-IN")}
               </span>
@@ -165,14 +167,14 @@ export function ProductCard(props: ProductCardProps) {
     ? `${p.shape.toUpperCase()} / M`
     : p.category
     ? `${p.category.toUpperCase()} / M`
-    : "OVAL / M";
+    : null;
 
   return (
     <Link href={`/products/${p.slug}`} className="group block h-full select-none">
       <div className="relative flex flex-col h-full bg-white transition-all duration-200">
         
         {/* Product Image Box */}
-        <div className="relative aspect-square w-full bg-white overflow-hidden flex items-center justify-center p-4 sm:p-6 border border-neutral-100 rounded-sm">
+        <div className="relative aspect-square w-full bg-white overflow-hidden flex items-center justify-center p-4 sm:p-6 rounded-none border border-b-0 border-gray-200">
           {p.image_url ? (
             <Image
               src={p.image_url}
@@ -206,7 +208,7 @@ export function ProductCard(props: ProductCardProps) {
           <div className="absolute inset-x-0 bottom-0 translate-y-full group-hover:translate-y-0 transition-transform duration-300 z-20">
             <button
               onClick={handleAddToCart}
-              className={`w-full py-2.5 sm:py-3 flex items-center justify-center gap-2 text-[10.5px] sm:text-[11px] font-bold tracking-wider uppercase transition-all duration-200 shadow-md ${
+              className={`w-full py-2.5 sm:py-3 flex items-center justify-center gap-2 text-[10.5px] sm:text-[11px] font-bold tracking-wider uppercase transition-all duration-200 shadow-md rounded-none ${
                 added
                   ? "bg-emerald-600 text-white"
                   : "bg-[#0a0a0a] text-white hover:bg-[#c8874a]"
@@ -226,11 +228,13 @@ export function ProductCard(props: ProductCardProps) {
         </div>
 
         {/* Product Details Section Below Image */}
-        <div className="pt-2.5 pb-1 px-0.5 flex flex-col flex-1 justify-between">
+        <div className="pt-2.5 pb-2.5 px-2 flex flex-col flex-1 justify-between border border-t-0 border-gray-200">
           <div>
-            <p className="text-[9px] sm:text-[9.5px] font-semibold tracking-wider text-neutral-400 uppercase mb-0.5">
-              {tagLabel}
-            </p>
+            {tagLabel && (
+              <p className="text-[9px] sm:text-[9.5px] font-semibold tracking-wider text-neutral-400 uppercase mb-0.5">
+                {tagLabel}
+              </p>
+            )}
             <h3 className="text-[11.5px] sm:text-[12px] font-bold text-neutral-900 leading-snug line-clamp-1 group-hover:text-[#c8874a] transition-colors">
               {p.name}
             </h3>

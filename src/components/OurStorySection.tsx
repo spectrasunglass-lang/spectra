@@ -9,8 +9,8 @@ interface OurStorySectionProps {
 
 export default function OurStorySection({ storyImageUrl }: OurStorySectionProps) {
   return (
-    <section className="bg-[#0a0a0a] py-14 md:py-24 border-b border-white/[0.06]">
-      <div className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12">
+    <section className="bg-[#0a0a0a]">
+      <div className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 py-5 md:py-0">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 items-center">
           {/* Text content */}
           <div className="w-full max-w-xl lg:max-w-2xl">
@@ -40,7 +40,7 @@ export default function OurStorySection({ storyImageUrl }: OurStorySectionProps)
           </div>
 
           {/* Story image — empty slot for admin upload */}
-          <div className="relative w-full aspect-[3/4] max-h-[480px] bg-[#141414] overflow-hidden">
+          <div className="relative w-full aspect-[3/4] max-h-[240px] md:max-h-[480px] bg-[#141414] overflow-hidden">
             {storyImageUrl ? (
               <Image
                 src={storyImageUrl}
