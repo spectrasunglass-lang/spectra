@@ -120,15 +120,13 @@ export default async function Home() {
     } catch { }
   }
 
-  // Build slug → image_url map from admin-managed category_shapes JSON
-  const categoryIconUrls: Record<string, string> = {};
+  // Parse admin-managed category_shapes JSON
+  let shapeCategories: { id?: string; name: string; slug: string; image_url?: string }[] = [];
   if (settingsMap.category_shapes) {
     try {
       const cats = JSON.parse(settingsMap.category_shapes);
       if (Array.isArray(cats)) {
-        cats.forEach((c: { slug?: string; image_url?: string }) => {
-          if (c.slug && c.image_url) categoryIconUrls[c.slug] = c.image_url;
-        });
+        shapeCategories = cats;
       }
     } catch { }
   }
@@ -139,7 +137,7 @@ export default async function Home() {
       <HeroSection slides={heroSlides} />
 
       {/* 2. Shop By Shape */}
-      <ShopByShapeSection iconUrls={categoryIconUrls} />
+      <ShopByShapeSection categories={shapeCategories} />
 
 
 

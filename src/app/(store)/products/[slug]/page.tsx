@@ -69,7 +69,7 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
 
       {/* Related Products */}
       {relatedProducts.length > 0 && (
-        <section className="border-t border-white/[0.08] py-16 max-w-7xl mx-auto px-5 sm:px-8 lg:px-12">
+        <section className="border-t border-white/[0.08] pt-5 pb-16 md:pb-0 md:py-16 max-w-7xl mx-auto px-5 sm:px-8 lg:px-12">
           <div className="flex items-center justify-between pb-8">
             <div>
               <p className="text-[10.5px] font-bold tracking-[0.3em] uppercase text-[#c8874a]">
@@ -81,7 +81,7 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5 md:gap-7">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-3">
             {relatedProducts.map((item) => (
               <ProductCard key={item.id} product={item} />
             ))}

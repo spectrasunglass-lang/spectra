@@ -66,19 +66,19 @@ const benefits = [
 export default function BenefitsBar() {
   return (
     <div className="bg-[#070707] border-t border-b border-white/[0.08]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-white/[0.08]">
+      <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-3 divide-x divide-white/[0.08]">
           {benefits.map((benefit) => (
             <div
               key={benefit.id}
-              className="flex items-center gap-3.5 py-5 sm:py-6 px-4 sm:px-8 justify-start md:justify-center"
+              className="flex flex-col md:flex-row items-center text-center md:text-left gap-1.5 sm:gap-3.5 py-4 sm:py-6 px-1.5 sm:px-8 justify-center"
             >
               {benefit.icon}
               <div>
-                <p className="text-[11px] sm:text-[12px] font-bold tracking-[0.16em] text-white uppercase">
+                <p className="text-[9px] sm:text-[12px] font-bold tracking-[0.1em] sm:tracking-[0.16em] text-white uppercase leading-tight">
                   {benefit.title}
                 </p>
-                <p className="text-[11px] sm:text-[12px] text-neutral-400 font-normal tracking-wide mt-0.5">
+                <p className="text-[8.5px] sm:text-[12px] text-neutral-400 font-normal tracking-tight sm:tracking-wide mt-0.5 leading-tight">
                   {benefit.subtitle}
                 </p>
               </div>

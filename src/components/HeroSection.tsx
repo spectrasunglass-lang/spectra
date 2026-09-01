@@ -73,7 +73,7 @@ export default function HeroSection({
 
   return (
     <section
-      className="relative w-full min-h-[calc(100dvh-60px)] sm:min-h-[calc(100dvh-64px)] bg-[#0a0a0a] overflow-hidden flex flex-col justify-end md:justify-center group/hero select-none"
+      className="relative w-full min-h-[72dvh] sm:min-h-[80dvh] md:min-h-[calc(100dvh-64px)] bg-[#0a0a0a] overflow-hidden flex flex-col justify-end md:justify-center group/hero select-none"
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
@@ -151,94 +151,58 @@ export default function HeroSection({
 
 
       {/* Hero content */}
-      <div className="relative z-20 w-full max-w-7xl mx-auto px-5 sm:px-10 lg:px-20 pb-14 pt-20 md:py-20">
-        <div className="max-w-xs sm:max-w-sm md:max-w-md lg:max-w-xl">
-          {/* Label */}
-          <p className="text-[10px] sm:text-[11px] font-bold tracking-[0.3em] uppercase text-[#c8874a] mb-3 sm:mb-4">
+      <div className="relative z-20 w-full max-w-7xl mx-auto px-5 sm:px-10 lg:px-20 pb-8 pt-10 md:py-20 flex flex-col items-center md:items-start text-center md:text-left">
+        <div className="max-w-md sm:max-w-lg md:max-w-md lg:max-w-xl flex flex-col items-center md:items-start">
+          {/* Label (Desktop Only) */}
+          <p className="hidden md:block text-[10px] sm:text-[11px] font-bold tracking-[0.3em] uppercase text-[#c8874a] mb-3 sm:mb-4">
             NEW COLLECTION 2026
           </p>
 
           {/* Headline with Exact Stencil Typography */}
-          <h1 className="font-stencil uppercase leading-[1.02] tracking-[0.08em] sm:tracking-[0.1em] mb-4 sm:mb-5">
-            <span className="block text-white text-4xl sm:text-5xl md:text-6xl lg:text-[68px]">
-              SEE BEYOND
+          <h1 className="font-stencil uppercase leading-[1.05] tracking-[0.06em] sm:tracking-[0.1em] mb-4 sm:mb-5">
+            <span className="inline md:block text-white text-[23px] sm:text-4xl md:text-6xl lg:text-[68px]">
+              SEE BEYOND{" "}
             </span>
-            <span className="block text-[#c8874a] text-4xl sm:text-5xl md:text-6xl lg:text-[68px] mt-1">
+            <span className="inline md:block text-[#c8874a] text-[23px] sm:text-4xl md:text-6xl lg:text-[68px] md:mt-1">
               LIMITS
             </span>
           </h1>
 
-          {/* Subtext */}
-          <p className="text-neutral-300 text-[13px] sm:text-sm md:text-[15px] leading-relaxed mb-6 sm:mb-8 font-medium">
+          {/* Subtext (Desktop Only) */}
+          <p className="hidden md:block text-neutral-300 text-[13px] sm:text-sm md:text-[15px] leading-relaxed mb-6 sm:mb-8 font-medium">
             Crafted for visionaries.
             <br />
             Designed to stand apart.
           </p>
 
-          {/* CTA Buttons */}
-          <div className="flex gap-3">
+          {/* Mobile CTA: Single SHOP NOW button */}
+          <div className="flex md:hidden justify-center">
+            <Link
+              href="/sunglasses"
+              className="bg-[#c8874a] hover:bg-[#b87840] text-white text-[11px] font-bold px-8 py-3 rounded-sm flex items-center justify-center gap-2 uppercase tracking-[0.15em] transition-all shadow-md w-full max-w-[200px]"
+            >
+              SHOP NOW
+            </Link>
+          </div>
+
+          {/* Desktop CTA Buttons */}
+          <div className="hidden md:flex gap-3">
             <Link
               href="/men"
-              className="bg-[#c8874a] hover:bg-[#b87840] text-white text-[11px] font-bold px-6 py-3 rounded-lg flex items-center justify-center gap-2 uppercase tracking-[0.15em] transition-all shadow-md flex-1 sm:flex-initial"
+              className="bg-[#c8874a] hover:bg-[#b87840] text-white text-[11px] font-bold px-6 py-3 rounded-lg flex items-center justify-center gap-2 uppercase tracking-[0.15em] transition-all shadow-md sm:flex-initial"
             >
               SHOP MEN
-              <svg
-                width="12"
-                height="12"
-                viewBox="0 0 13 13"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <path d="M2 11L11 2M11 2H5M11 2V8" />
-              </svg>
             </Link>
 
             <Link
               href="/women"
-              className="border border-white/40 hover:border-white text-white hover:bg-white/[0.06] text-[11px] font-bold px-6 py-3 rounded-lg flex items-center justify-center gap-2 uppercase tracking-[0.15em] transition-all flex-1 sm:flex-initial"
+              className="border border-white/40 hover:border-white text-white hover:bg-white/[0.06] text-[11px] font-bold px-6 py-3 rounded-lg flex items-center justify-center gap-2 uppercase tracking-[0.15em] transition-all sm:flex-initial"
             >
               SHOP WOMEN
-              <svg
-                width="12"
-                height="12"
-                viewBox="0 0 13 13"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <path d="M2 11L11 2M11 2H5M11 2V8" />
-              </svg>
             </Link>
           </div>
         </div>
       </div>
-
-      {/* Mobile Slide Dots */}
-      {totalSlides > 1 && (
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex gap-2 md:hidden">
-          {slideList.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => setActiveSlide(i)}
-              aria-label={`Go to slide ${i + 1}`}
-              className="relative h-1.5 rounded-full overflow-hidden transition-all duration-200 bg-white/25 cursor-pointer"
-              style={{ width: activeSlide === i ? "24px" : "6px" }}
-            >
-              {activeSlide === i && (
-                <span
-                  key={activeSlide}
-                  className="absolute inset-0 bg-[#c8874a] rounded-full animate-slide-progress"
-                  style={{
-                    animationDuration: `${autoSlideInterval}ms`,
-                    animationTimingFunction: "linear",
-                  }}
-                />
-              )}
-            </button>
-          ))}
-        </div>
-      )}
     </section>
   );
 }

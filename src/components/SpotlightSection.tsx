@@ -30,7 +30,7 @@ export default function SpotlightSection({
     "Explore signature handcrafted silhouettes captured in our latest visual concepts.";
 
   return (
-    <section className="bg-white py-14 md:py-20 overflow-hidden select-none">
+    <section className="bg-white py-7 md:py-20 overflow-hidden select-none">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Header row */}

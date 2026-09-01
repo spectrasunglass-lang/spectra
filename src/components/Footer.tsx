@@ -3,11 +3,49 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowRight, Check, Mail, Phone } from "lucide-react";
+import { ArrowRight, Check, ChevronDown, Mail, Phone } from "lucide-react";
+
+const footerSections = [
+  {
+    id: "shop",
+    title: "Shop Collections",
+    links: [
+      { name: "New Arrivals", href: "/new-arrivals" },
+      { name: "Men's Sunglasses", href: "/men" },
+      { name: "Women's Sunglasses", href: "/women" },
+      { name: "Polarized Lenses", href: "/polarized" },
+      { name: "All Sunglasses", href: "/sunglasses" },
+      { name: "Luxury Gift Sets", href: "/gifts" },
+    ],
+  },
+  {
+    id: "care",
+    title: "Client Concierge",
+    links: [
+      { name: "Track Your Order", href: "/cart" },
+      { name: "Complimentary Shipping", href: "/about" },
+      { name: "14-Day Returns & Exchange", href: "/about" },
+      { name: "Lens Care & Warranty", href: "/about" },
+      { name: "Authenticity Guarantee", href: "/about" },
+      { name: "FAQ & Assistance", href: "/contact" },
+    ],
+  },
+  {
+    id: "maison",
+    title: "The Maison",
+    links: [
+      { name: "Our Heritage & Story", href: "/about" },
+      { name: "Optical Craftsmanship", href: "/about" },
+      { name: "Contact Concierge", href: "/contact" },
+      { name: "Admin Portal", href: "/admin" },
+    ],
+  },
+];
 
 export default function Footer() {
   const [email, setEmail] = useState("");
   const [subscribed, setSubscribed] = useState(false);
+  const [openSection, setOpenSection] = useState<string | null>(null);
 
   const handleSubscribe = (e: React.FormEvent) => {
     e.preventDefault();
@@ -19,6 +57,10 @@ export default function Footer() {
     }, 4000);
   };
 
+  const toggleSection = (id: string) => {
+    setOpenSection((prev) => (prev === id ? null : id));
+  };
+
   return (
     <footer className="relative bg-[#070707] text-white border-t border-white/[0.08] overflow-hidden">
       {/* Top Gold Hairline */}
@@ -26,10 +68,10 @@ export default function Footer() {
 
       {/* Main Footer Container */}
       <div className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 pt-16 pb-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 lg:gap-8 pb-14 border-b border-white/[0.06]">
-          
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 lg:gap-8 pb-0 md:pb-14 md:border-b border-white/[0.06]">
+
           {/* Brand & Newsletter Column */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-2 space-y-6 pb-6 md:pb-0 border-b md:border-b-0 border-white/[0.06]">
             <Link href="/" className="inline-block hover:opacity-80 transition-opacity">
               <Image
                 src="/logo/logo.png"
@@ -83,8 +125,65 @@ export default function Footer() {
             </div>
           </div>
 
+          {/* --- MOBILE ACCORDION SECTIONS --- */}
+          <div className="md:hidden col-span-1 divide-y divide-white/[0.06] border-b border-white/[0.06]">
+            {footerSections.map((section) => {
+              const isOpen = openSection === section.id;
+              return (
+                <div key={section.id}>
+                  <button
+                    onClick={() => toggleSection(section.id)}
+                    className="w-full flex items-center justify-between py-4 text-left"
+                  >
+                    <span className="text-[11px] font-bold tracking-[0.25em] uppercase text-[#c8874a]">
+                      {section.title}
+                    </span>
+                    <ChevronDown
+                      size={15}
+                      className={`text-neutral-400 transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`}
+                    />
+                  </button>
+                  <div
+                    className={`overflow-hidden transition-all duration-300 ease-out ${isOpen ? "max-h-96 pb-4" : "max-h-0"}`}
+                  >
+                    <ul className="space-y-3 text-[12.5px]">
+                      {section.links.map((link) => (
+                        <li key={link.name}>
+                          <Link
+                            href={link.href}
+                            className="text-neutral-400 hover:text-white transition-colors"
+                          >
+                            {link.name}
+                          </Link>
+                        </li>
+                      ))}
+                      {/* Contact info inside Maison accordion */}
+                      {section.id === "maison" && (
+                        <li className="pt-2 space-y-2 text-[12px] text-neutral-400">
+                          <div className="flex items-center gap-2">
+                            <Mail size={13} className="text-[#c8874a]" />
+                            <a href="mailto:concierge@spectrasunglass.com" className="hover:text-white transition-colors">
+                              concierge@spectrasunglass.com
+                            </a>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Phone size={13} className="text-[#c8874a]" />
+                            <a href="tel:+919876543210" className="hover:text-white transition-colors">
+                              +91 98765 43210
+                            </a>
+                          </div>
+                        </li>
+                      )}
+                    </ul>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* --- DESKTOP COLUMNS (hidden on mobile) --- */}
           {/* Shop Column */}
-          <div className="space-y-4">
+          <div className="hidden md:block space-y-4">
             <h4 className="text-[11px] font-bold tracking-[0.25em] uppercase text-[#c8874a]">
               Shop Collections
             </h4>
@@ -98,10 +197,7 @@ export default function Footer() {
                 { name: "Luxury Gift Sets", href: "/gifts" },
               ].map((link) => (
                 <li key={link.name}>
-                  <Link
-                    href={link.href}
-                    className="text-neutral-400 hover:text-white hover:translate-x-1 transition-all inline-block duration-200"
-                  >
+                  <Link href={link.href} className="text-neutral-400 hover:text-white hover:translate-x-1 transition-all inline-block duration-200">
                     {link.name}
                   </Link>
                 </li>
@@ -110,7 +206,7 @@ export default function Footer() {
           </div>
 
           {/* Customer Care Column */}
-          <div className="space-y-4">
+          <div className="hidden md:block space-y-4">
             <h4 className="text-[11px] font-bold tracking-[0.25em] uppercase text-[#c8874a]">
               Client Concierge
             </h4>
@@ -124,10 +220,7 @@ export default function Footer() {
                 { name: "FAQ & Assistance", href: "/contact" },
               ].map((link) => (
                 <li key={link.name}>
-                  <Link
-                    href={link.href}
-                    className="text-neutral-400 hover:text-white hover:translate-x-1 transition-all inline-block duration-200"
-                  >
+                  <Link href={link.href} className="text-neutral-400 hover:text-white hover:translate-x-1 transition-all inline-block duration-200">
                     {link.name}
                   </Link>
                 </li>
@@ -136,7 +229,7 @@ export default function Footer() {
           </div>
 
           {/* Maison & Contact Column */}
-          <div className="space-y-4">
+          <div className="hidden md:block space-y-4">
             <h4 className="text-[11px] font-bold tracking-[0.25em] uppercase text-[#c8874a]">
               The Maison
             </h4>
@@ -148,10 +241,7 @@ export default function Footer() {
                 { name: "Admin Portal", href: "/admin" },
               ].map((link) => (
                 <li key={link.name}>
-                  <Link
-                    href={link.href}
-                    className="text-neutral-400 hover:text-white hover:translate-x-1 transition-all inline-block duration-200"
-                  >
+                  <Link href={link.href} className="text-neutral-400 hover:text-white hover:translate-x-1 transition-all inline-block duration-200">
                     {link.name}
                   </Link>
                 </li>
