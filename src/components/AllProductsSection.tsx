@@ -124,7 +124,7 @@ export default function AllProductsSection({
   }, [loadMoreProducts, hasMore, loading]);
 
   return (
-    <section className="bg-white py-14 md:py-20 border-b border-neutral-100">
+    <section className="bg-white py-7 md:py-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header row */}
         <div className="flex items-center justify-between mb-8 md:mb-12">
@@ -132,7 +132,7 @@ export default function AllProductsSection({
             <h2 className="text-xs md:text-sm font-bold tracking-[0.3em] uppercase text-neutral-900">
               All Products
             </h2>
-            <p className="text-[12px] text-neutral-400 mt-1">
+            <p className="text-[12px] text-neutral-400 mt-1 hidden md:block">
               Explore our full collection of visionary eyewear
             </p>
           </div>
@@ -147,7 +147,7 @@ export default function AllProductsSection({
 
         {/* 4 products per row grid on desktop */}
         {products.length > 0 ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5 md:gap-8">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 md:gap-3">
             {products.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
@@ -178,15 +178,6 @@ export default function AllProductsSection({
 
         {/* Scroll Sentinel */}
         <div ref={observerTarget} className="h-8 w-full" />
-
-        {/* End of list message */}
-        {!hasMore && products.length > 0 && (
-          <div className="text-center pt-8 pb-2">
-            <p className="text-[11px] font-bold tracking-[0.2em] uppercase text-neutral-400">
-              You have viewed all {products.length} products
-            </p>
-          </div>
-        )}
       </div>
     </section>
   );

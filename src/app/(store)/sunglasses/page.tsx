@@ -2,8 +2,9 @@ import React from "react";
 import { createClient } from "@/lib/supabase/server";
 import { ProductCard, Product } from "@/components/ProductCard";
 import Link from "next/link";
-import { SlidersHorizontal, Package, Sparkles } from "lucide-react";
+import { Package, Sparkles } from "lucide-react";
 import type { Metadata } from "next";
+import MobileFilterSheet from "@/components/MobileFilterSheet";
 
 export const metadata: Metadata = {
   title: "All Sunglasses — SPECTRA",
@@ -67,7 +68,7 @@ export default async function SunglassesPage({ searchParams }: SunglassesPagePro
   return (
     <div className="bg-[#0a0a0a] min-h-screen">
       {/* Banner Header */}
-      <div className="relative border-b border-white/[0.08] bg-gradient-to-b from-[#141414] to-[#0a0a0a] py-16 sm:py-20">
+      <div className="relative border-b border-white/[0.08] bg-gradient-to-b from-[#141414] to-[#0a0a0a] py-10 sm:py-20">
         <div className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 text-center">
           <p className="text-[10.5px] font-bold tracking-[0.3em] uppercase text-[#c8874a] mb-2 flex items-center justify-center gap-1.5">
             <Sparkles size={13} />
@@ -83,9 +84,9 @@ export default async function SunglassesPage({ searchParams }: SunglassesPagePro
       </div>
 
       {/* Main Content Area */}
-      <div className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 py-10 sm:py-14">
-        {/* Filters Toolbar */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-8 border-b border-white/[0.08]">
+      <div className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 pb-10 sm:py-14">
+        {/* Filters Toolbar — desktop only */}
+        <div className="hidden md:flex flex-col md:flex-row md:items-center justify-between gap-4 px-4 py-3 mb-8 rounded-sm">
           
           {/* Category Tabs */}
           <div className="flex items-center gap-1.5 overflow-x-auto pb-2 md:pb-0 scrollbar-none">
@@ -96,7 +97,7 @@ export default async function SunglassesPage({ searchParams }: SunglassesPagePro
                 <Link
                   key={c}
                   href={href}
-                  className={`px-4 py-2 rounded-xl text-[11.5px] font-bold uppercase tracking-wider transition-all whitespace-nowrap ${
+                  className={`px-4 py-2 rounded-sm text-[11.5px] font-bold uppercase tracking-wider transition-all whitespace-nowrap ${
                     isActive
                       ? "bg-[#c8874a] text-white shadow-md shadow-[#c8874a]/20"
                       : "bg-[#141414] text-neutral-400 hover:text-white hover:bg-[#1a1a1a] border border-white/[0.06]"
@@ -123,7 +124,7 @@ export default async function SunglassesPage({ searchParams }: SunglassesPagePro
                     <Link
                       key={s}
                       href={href}
-                      className={`px-3 py-1.5 rounded-lg text-[11px] font-semibold capitalize transition-colors ${
+                      className={`px-3 py-1 rounded-sm text-[11px] font-semibold capitalize transition-colors ${
                         isActive
                           ? "bg-white text-black font-bold"
                           : "text-neutral-400 hover:text-white"
@@ -143,9 +144,17 @@ export default async function SunglassesPage({ searchParams }: SunglassesPagePro
           </div>
         </div>
 
+        {/* Mobile filter bar — inline, above the product grid */}
+        <MobileFilterSheet
+          categoryFilter={categoryFilter}
+          shapeFilter={shapeFilter}
+          shapes={shapes}
+          categories={categories}
+        />
+
         {/* Product Grid */}
         {products.length > 0 ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5 md:gap-7 pt-8">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-3">
             {products.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}

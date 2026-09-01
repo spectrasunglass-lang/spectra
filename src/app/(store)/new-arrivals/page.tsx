@@ -51,7 +51,7 @@ export default async function NewArrivalsPage() {
 
       <div className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 py-10 sm:py-14">
         {products.length > 0 ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5 md:gap-7">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-3">
             {products.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}

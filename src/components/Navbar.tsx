@@ -42,6 +42,8 @@ export default function Navbar() {
     { name: "MEN", href: "/men" },
     { name: "WOMEN", href: "/women" },
     { name: "SUNGLASSES", href: "/sunglasses" },
+    { name: "POLARIZED", href: "/polarized" },
+    { name: "GIFTS", href: "/gifts" }
   ];
 
   const allNavItems = [
@@ -50,7 +52,6 @@ export default function Navbar() {
     { name: "MEN", href: "/men" },
     { name: "WOMEN", href: "/women" },
     { name: "SUNGLASSES", href: "/sunglasses" },
-    { name: "POLARIZED", href: "/polarized" },
     { name: "COLLECTIONS", href: "/collections" },
     { name: "GIFTS", href: "/gifts" },
   ];
@@ -65,11 +66,10 @@ export default function Navbar() {
       <SearchOverlay isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
 
       <header
-        className={`sticky top-0 z-40 w-full transition-all duration-300 ${
-          scrolled
+        className={`sticky top-0 z-40 w-full transition-all duration-300 ${scrolled
             ? "bg-[#0a0a0a]/98 backdrop-blur-xl shadow-2xl shadow-black/50"
             : "bg-[#0a0a0a]/95 backdrop-blur-md"
-        }`}
+          }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="relative flex items-center justify-between h-[60px] sm:h-20">
@@ -171,24 +171,21 @@ export default function Navbar() {
 
       {/* Mobile Drawer */}
       <div
-        className={`fixed inset-0 z-50 transition-[visibility] duration-300 ${
-          isMenuOpen ? "visible" : "invisible pointer-events-none"
-        }`}
+        className={`fixed inset-0 z-50 transition-[visibility] duration-300 ${isMenuOpen ? "visible" : "invisible pointer-events-none"
+          }`}
         aria-modal="true"
         role="dialog"
         aria-label="Navigation menu"
       >
         <div
-          className={`fixed inset-0 bg-black/75 backdrop-blur-sm transition-opacity duration-300 ease-in-out ${
-            isMenuOpen ? "opacity-100" : "opacity-0"
-          }`}
+          className={`fixed inset-0 bg-black/75 backdrop-blur-sm transition-opacity duration-300 ease-in-out ${isMenuOpen ? "opacity-100" : "opacity-0"
+            }`}
           onClick={() => setIsMenuOpen(false)}
         />
 
         <aside
-          className={`fixed top-0 left-0 bottom-0 w-full max-w-[280px] sm:max-w-xs bg-[#0e0e0e] border-r border-neutral-800 text-white shadow-2xl flex flex-col z-50 transform transition-transform duration-300 ease-out ${
-            isMenuOpen ? "translate-x-0" : "-translate-x-full"
-          }`}
+          className={`fixed top-0 left-0 bottom-0 w-full max-w-[280px] sm:max-w-xs bg-[#0e0e0e] border-r border-neutral-800 text-white shadow-2xl flex flex-col z-50 transform transition-transform duration-300 ease-out ${isMenuOpen ? "translate-x-0" : "-translate-x-full"
+            }`}
         >
           {/* Drawer Header */}
           <div className="flex items-center justify-between px-5 py-4 border-b border-neutral-800/80">

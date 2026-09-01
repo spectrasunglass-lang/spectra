@@ -68,15 +68,7 @@ export default function ProductDetailClient({ product }: { product: ProductData 
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 py-10 sm:py-16">
-      {/* Breadcrumb */}
-      <nav className="flex items-center gap-2 text-[11px] text-neutral-500 uppercase tracking-widest mb-8">
-        <Link href="/" className="hover:text-white transition-colors">Home</Link>
-        <span>/</span>
-        <Link href="/sunglasses" className="hover:text-white transition-colors">Sunglasses</Link>
-        <span>/</span>
-        <span className="text-[#c8874a] font-bold truncate max-w-[200px]">{product.name}</span>
-      </nav>
+    <div className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 py-10 sm:py-5">
 
       {/* Main Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-start">
@@ -102,7 +94,7 @@ export default function ProductDetailClient({ product }: { product: ProductData 
           )}
 
           {/* Main Large Image Studio White Showcase */}
-          <div className="relative flex-1 aspect-square sm:aspect-[4/4.5] max-h-[580px] bg-white rounded-3xl overflow-hidden border border-white/[0.08] shadow-2xl flex items-center justify-center p-8 group">
+          <div className="relative flex-1 aspect-square sm:aspect-[4/4.5] max-h-[580px] bg-white rounded-sm overflow-hidden border border-white/[0.08] shadow-2xl flex items-center justify-center p-8 group">
             {product.is_new && (
               <span className="absolute top-5 left-5 bg-black text-white text-[10px] font-bold tracking-[0.2em] uppercase px-3 py-1.5 rounded-full z-10">
                 NEW RELEASE
@@ -129,11 +121,10 @@ export default function ProductDetailClient({ product }: { product: ProductData 
         <div className="lg:col-span-5 space-y-6">
           <div>
             <div className="flex items-center gap-2 text-[10.5px] font-bold tracking-[0.25em] text-[#c8874a] uppercase mb-2">
-              <Sparkles size={13} />
               <span>{product.category || "Unisex"} • {product.shape || "Eyewear"}</span>
             </div>
 
-            <h1 className="font-stencil text-3xl sm:text-4xl text-white tracking-wider uppercase">
+            <h1 className="text-3xl sm:text-4xl text-white tracking-wider uppercase">
               {product.name}
             </h1>
 
@@ -146,7 +137,7 @@ export default function ProductDetailClient({ product }: { product: ProductData 
 
           {/* Price Card */}
           <div className="flex items-baseline gap-3.5 pb-4 border-b border-white/[0.08]">
-            <span className="text-3xl font-bold text-white tracking-tight">
+            <span className="text-3xl text-white tracking-tight">
               ₹{Number(product.price).toLocaleString("en-IN")}
             </span>
             {product.compare_price && product.compare_price > product.price && (
