@@ -12,7 +12,7 @@ export default function CartPage() {
   if (items.length === 0) {
     return (
       <div className="min-h-[70vh] flex flex-col items-center justify-center gap-6 px-4 text-white">
-        <div className="w-24 h-24 rounded-3xl bg-white/[0.05] border border-white/[0.08] flex items-center justify-center">
+        <div className="w-24 h-24 rounded-sm bg-white/[0.05] flex items-center justify-center">
           <ShoppingBag size={40} className="text-white/20" />
         </div>
         <div className="text-center">
@@ -21,7 +21,7 @@ export default function CartPage() {
         </div>
         <Link
           href="/"
-          className="inline-flex items-center gap-2 bg-[#c8874a] hover:bg-[#b87840] text-white text-[13px] font-bold px-6 py-3.5 rounded-xl transition-colors"
+          className="inline-flex items-center gap-2 bg-[#c8874a] hover:bg-[#b87840] text-white text-[13px] font-bold px-6 py-3.5 rounded-sm transition-colors"
         >
           <ArrowLeft size={15} />
           Continue Shopping
@@ -53,11 +53,11 @@ export default function CartPage() {
           {items.map((item) => (
             <div
               key={item.id}
-              className="flex gap-5 p-5 bg-white/[0.03] border border-white/[0.07] rounded-2xl hover:border-white/[0.12] transition-colors"
+              className="flex gap-5 p-5 bg-white/[0.03] rounded-sm transition-colors"
             >
               {/* Image */}
               <Link href={`/products/${item.slug}`} className="flex-shrink-0">
-                <div className="w-24 h-24 rounded-xl bg-[#f5f0eb] overflow-hidden relative">
+                <div className="w-24 h-24 rounded-sm bg-[#f5f0eb] overflow-hidden relative">
                   {item.image_url ? (
                     <Image src={item.image_url} alt={item.name} fill className="object-contain p-2" />
                   ) : (
@@ -79,7 +79,7 @@ export default function CartPage() {
                   </div>
                   <button
                     onClick={() => removeItem(item.id)}
-                    className="p-1.5 rounded-lg text-white/20 hover:text-red-400 hover:bg-red-500/10 transition-colors flex-shrink-0"
+                    className="p-1.5 rounded-sm text-white/20 hover:text-red-400 hover:bg-red-500/10 transition-colors flex-shrink-0"
                   >
                     <Trash2 size={14} />
                   </button>
@@ -87,10 +87,10 @@ export default function CartPage() {
 
                 <div className="flex items-center justify-between mt-4">
                   {/* Qty */}
-                  <div className="flex items-center gap-1 bg-white/[0.06] rounded-xl p-1">
+                  <div className="flex items-center gap-1 bg-white/[0.06] rounded-sm p-1">
                     <button
                       onClick={() => updateQty(item.id, item.quantity - 1)}
-                      className="w-7 h-7 rounded-lg flex items-center justify-center text-white/50 hover:text-white hover:bg-white/[0.1] transition-colors"
+                      className="w-7 h-7 rounded-sm flex items-center justify-center text-white/50 hover:text-white hover:bg-white/[0.1] transition-colors"
                     >
                       <Minus size={12} />
                     </button>
@@ -99,7 +99,7 @@ export default function CartPage() {
                     </span>
                     <button
                       onClick={() => updateQty(item.id, item.quantity + 1)}
-                      className="w-7 h-7 rounded-lg flex items-center justify-center text-white/50 hover:text-white hover:bg-white/[0.1] transition-colors"
+                      className="w-7 h-7 rounded-sm flex items-center justify-center text-white/50 hover:text-white hover:bg-white/[0.1] transition-colors"
                     >
                       <Plus size={12} />
                     </button>
@@ -126,7 +126,7 @@ export default function CartPage() {
 
         {/* Order Summary */}
         <div className="lg:col-span-1">
-          <div className="sticky top-24 bg-white/[0.03] border border-white/[0.08] rounded-2xl p-6 space-y-5">
+          <div className="sticky top-24 bg-white/[0.03] rounded-sm p-6 space-y-5">
             <h2 className="text-[15px] font-bold text-white">Order Summary</h2>
 
             <div className="space-y-3 text-[13px]">
@@ -146,7 +146,7 @@ export default function CartPage() {
             </div>
 
             {/* CTA */}
-            <button className="w-full flex items-center justify-center gap-2 bg-[#c8874a] hover:bg-[#b87840] text-white text-[13px] font-bold py-4 rounded-xl transition-colors">
+            <button className="w-full flex items-center justify-center gap-2 bg-[#c8874a] hover:bg-[#b87840] text-white text-[13px] font-bold py-4 rounded-sm transition-colors">
               Proceed to Checkout
               <ArrowRight size={15} />
             </button>
