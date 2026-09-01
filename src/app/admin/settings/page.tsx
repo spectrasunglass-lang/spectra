@@ -15,6 +15,8 @@ interface SettingsForm {
   free_shipping_threshold: string;
   return_window_days: string;
   tax_included: string;
+  cod_advance_enabled: string;
+  cod_advance_amount: string;
 }
 
 const defaults: SettingsForm = {
@@ -28,6 +30,8 @@ const defaults: SettingsForm = {
   free_shipping_threshold: "0",
   return_window_days: "14",
   tax_included: "true",
+  cod_advance_enabled: "false",
+  cod_advance_amount: "199",
 };
 
 export default function SettingsPage() {
@@ -185,6 +189,38 @@ export default function SettingsPage() {
             >
               <span className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow-sm transition-all duration-200 ${taxOn ? "left-[22px]" : "left-0.5"}`} />
             </button>
+          </div>
+
+          {/* COD Advance Payment */}
+          <div className="pt-4 border-t border-white/[0.06] mt-2 space-y-3">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-[13px] font-semibold text-white">COD Advance Payment</p>
+                <p className="text-[11px] text-white/40 mt-0.5">Require an advance deposit for Cash on Delivery orders</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => set("cod_advance_enabled", form.cod_advance_enabled === "true" ? "false" : "true")}
+                className={`relative w-11 h-6 rounded-full transition-colors duration-200 ${form.cod_advance_enabled === "true" ? "bg-[#c8874a]" : "bg-[#252525]"}`}
+              >
+                <span className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow-sm transition-all duration-200 ${form.cod_advance_enabled === "true" ? "left-[22px]" : "left-0.5"}`} />
+              </button>
+            </div>
+
+            {form.cod_advance_enabled === "true" && (
+              <div className="pt-2">
+                <Field label="COD Advance Amount (₹)">
+                  <input
+                    type="number"
+                    min="1"
+                    value={form.cod_advance_amount}
+                    onChange={(e) => set("cod_advance_amount", e.target.value)}
+                    className={inputCls}
+                    placeholder="199"
+                  />
+                </Field>
+              </div>
+            )}
           </div>
         </Section>
 
