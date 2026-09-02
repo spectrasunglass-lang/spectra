@@ -39,7 +39,6 @@ export default async function WomenPage() {
       <div className="relative border-b border-white/[0.08] bg-gradient-to-b from-[#181412] via-[#100d0b] to-[#0a0a0a] py-16 sm:py-20">
         <div className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 text-center">
           <p className="text-[10.5px] font-bold tracking-[0.3em] uppercase text-[#c8874a] mb-2 flex items-center justify-center gap-1.5">
-            <Sparkles size={14} />
             Elegance In Every Angle
           </p>
           <h1 className="font-stencil text-3xl sm:text-5xl text-white tracking-[0.1em] uppercase">

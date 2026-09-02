@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { verifyRazorpaySignature } from "@/lib/razorpay";
 import { createClient } from "@/lib/supabase/server";
+import { sendOrderEmails } from "@/lib/brevo";
 
 export async function POST(req: NextRequest) {
   try {
@@ -79,12 +80,34 @@ export async function POST(req: NextRequest) {
       .select("id")
       .single();
 
+    const confirmedOrderId = data?.id || `ORD-${Date.now().toString().slice(-6)}`;
+
+    // 5. Send order confirmation to Customer AND notification to Admin via Brevo
+    try {
+      await sendOrderEmails({
+        orderId: confirmedOrderId,
+        customerName: address.fullName,
+        customerEmail: address.email,
+        customerPhone: address.phone,
+        items,
+        productSummary,
+        totalAmount: Number(totalAmount),
+        chargeAmount: Number(chargeAmount),
+        balanceDue: Number(balanceDue),
+        paymentMethod,
+        paymentId: razorpay_payment_id,
+        address,
+      });
+    } catch (emailErr) {
+      console.error("Non-blocking Brevo email error:", emailErr);
+    }
+
     if (dbError) {
       console.error("Database order insertion error after payment:", dbError);
       // Even if DB insert had an issue, the payment is confirmed; fallback to order id
       return NextResponse.json({
         success: true,
-        orderId: `ORD-${Date.now().toString().slice(-6)}`,
+        orderId: confirmedOrderId,
         paymentId: razorpay_payment_id,
         warning: "Payment verified successfully",
       });
@@ -92,7 +115,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      orderId: data.id,
+      orderId: confirmedOrderId,
       paymentId: razorpay_payment_id,
     });
   } catch (error: unknown) {

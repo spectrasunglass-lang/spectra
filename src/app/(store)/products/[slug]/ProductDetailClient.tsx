@@ -173,7 +173,7 @@ export default function ProductDetailClient({ product }: { product: ProductData 
             <button
               type="button"
               onClick={handleAddToCart}
-              className={`w-full py-4 rounded-xl font-bold text-[12px] uppercase tracking-[0.18em] flex items-center justify-center gap-2 transition-all shadow-xl cursor-pointer ${
+              className={`w-full py-4 rounded-sm font-bold text-[12px] uppercase tracking-[0.18em] flex items-center justify-center gap-2 transition-all shadow-xl cursor-pointer ${
                 added
                   ? "bg-emerald-600 text-white shadow-emerald-900/30"
                   : "bg-[#c8874a] hover:bg-[#b87840] text-white shadow-[#c8874a]/25 hover:shadow-[#c8874a]/40"
@@ -193,7 +193,7 @@ export default function ProductDetailClient({ product }: { product: ProductData 
             <Link
               href="/cart"
               onClick={handleAddToCart}
-              className="w-full py-4 rounded-xl font-bold text-[12px] uppercase tracking-[0.18em] flex items-center justify-center gap-2 bg-white text-black hover:bg-neutral-200 transition-colors shadow-lg cursor-pointer"
+              className="w-full py-4 rounded-sm font-bold text-[12px] uppercase tracking-[0.18em] flex items-center justify-center gap-2 bg-white text-black hover:bg-neutral-200 transition-colors shadow-lg cursor-pointer"
             >
               <Zap size={16} /> Buy Now
             </Link>

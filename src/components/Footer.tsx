@@ -10,11 +10,12 @@ const footerSections = [
     id: "shop",
     title: "Shop Collections",
     links: [
+      { name: "Home", href: "/" },
       { name: "New Arrivals", href: "/new-arrivals" },
       { name: "Men's Sunglasses", href: "/men" },
       { name: "Women's Sunglasses", href: "/women" },
-      { name: "Polarized Lenses", href: "/polarized" },
       { name: "All Sunglasses", href: "/sunglasses" },
+      { name: "Polarized Lenses", href: "/polarized" },
       { name: "Luxury Gift Sets", href: "/gifts" },
     ],
   },
@@ -22,12 +23,12 @@ const footerSections = [
     id: "care",
     title: "Client Concierge",
     links: [
-      { name: "Track Your Order", href: "/cart" },
-      { name: "Complimentary Shipping", href: "/about" },
-      { name: "14-Day Returns & Exchange", href: "/about" },
-      { name: "Lens Care & Warranty", href: "/about" },
-      { name: "Authenticity Guarantee", href: "/about" },
-      { name: "FAQ & Assistance", href: "/contact" },
+      { name: "Track Your Order", href: "/track-order" },
+      { name: "Shipping Policy", href: "/shipping" },
+      { name: "Authenticity Guarantee", href: "/authenticity" },
+      { name: "Privacy Policy", href: "/privacy-policy" },
+      { name: "Terms of Service", href: "/terms-of-service" },
+      { name: "FAQ & Assistance", href: "/faq" },
     ],
   },
   {
@@ -35,7 +36,6 @@ const footerSections = [
     title: "The Maison",
     links: [
       { name: "Our Heritage & Story", href: "/about" },
-      { name: "Optical Craftsmanship", href: "/about" },
       { name: "Contact Concierge", href: "/contact" },
       { name: "Admin Portal", href: "/admin" },
     ],
@@ -84,8 +84,7 @@ export default function Footer() {
             </Link>
 
             <p className="text-neutral-400 text-[13px] leading-relaxed max-w-sm">
-              Crafted for visionaries. Designed to stand apart. Luxury handcrafted eyewear combining timeless aesthetics with precision optical performance.
-            </p>
+Crafted for visionaries. Designed to stand apart. Luxury eyewear with timeless style and precision.            </p>
 
             {/* Newsletter Subscription */}
             <div className="pt-2">
@@ -110,12 +109,12 @@ export default function Footer() {
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="Enter your email address"
                       required
-                      className="w-full bg-[#121212] border border-white/[0.1] rounded-xl px-4 py-3 text-[12.5px] text-white placeholder-neutral-500 focus:outline-none focus:border-[#c8874a] transition-colors"
+                      className="w-full bg-[#121212] rounded-sm px-4 py-3 text-[12.5px] text-white placeholder-neutral-500 focus:outline-none focus:border-[#c8874a] transition-colors"
                     />
                   </div>
                   <button
                     type="submit"
-                    className="bg-[#c8874a] hover:bg-[#b87840] text-white px-5 py-3 rounded-xl text-[12px] font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all shadow-md shadow-[#c8874a]/20 flex-shrink-0 cursor-pointer"
+                    className="bg-[#c8874a] hover:bg-[#b87840] text-white px-5 py-3 rounded-sm text-[12px] font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all shadow-md shadow-[#c8874a]/20 flex-shrink-0 cursor-pointer"
                   >
                     Subscribe
                     <ArrowRight size={14} />
@@ -189,11 +188,12 @@ export default function Footer() {
             </h4>
             <ul className="space-y-2.5 text-[12.5px]">
               {[
+                { name: "Home", href: "/" },
                 { name: "New Arrivals", href: "/new-arrivals" },
                 { name: "Men's Sunglasses", href: "/men" },
                 { name: "Women's Sunglasses", href: "/women" },
-                { name: "Polarized Lenses", href: "/polarized" },
                 { name: "All Sunglasses", href: "/sunglasses" },
+                { name: "Polarized Lenses", href: "/polarized" },
                 { name: "Luxury Gift Sets", href: "/gifts" },
               ].map((link) => (
                 <li key={link.name}>
@@ -212,12 +212,12 @@ export default function Footer() {
             </h4>
             <ul className="space-y-2.5 text-[12.5px]">
               {[
-                { name: "Track Your Order", href: "/cart" },
-                { name: "Complimentary Shipping", href: "/about" },
-                { name: "14-Day Returns & Exchange", href: "/about" },
-                { name: "Lens Care & Warranty", href: "/about" },
-                { name: "Authenticity Guarantee", href: "/about" },
-                { name: "FAQ & Assistance", href: "/contact" },
+                { name: "Track Your Order", href: "/track-order" },
+                { name: "Shipping Policy", href: "/shipping" },
+                { name: "Authenticity Guarantee", href: "/authenticity" },
+                { name: "Privacy Policy", href: "/privacy-policy" },
+                { name: "Terms of Service", href: "/terms-of-service" },
+                { name: "FAQ & Assistance", href: "/faq" },
               ].map((link) => (
                 <li key={link.name}>
                   <Link href={link.href} className="text-neutral-400 hover:text-white hover:translate-x-1 transition-all inline-block duration-200">
@@ -236,7 +236,6 @@ export default function Footer() {
             <ul className="space-y-2.5 text-[12.5px]">
               {[
                 { name: "Our Heritage & Story", href: "/about" },
-                { name: "Optical Craftsmanship", href: "/about" },
                 { name: "Contact Concierge", href: "/contact" },
                 { name: "Admin Portal", href: "/admin" },
               ].map((link) => (
@@ -266,45 +265,56 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Bottom Bar: Copyright & Payment Badges */}
-        <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-neutral-500">
-          <div className="flex items-center gap-6">
+        {/* Bottom Bar: Copyright, Crafted By & Payment Badges */}
+        <div className="pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-[11px] text-neutral-500 text-center md:text-left">
+          {/* Left: Copyright */}
+          <div>
             <p>&copy; {new Date().getFullYear()} SPECTRA Eyewear. All rights reserved.</p>
-            <div className="hidden sm:flex items-center gap-4">
-              <Link href="/about" className="hover:text-neutral-300 transition-colors">Privacy Policy</Link>
-              <span>•</span>
-              <Link href="/about" className="hover:text-neutral-300 transition-colors">Terms of Service</Link>
-            </div>
           </div>
 
-          {/* Social Links & Payment Pill */}
-          <div className="flex items-center gap-4">
+          {/* Center: Crafted by Ekodrix */}
+          <div className="text-neutral-400 text-[11px] text-center">
+            Crafted by{" "}
             <a
-              href="https://instagram.com"
+              href="https://ekodrix.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="w-8 h-8 rounded-lg bg-[#141414] border border-white/[0.08] flex items-center justify-center text-neutral-400 hover:text-white hover:border-[#c8874a]/50 transition-colors"
-              aria-label="Instagram"
+              className="text-[#c8874a] hover:text-[#e5a872] hover:underline transition-colors font-medium"
             >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <rect width="20" height="20" x="2" y="2" rx="5" ry="5"/>
-                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
-                <line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/>
-              </svg>
+              Ekodrix
             </a>
-            <a
-              href="https://facebook.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-8 h-8 rounded-lg bg-[#141414] border border-white/[0.08] flex items-center justify-center text-neutral-400 hover:text-white hover:border-[#c8874a]/50 transition-colors"
-              aria-label="Facebook"
-            >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
-              </svg>
-            </a>
+          </div>
 
-            <div className="flex items-center gap-1.5 px-3 py-1 bg-[#121212] border border-white/[0.06] rounded-lg text-[10px] text-neutral-400 font-bold uppercase tracking-wider">
+          {/* Right: Social Links & Payment Pill */}
+          <div className="flex flex-wrap items-center justify-center md:justify-end gap-3 w-full md:w-auto">
+            <div className="flex items-center gap-2.5">
+              <a
+                href="https://instagram.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-8 h-8 rounded-lg bg-[#141414] border border-white/[0.08] flex items-center justify-center text-neutral-400 hover:text-white hover:border-[#c8874a]/50 transition-colors"
+                aria-label="Instagram"
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect width="20" height="20" x="2" y="2" rx="5" ry="5"/>
+                  <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+                  <line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/>
+                </svg>
+              </a>
+              <a
+                href="https://facebook.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-8 h-8 rounded-lg bg-[#141414] border border-white/[0.08] flex items-center justify-center text-neutral-400 hover:text-white hover:border-[#c8874a]/50 transition-colors"
+                aria-label="Facebook"
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
+                </svg>
+              </a>
+            </div>
+
+            <div className="flex items-center gap-1.5 px-3.5 py-2 bg-[#121212] border border-white/[0.06] rounded-lg text-[10px] text-neutral-400 font-bold uppercase tracking-wider">
               <span>UPI</span>
               <span>•</span>
               <span>CARDS</span>

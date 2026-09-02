@@ -52,6 +52,7 @@ export default function Navbar() {
     { name: "MEN", href: "/men" },
     { name: "WOMEN", href: "/women" },
     { name: "SUNGLASSES", href: "/sunglasses" },
+    { name: "POLARIZED", href: "/polarized" },
     { name: "COLLECTIONS", href: "/collections" },
     { name: "GIFTS", href: "/gifts" },
   ];
@@ -67,19 +68,19 @@ export default function Navbar() {
 
       <header
         className={`sticky top-0 z-40 w-full transition-all duration-300 ${scrolled
-            ? "bg-[#0a0a0a]/98 backdrop-blur-xl shadow-2xl shadow-black/50"
-            : "bg-[#0a0a0a]/95 backdrop-blur-md"
+          ? "bg-[#0a0a0a]/98 backdrop-blur-xl shadow-2xl shadow-black/50"
+          : "bg-[#0a0a0a]/95 backdrop-blur-md"
           }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="relative flex items-center justify-between h-[60px] sm:h-20">
 
-            {/* Left Area: Menubar button + Desktop Logo */}
+            {/* Left Area: Mobile Menu Button + Desktop Logo */}
             <div className="flex items-center gap-3 sm:gap-4">
               <button
                 type="button"
                 onClick={() => setIsMenuOpen(true)}
-                className="text-neutral-300 hover:text-white p-1.5 -ml-1.5 rounded-sm hover:bg-white/[0.06] transition-colors cursor-pointer flex items-center gap-2 group"
+                className="md:hidden text-neutral-300 hover:text-white p-1.5 -ml-1.5 rounded-sm hover:bg-white/[0.06] transition-colors cursor-pointer flex items-center gap-2 group"
                 aria-label="Open navigation menu"
               >
                 <Menu className="w-5 h-5 stroke-[1.5] group-hover:scale-110 transition-transform" />
@@ -112,24 +113,22 @@ export default function Navbar() {
               </Link>
             </div>
 
-            {/* Right Area: Nav links (desktop) + Action icons */}
-            <div className="flex items-center gap-6 sm:gap-8 text-neutral-300">
-              {/* Desktop Nav (MEN, WOMEN, SUNGLASSES) */}
-              <nav className="hidden md:flex items-center gap-6 lg:gap-8">
-                {desktopNavItems.map((item) => (
-                  <Link
-                    key={item.name}
-                    href={item.href}
-                    className="text-[10.5px] lg:text-[11.5px] font-semibold tracking-[0.22em] text-neutral-300 hover:text-white transition-colors duration-200 uppercase py-1 relative group"
-                  >
-                    {item.name}
-                    <span className="absolute bottom-0 left-0 w-0 h-[1.5px] bg-[#c8874a] transition-all duration-300 group-hover:w-full" />
-                  </Link>
-                ))}
-              </nav>
+            {/* Center Area: Desktop Navigation (centered on md+) */}
+            <nav className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-6 lg:gap-8 text-neutral-300">
+              {desktopNavItems.map((item) => (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  className="text-[10.5px] lg:text-[11.5px] font-semibold tracking-[0.22em] text-neutral-300 hover:text-white transition-colors duration-200 uppercase py-1 relative group"
+                >
+                  {item.name}
+                  <span className="absolute bottom-0 left-0 w-0 h-[1.5px] bg-[#c8874a] transition-all duration-300 group-hover:w-full" />
+                </Link>
+              ))}
+            </nav>
 
-              {/* Action icons */}
-              <div className="flex items-center gap-3 sm:gap-4">
+            {/* Right Area: Action icons */}
+            <div className="flex items-center gap-3 sm:gap-4 text-neutral-300">
                 {/* Search */}
                 <button
                   type="button"
@@ -166,8 +165,7 @@ export default function Navbar() {
               </div>
             </div>
           </div>
-        </div>
-      </header>
+        </header>
 
       {/* Mobile Drawer */}
       <div
