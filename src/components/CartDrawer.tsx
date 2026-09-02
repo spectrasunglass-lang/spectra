@@ -152,14 +152,14 @@ export default function CartDrawer() {
             <Link
               href="/cart"
               onClick={closeCart}
-              className="btn-gold w-full justify-center text-[13px] py-3.5 rounded-xl"
+              className="btn-gold w-full justify-center text-[13px] py-3.5 rounded-sm"
             >
               Proceed to Checkout
               <ArrowRight size={15} />
             </Link>
             <button
               onClick={closeCart}
-              className="btn-outline-white w-full justify-center text-[12px] py-3 rounded-xl"
+              className="btn-outline-white w-full justify-center text-[12px] py-3 rounded-sm"
             >
               Continue Shopping
             </button>

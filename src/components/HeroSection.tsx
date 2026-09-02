@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, ArrowUpRight } from "lucide-react";
 
 export interface HeroSlideData {
   desktop?: string | null;
@@ -73,7 +73,7 @@ export default function HeroSection({
 
   return (
     <section
-      className="relative w-full min-h-[72dvh] sm:min-h-[80dvh] md:min-h-[calc(100dvh-64px)] bg-[#0a0a0a] overflow-hidden flex flex-col justify-end md:justify-center group/hero select-none"
+      className="relative w-full min-h-[calc(100dvh-60px)] sm:min-h-[calc(100dvh-80px)] bg-[#0a0a0a] overflow-hidden flex flex-col justify-end md:justify-center group/hero select-none"
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
@@ -151,58 +151,68 @@ export default function HeroSection({
 
 
       {/* Hero content */}
-      <div className="relative z-20 w-full max-w-7xl mx-auto px-5 sm:px-10 lg:px-20 pb-8 pt-10 md:py-20 flex flex-col items-center md:items-start text-center md:text-left">
-        <div className="max-w-md sm:max-w-lg md:max-w-md lg:max-w-xl flex flex-col items-center md:items-start">
-          {/* Label (Desktop Only) */}
-          <p className="hidden md:block text-[10px] sm:text-[11px] font-bold tracking-[0.3em] uppercase text-[#c8874a] mb-3 sm:mb-4">
+      <div className="relative z-20 w-full max-w-7xl mx-auto px-5 sm:px-10 lg:px-20 pb-12 sm:pb-16 md:py-20 flex flex-col items-start text-left">
+        <div className="w-full max-w-md sm:max-w-lg md:max-w-md lg:max-w-xl flex flex-col items-start text-left">
+          {/* Label */}
+          <p className="text-[11px] sm:text-[12px] font-bold tracking-[0.3em] uppercase text-[#c8874a] mb-2 sm:mb-4">
             NEW COLLECTION 2026
           </p>
 
           {/* Headline with Exact Stencil Typography */}
-          <h1 className="font-stencil uppercase leading-[1.05] tracking-[0.06em] sm:tracking-[0.1em] mb-4 sm:mb-5">
-            <span className="inline md:block text-white text-[23px] sm:text-4xl md:text-6xl lg:text-[68px]">
+          <h1 className="font-stencil uppercase leading-[1.05] tracking-[0.06em] sm:tracking-[0.1em] mb-3 sm:mb-5">
+            <span className="block text-white text-[28px] sm:text-4xl md:text-6xl lg:text-[68px]">
               SEE BEYOND{" "}
             </span>
-            <span className="inline md:block text-[#c8874a] text-[23px] sm:text-4xl md:text-6xl lg:text-[68px] md:mt-1">
+            <span className="block text-[#c8874a] text-[28px] sm:text-4xl md:text-6xl lg:text-[68px] mt-1">
               LIMITS
             </span>
           </h1>
 
-          {/* Subtext (Desktop Only) */}
-          <p className="hidden md:block text-neutral-300 text-[13px] sm:text-sm md:text-[15px] leading-relaxed mb-6 sm:mb-8 font-medium">
+          {/* Subtext */}
+          <p className="text-neutral-300 text-[13px] sm:text-sm md:text-[15px] leading-relaxed mb-5 sm:mb-8 font-medium">
             Crafted for visionaries.
             <br />
             Designed to stand apart.
           </p>
 
-          {/* Mobile CTA: Single SHOP NOW button */}
-          <div className="flex md:hidden justify-center">
-            <Link
-              href="/sunglasses"
-              className="bg-[#c8874a] hover:bg-[#b87840] text-white text-[11px] font-bold px-8 py-3 rounded-sm flex items-center justify-center gap-2 uppercase tracking-[0.15em] transition-all shadow-md w-full max-w-[200px]"
-            >
-              SHOP NOW
-            </Link>
-          </div>
-
-          {/* Desktop CTA Buttons */}
-          <div className="hidden md:flex gap-3">
+          {/* CTA Buttons */}
+          <div className="flex flex-col sm:flex-row gap-3 items-start w-full">
             <Link
               href="/men"
-              className="bg-[#c8874a] hover:bg-[#b87840] text-white text-[11px] font-bold px-6 py-3 rounded-lg flex items-center justify-center gap-2 uppercase tracking-[0.15em] transition-all shadow-md sm:flex-initial"
+              className="w-full max-w-[220px] bg-[#c8874a] hover:bg-[#b87840] text-white text-[11px] font-bold px-5 py-3.5 rounded-lg flex items-center justify-center gap-2 uppercase tracking-[0.15em] transition-all shadow-md group/btn"
             >
-              SHOP MEN
+              <span>SHOP MEN</span>
+              <ArrowUpRight size={15} className="text-white transition-transform duration-200 group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5" />
             </Link>
 
             <Link
               href="/women"
-              className="border border-white/40 hover:border-white text-white hover:bg-white/[0.06] text-[11px] font-bold px-6 py-3 rounded-lg flex items-center justify-center gap-2 uppercase tracking-[0.15em] transition-all sm:flex-initial"
+              className="w-full max-w-[220px] border border-[#c8874a]/60 hover:border-[#c8874a] text-white hover:bg-white/[0.04] text-[11px] font-bold px-5 py-3.5 rounded-lg flex items-center justify-center gap-2 uppercase tracking-[0.15em] transition-all group/btn"
             >
-              SHOP WOMEN
+              <span>EXPLORE WOMEN</span>
+              <ArrowUpRight size={15} className="text-white transition-transform duration-200 group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5" />
             </Link>
           </div>
         </div>
       </div>
+
+      {/* Slide Indicators - Centered at Bottom */}
+      {totalSlides > 1 && (
+        <div className="absolute bottom-4 sm:bottom-6 left-0 right-0 z-30 flex items-center justify-center gap-2 pointer-events-auto">
+          {slideList.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => setActiveSlide(i)}
+              aria-label={`Go to slide ${i + 1}`}
+              className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
+                activeSlide === i
+                  ? "w-8 bg-[#c8874a]"
+                  : "w-6 bg-white/30 hover:bg-white/50"
+              }`}
+            />
+          ))}
+        </div>
+      )}
     </section>
   );
 }

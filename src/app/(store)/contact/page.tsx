@@ -27,7 +27,6 @@ export default function ContactPage() {
       <div className="relative border-b border-white/[0.08] bg-gradient-to-b from-[#161616] to-[#0a0a0a] py-16 sm:py-20 text-center">
         <div className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12">
           <p className="text-[10.5px] font-bold tracking-[0.3em] uppercase text-[#c8874a] mb-2 flex items-center justify-center gap-1.5">
-            <Sparkles size={14} />
             Client Relations
           </p>
           <h1 className="font-stencil text-3xl sm:text-5xl text-white tracking-[0.1em] uppercase">
@@ -54,8 +53,8 @@ export default function ContactPage() {
             </div>
 
             <div className="space-y-5 text-[13px]">
-              <div className="flex items-start gap-4 p-4 rounded-2xl bg-[#121212] border border-white/[0.06]">
-                <div className="w-10 h-10 rounded-xl bg-[#1c1c1c] flex items-center justify-center text-[#c8874a] flex-shrink-0">
+              <div className="flex items-start gap-4 p-4 rounded-sm bg-[#121212]">
+                <div className="w-10 h-10 rounded-sm bg-[#1c1c1c] flex items-center justify-center text-[#c8874a] flex-shrink-0">
                   <Mail size={18} />
                 </div>
                 <div>
@@ -66,8 +65,8 @@ export default function ContactPage() {
                 </div>
               </div>
 
-              <div className="flex items-start gap-4 p-4 rounded-2xl bg-[#121212] border border-white/[0.06]">
-                <div className="w-10 h-10 rounded-xl bg-[#1c1c1c] flex items-center justify-center text-[#c8874a] flex-shrink-0">
+              <div className="flex items-start gap-4 p-4 rounded-sm bg-[#121212]">
+                <div className="w-10 h-10 rounded-sm bg-[#1c1c1c] flex items-center justify-center text-[#c8874a] flex-shrink-0">
                   <Phone size={18} />
                 </div>
                 <div>
@@ -78,8 +77,8 @@ export default function ContactPage() {
                 </div>
               </div>
 
-              <div className="flex items-start gap-4 p-4 rounded-2xl bg-[#121212] border border-white/[0.06]">
-                <div className="w-10 h-10 rounded-xl bg-[#1c1c1c] flex items-center justify-center text-[#c8874a] flex-shrink-0">
+              <div className="flex items-start gap-4 p-4 rounded-sm bg-[#121212]">
+                <div className="w-10 h-10 rounded-sm bg-[#1c1c1c] flex items-center justify-center text-[#c8874a] flex-shrink-0">
                   <MapPin size={18} />
                 </div>
                 <div>
@@ -93,7 +92,7 @@ export default function ContactPage() {
           </div>
 
           {/* Right: Contact Form */}
-          <div className="lg:col-span-7 bg-[#121212] border border-white/[0.08] rounded-3xl p-8 sm:p-10 shadow-2xl">
+          <div className="lg:col-span-7 bg-[#121212] rounded-sm p-8 sm:p-10 shadow-2xl">
             <h3 className="text-xl font-bold uppercase text-white tracking-tight mb-2">
               Send Us A Message
             </h3>
@@ -102,7 +101,7 @@ export default function ContactPage() {
             </p>
 
             {submitted ? (
-              <div className="p-6 bg-[#c8874a]/15 border border-[#c8874a]/30 rounded-2xl text-center space-y-2">
+              <div className="p-6 bg-[#c8874a]/15 border border-[#c8874a]/30 rounded-sm text-center space-y-2">
                 <div className="w-12 h-12 rounded-full bg-[#c8874a] text-white mx-auto flex items-center justify-center">
                   <Check size={20} />
                 </div>
@@ -124,7 +123,7 @@ export default function ContactPage() {
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                       placeholder="e.g. Aryan Sharma"
-                      className="w-full bg-[#181818] border border-white/[0.1] rounded-xl px-4 py-3 text-[13px] text-white focus:outline-none focus:border-[#c8874a]"
+                      className="w-full bg-[#181818] rounded-sm px-4 py-3 text-[13px] text-white placeholder-neutral-500 focus:outline-none transition-colors"
                     />
                   </div>
 
@@ -138,7 +137,7 @@ export default function ContactPage() {
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                       placeholder="e.g. aryan@example.com"
-                      className="w-full bg-[#181818] border border-white/[0.1] rounded-xl px-4 py-3 text-[13px] text-white focus:outline-none focus:border-[#c8874a]"
+                      className="w-full bg-[#181818] rounded-sm px-4 py-3 text-[13px] text-white placeholder-neutral-500 focus:outline-none transition-colors"
                     />
                   </div>
                 </div>
@@ -150,7 +149,7 @@ export default function ContactPage() {
                   <select
                     value={formData.subject}
                     onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                    className="w-full bg-[#181818] border border-white/[0.1] rounded-xl px-4 py-3 text-[13px] text-white focus:outline-none focus:border-[#c8874a]"
+                    className="w-full bg-[#181818] rounded-sm px-4 py-3 text-[13px] text-white focus:outline-none transition-colors"
                   >
                     <option value="Order Inquiry">Order & Tracking Assistance</option>
                     <option value="Styling Advice">Bespoke Styling & Fit Consultation</option>
@@ -169,13 +168,13 @@ export default function ContactPage() {
                     value={formData.message}
                     onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                     placeholder="Tell us how we can assist you..."
-                    className="w-full bg-[#181818] border border-white/[0.1] rounded-xl px-4 py-3 text-[13px] text-white focus:outline-none focus:border-[#c8874a]"
+                    className="w-full bg-[#181818] rounded-sm px-4 py-3 text-[13px] text-white placeholder-neutral-500 focus:outline-none transition-colors"
                   />
                 </div>
 
                 <button
                   type="submit"
-                  className="w-full py-4 bg-[#c8874a] hover:bg-[#b87840] text-white rounded-xl text-[12px] font-bold uppercase tracking-[0.2em] flex items-center justify-center gap-2 transition-all shadow-xl shadow-[#c8874a]/25 cursor-pointer"
+                  className="w-full py-4 bg-[#c8874a] hover:bg-[#b87840] text-white rounded-sm text-[12px] font-bold uppercase tracking-[0.2em] flex items-center justify-center gap-2 transition-all shadow-xl shadow-[#c8874a]/25 cursor-pointer"
                 >
                   <Send size={15} /> Submit Inquiry
                 </button>
