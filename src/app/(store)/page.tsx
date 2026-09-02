@@ -14,7 +14,7 @@ export const metadata: Metadata = {
     "SPECTRA luxury eyewear. Crafted for visionaries. Designed to stand apart. Shop men's and women's sunglasses, polarized lenses and exclusive collections.",
 };
 
-export const revalidate = 0; // Fresh data on each load
+export const revalidate = 60; // Cache for 60s at edge to protect Supabase egress
 
 export default async function Home() {
   const supabase = await createClient();

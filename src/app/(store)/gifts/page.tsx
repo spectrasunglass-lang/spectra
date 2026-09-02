@@ -10,14 +10,14 @@ export const metadata: Metadata = {
   description: "Curated eyewear gifts, luxury gift packaging, bespoke gift sets and gift cards by SPECTRA.",
 };
 
-export const revalidate = 0;
+export const revalidate = 60;
 
 export default async function GiftsPage() {
   const supabase = await createClient();
 
   const { data: giftData } = await supabase
     .from("products")
-    .select("*")
+    .select("id, name, subtitle, price, compare_price, image_url, slug, is_new, shape, category")
     .eq("status", "active")
     .eq("is_gift", true)
     .order("created_at", { ascending: false })
@@ -25,7 +25,7 @@ export default async function GiftsPage() {
 
   const data = (giftData && giftData.length > 0)
     ? giftData
-    : (await supabase.from("products").select("*").eq("status", "active").order("created_at", { ascending: false }).limit(8)).data;
+    : (await supabase.from("products").select("id, name, subtitle, price, compare_price, image_url, slug, is_new, shape, category").eq("status", "active").order("created_at", { ascending: false }).limit(8)).data;
 
   const products: Product[] = (data || []).map((p) => ({
     id: p.id,

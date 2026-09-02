@@ -10,14 +10,14 @@ export const metadata: Metadata = {
   description: "Explore handcrafted luxury sunglasses for men. Aviator, Wayfarer, Square and Polarized collections.",
 };
 
-export const revalidate = 0;
+export const revalidate = 60;
 
 export default async function MenPage() {
   const supabase = await createClient();
 
   const { data } = await supabase
     .from("products")
-    .select("*")
+    .select("id, name, subtitle, price, compare_price, image_url, slug, is_new, shape, category")
     .in("category", ["men", "unisex"])
     .eq("status", "active")
     .order("created_at", { ascending: false });

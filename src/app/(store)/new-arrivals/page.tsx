@@ -10,14 +10,14 @@ export const metadata: Metadata = {
   description: "Explore the latest 2026 sunglasses arrivals. Handcrafted limited-batch frames from SPECTRA.",
 };
 
-export const revalidate = 0;
+export const revalidate = 60;
 
 export default async function NewArrivalsPage() {
   const supabase = await createClient();
 
   const { data } = await supabase
     .from("products")
-    .select("*")
+    .select("id, name, subtitle, price, compare_price, image_url, slug, is_new, shape, category")
     .eq("status", "active")
     .order("created_at", { ascending: false });
 

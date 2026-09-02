@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   description: "Browse the complete SPECTRA luxury eyewear and sunglasses collection. Handcrafted frames, polarized lenses.",
 };
 
-export const revalidate = 0;
+export const revalidate = 60;
 
 interface CollectionsPageProps {
   searchParams: Promise<{
@@ -35,7 +35,10 @@ export default async function CollectionsPage({ searchParams }: CollectionsPageP
 
   const supabase = await createClient();
 
-  let query = supabase.from("products").select("*").eq("status", "active");
+  let query = supabase
+    .from("products")
+    .select("id, name, subtitle, price, compare_price, image_url, slug, is_new, shape, category")
+    .eq("status", "active");
 
   if (categoryFilter !== "all") {
     query = query.eq("category", categoryFilter);

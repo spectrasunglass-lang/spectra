@@ -5,7 +5,7 @@ import { ProductCard, Product } from "@/components/ProductCard";
 import ProductDetailClient from "./ProductDetailClient";
 import type { Metadata } from "next";
 
-export const revalidate = 0;
+export const revalidate = 60;
 
 interface ProductPageProps {
   params: Promise<{ slug: string }>;
@@ -47,7 +47,7 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
   // Fetch related products in the same category
   const { data: relatedData } = await supabase
     .from("products")
-    .select("*")
+    .select("id, name, subtitle, price, compare_price, image_url, slug, is_new, shape, category")
     .eq("status", "active")
     .neq("id", product.id)
     .limit(4);

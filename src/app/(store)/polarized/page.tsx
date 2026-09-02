@@ -10,21 +10,21 @@ export const metadata: Metadata = {
   description: "Advanced polarized optics for crystal-clear contrast and 100% UV glare protection.",
 };
 
-export const revalidate = 0;
+export const revalidate = 60;
 
 export default async function PolarizedPage() {
   const supabase = await createClient();
 
   const { data: polarizedData } = await supabase
     .from("products")
-    .select("*")
+    .select("id, name, subtitle, price, compare_price, image_url, slug, is_new, shape, category")
     .eq("status", "active")
     .eq("is_polarized", true)
     .order("created_at", { ascending: false });
 
   const data = (polarizedData && polarizedData.length > 0)
     ? polarizedData
-    : (await supabase.from("products").select("*").eq("status", "active").order("created_at", { ascending: false })).data;
+    : (await supabase.from("products").select("id, name, subtitle, price, compare_price, image_url, slug, is_new, shape, category").eq("status", "active").order("created_at", { ascending: false })).data;
 
   const products: Product[] = (data || []).map((p) => ({
     id: p.id,
