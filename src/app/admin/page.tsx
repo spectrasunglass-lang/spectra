@@ -12,6 +12,7 @@ import {
   Plus,
   Eye,
   TrendingUp,
+  Mail,
 } from "lucide-react";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -29,6 +30,7 @@ export default async function AdminDashboard() {
     { data: recentOrders },
     { data: topProducts },
     { data: chartData },
+    { count: totalSubscribers },
   ] = await Promise.all([
     supabase.from("products").select("*", { count: "exact", head: true }),
     supabase.from("orders").select("amount, status, created_at, customer_email"),
@@ -49,6 +51,7 @@ export default async function AdminDashboard() {
         new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
       )
       .order("created_at", { ascending: true }),
+    supabase.from("subscribers").select("*", { count: "exact", head: true }),
   ]);
 
   const allOrders = ordersData ?? [];
@@ -84,7 +87,7 @@ export default async function AdminDashboard() {
     { label: "Total Revenue", value: fmt(totalRevenue), icon: <IndianRupee size={18} />, variant: "dark" as const },
     { label: "Orders Today", value: String(ordersToday), icon: <ShoppingBag size={18} />, variant: "gold" as const },
     { label: "Total Products", value: String(totalProducts ?? 0), icon: <Package size={18} />, variant: "charcoal" as const },
-    { label: "Customers", value: String(new Set(allOrders.map((o) => o.customer_email ?? "")).size), icon: <Users size={18} />, variant: "carbon" as const },
+    { label: "VIP Subscribers", value: String(totalSubscribers ?? 0), icon: <Mail size={18} />, variant: "carbon" as const },
   ];
 
   return (
@@ -159,6 +162,7 @@ export default async function AdminDashboard() {
           {[
             { label: "Add New Product", href: "/admin/products/new", icon: <Package size={15} />, desc: "Create product listing" },
             { label: "View Orders", href: "/admin/orders", icon: <ShoppingBag size={15} />, desc: "Track customer orders" },
+            { label: "VIP Subscribers", href: "/admin/subscribers", icon: <Mail size={15} />, desc: "Compose campaigns & export" },
             { label: "Upload Media", href: "/admin/media", icon: <Eye size={15} />, desc: "Hero banners & brand imagery" },
           ].map((a) => (
             <Link

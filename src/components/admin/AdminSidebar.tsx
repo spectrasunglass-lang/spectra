@@ -16,16 +16,18 @@ import {
   ExternalLink,
   Sparkles,
   Shapes,
+  Mail,
 } from "lucide-react";
 
 const navItems = [
-  { label: "Dashboard",  href: "/admin",            icon: LayoutDashboard, exact: true  },
-  { label: "Products",   href: "/admin/products",   icon: Package,         exact: false },
-  { label: "Orders",     href: "/admin/orders",     icon: ShoppingBag,     exact: false },
-  { label: "Campaigns",  href: "/admin/campaigns",  icon: Sparkles,        exact: false },
-  { label: "Categories", href: "/admin/categories", icon: Shapes,          exact: false },
-  { label: "Media",      href: "/admin/media",      icon: ImageIcon,       exact: false },
-  { label: "Settings",   href: "/admin/settings",   icon: Settings,        exact: false },
+  { label: "Dashboard",   href: "/admin",             icon: LayoutDashboard, exact: true  },
+  { label: "Products",    href: "/admin/products",    icon: Package,         exact: false },
+  { label: "Orders",      href: "/admin/orders",      icon: ShoppingBag,     exact: false },
+  { label: "Subscribers", href: "/admin/subscribers", icon: Mail,            exact: false },
+  { label: "Campaigns",   href: "/admin/campaigns",   icon: Sparkles,        exact: false },
+  { label: "Categories",  href: "/admin/categories",  icon: Shapes,          exact: false },
+  { label: "Media",       href: "/admin/media",       icon: ImageIcon,       exact: false },
+  { label: "Settings",    href: "/admin/settings",    icon: Settings,        exact: false },
 ];
 
 export default function AdminSidebar() {
@@ -132,12 +134,12 @@ export default function AdminSidebar() {
         </div>
       </nav>
 
-      {/* Store link */}
-      <div className="pb-4 px-3 border-t border-white/[0.05] pt-3">
+      {/* Store link & Logout */}
+      <div className="pb-4 px-3 border-t border-white/[0.05] pt-3 space-y-1">
         <Link
           href="/"
           title={collapsed ? "View Store" : undefined}
-          className={`flex items-center gap-3 py-2.5 rounded-sm text-white/30 hover:text-white hover:bg-white/[0.04] transition-all group relative ${
+          className={`flex items-center gap-3 py-2 rounded-sm text-white/40 hover:text-white hover:bg-white/[0.04] transition-all group relative ${
             collapsed ? "justify-center px-2" : "px-3"
           }`}
         >
@@ -145,13 +147,33 @@ export default function AdminSidebar() {
             <ExternalLink size={14} />
           </div>
           {!collapsed && <span className="text-[12px] font-semibold">View Store</span>}
-          {!collapsed && <LogOut size={12} className="ml-auto opacity-40" />}
           {collapsed && (
             <span className="absolute left-full ml-3 px-3 py-1.5 bg-[#1a1a1a] border border-white/10 text-white text-[11px] font-semibold rounded-sm opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all whitespace-nowrap z-50 shadow-2xl pointer-events-none">
               View Store
             </span>
           )}
         </Link>
+
+        <button
+          onClick={async () => {
+            await fetch("/api/admin/logout", { method: "POST" });
+            window.location.href = "/admin/login";
+          }}
+          title={collapsed ? "Sign Out" : undefined}
+          className={`w-full flex items-center gap-3 py-2 rounded-sm text-red-400/60 hover:text-red-400 hover:bg-red-500/10 transition-all group relative cursor-pointer ${
+            collapsed ? "justify-center px-2" : "px-3"
+          }`}
+        >
+          <div className="w-8 h-8 rounded-sm bg-[#161616] group-hover:bg-red-500/15 flex items-center justify-center flex-shrink-0 transition-colors text-red-400/60 group-hover:text-red-400">
+            <LogOut size={14} />
+          </div>
+          {!collapsed && <span className="text-[12px] font-semibold">Sign Out</span>}
+          {collapsed && (
+            <span className="absolute left-full ml-3 px-3 py-1.5 bg-[#1a1a1a] border border-white/10 text-red-400 text-[11px] font-semibold rounded-sm opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all whitespace-nowrap z-50 shadow-2xl pointer-events-none">
+              Sign Out
+            </span>
+          )}
+        </button>
       </div>
 
       {/* Collapse toggle */}

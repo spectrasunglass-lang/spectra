@@ -6,7 +6,7 @@ import Link from "next/link";
 import { ArrowLeft, Save, Loader2, CheckCircle2 } from "lucide-react";
 import ImageUpload from "@/components/admin/ImageUpload";
 
-const categories = ["Men", "Women", "Unisex", "Kids"];
+const categories = ["Men", "Women", "Sunglasses", "Unisex", "Kids"];
 const shapes = ["Oval", "Rectangle", "Wayfarer", "Round", "Aviator", "Square", "Cat Eye"];
 
 export default function NewProductPage() {
@@ -25,6 +25,8 @@ export default function NewProductPage() {
     shape: "Rectangle",
     description: "",
     is_new: true,
+    is_polarized: false,
+    is_gift: false,
     status: "active" as "active" | "draft",
     image_url: null as string | null,
   });
@@ -61,6 +63,8 @@ export default function NewProductPage() {
           shape: form.shape.toLowerCase(),
           description: form.description,
           is_new: form.is_new,
+          is_polarized: form.is_polarized,
+          is_gift: form.is_gift,
           status: form.status,
           image_url: form.image_url,
         },
@@ -286,13 +290,63 @@ export default function NewProductPage() {
               <button
                 type="button"
                 onClick={() => set("is_new", !form.is_new)}
-                className={`relative w-11 h-6 rounded-full transition-colors duration-200 focus:outline-none ${
+                className={`relative w-11 h-6 rounded-full transition-colors duration-200 focus:outline-none cursor-pointer ${
                   form.is_new ? "bg-[#c8874a]" : "bg-[#252525]"
                 }`}
               >
                 <span
                   className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow-sm transition-all duration-200 ${
                     form.is_new ? "left-[22px]" : "left-0.5"
+                  }`}
+                />
+              </button>
+            </div>
+
+            {/* Polarized toggle */}
+            <div className="flex items-center justify-between border-t border-white/[0.06] pt-4">
+              <div>
+                <p className="text-[13px] font-semibold text-white">
+                  Polarized Lens
+                </p>
+                <p className="text-[11px] text-white/40 mt-0.5">
+                  Displays in Polarized Optics collection
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => set("is_polarized", !form.is_polarized)}
+                className={`relative w-11 h-6 rounded-full transition-colors duration-200 focus:outline-none cursor-pointer ${
+                  form.is_polarized ? "bg-[#c8874a]" : "bg-[#252525]"
+                }`}
+              >
+                <span
+                  className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow-sm transition-all duration-200 ${
+                    form.is_polarized ? "left-[22px]" : "left-0.5"
+                  }`}
+                />
+              </button>
+            </div>
+
+            {/* Gift Recommended toggle */}
+            <div className="flex items-center justify-between border-t border-white/[0.06] pt-4">
+              <div>
+                <p className="text-[13px] font-semibold text-white">
+                  Featured for Gifting
+                </p>
+                <p className="text-[11px] text-white/40 mt-0.5">
+                  Displays in Luxury Gifts collection
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => set("is_gift", !form.is_gift)}
+                className={`relative w-11 h-6 rounded-full transition-colors duration-200 focus:outline-none cursor-pointer ${
+                  form.is_gift ? "bg-[#c8874a]" : "bg-[#252525]"
+                }`}
+              >
+                <span
+                  className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow-sm transition-all duration-200 ${
+                    form.is_gift ? "left-[22px]" : "left-0.5"
                   }`}
                 />
               </button>

@@ -76,7 +76,7 @@ export default function SpotlightSection({
                 {/* Top Typography Overlay (if title provided) */}
                 {card.title && (
                   <div className="absolute top-7 sm:top-9 left-0 right-0 px-4 text-center z-10 flex flex-col items-center">
-                    <h3 className="font-extrabold text-white text-xl sm:text-2xl md:text-[26px] tracking-[0.16em] uppercase font-stencil drop-shadow-md transition-transform duration-300 group-hover:-translate-y-0.5">
+                    <h3 className="font-extrabold text-white text-xl sm:text-2xl md:text-[26px] tracking-[0.12em] uppercase drop-shadow-md transition-transform duration-300 group-hover:-translate-y-0.5">
                       {card.title}
                     </h3>
                     {card.subtitle && (

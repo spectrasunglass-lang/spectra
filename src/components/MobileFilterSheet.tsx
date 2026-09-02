@@ -39,7 +39,7 @@ export default function MobileFilterSheet({
     if (cat !== "all") params.set("category", cat);
     if (shape !== "all") params.set("shape", shape);
     const qs = params.toString();
-    return qs ? `/sunglasses?${qs}` : "/sunglasses";
+    return qs ? `/collections?${qs}` : "/collections";
   };
 
   return (
@@ -154,7 +154,7 @@ export default function MobileFilterSheet({
           {/* Reset */}
           {activeCount > 0 && (
             <Link
-              href="/sunglasses"
+              href="/collections"
               onClick={() => setOpen(false)}
               className="block w-full text-center py-3 rounded-xl border border-white/[0.1] text-[12px] text-neutral-400 font-semibold uppercase tracking-wider hover:text-white hover:border-white/[0.2] transition-colors"
             >

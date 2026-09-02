@@ -1,8 +1,9 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
+import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
-import { Search, Filter, ShoppingBag, Loader2, RefreshCw, ChevronDown, ChevronUp } from "lucide-react";
+import { Search, Filter, ShoppingBag, Loader2, RefreshCw, ChevronDown, ChevronUp, Package } from "lucide-react";
 import StatusBadge from "@/components/admin/StatusBadge";
 
 type OrderStatus = "pending" | "processing" | "shipped" | "delivered" | "cancelled";
@@ -39,6 +40,8 @@ const nextStatuses: Record<OrderStatus, OrderStatus[]> = {
 
 export default function OrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
+  const [productList, setProductList] = useState<{ id: string; name: string; image_url: string | null }[]>([]);
+  const [productImages, setProductImages] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [search, setSearch] = useState("");
@@ -48,13 +51,57 @@ export default function OrdersPage() {
   const fetchOrders = useCallback(async () => {
     setLoading(true);
     const supabase = createClient();
-    const { data, error } = await supabase
-      .from("orders")
-      .select("*")
-      .order("created_at", { ascending: false });
-    if (!error && data) setOrders(data as Order[]);
+    const [ordersRes, productsRes] = await Promise.all([
+      supabase.from("orders").select("*").order("created_at", { ascending: false }),
+      supabase.from("products").select("id, name, image_url"),
+    ]);
+
+    if (!ordersRes.error && ordersRes.data) {
+      setOrders(ordersRes.data as Order[]);
+    }
+
+    if (!productsRes.error && productsRes.data) {
+      setProductList(productsRes.data);
+      const map: Record<string, string> = {};
+      productsRes.data.forEach((p) => {
+        if (p.image_url) {
+          map[p.name.toLowerCase().trim()] = p.image_url;
+          map[p.id] = p.image_url;
+        }
+      });
+      setProductImages(map);
+    }
+
     setLoading(false);
   }, []);
+
+  const resolveProductImage = (productText: string) => {
+    if (!productText) return null;
+    const lowerText = productText.toLowerCase();
+
+    // 1. Direct match
+    if (productImages[lowerText.trim()]) return productImages[lowerText.trim()];
+
+    // 2. Remove (x1), (x2) and take first item if multi-product
+    const cleanFirst = productText
+      .split(",")[0]
+      .replace(/\s*\(\s*x\d+\s*\)/gi, "")
+      .trim()
+      .toLowerCase();
+
+    if (productImages[cleanFirst]) return productImages[cleanFirst];
+
+    // 3. Substring match across all products
+    for (const p of productList) {
+      if (!p.image_url) continue;
+      const pName = p.name.toLowerCase().trim();
+      if (lowerText.includes(pName) || pName.includes(cleanFirst) || cleanFirst.includes(pName)) {
+        return p.image_url;
+      }
+    }
+
+    return null;
+  };
 
   useEffect(() => {
     fetchOrders();
@@ -204,7 +251,26 @@ export default function OrdersPage() {
                       <p className="text-[12px] font-semibold text-white">{order.customer_name}</p>
                       <p className="text-[11px] text-white/40">{order.customer_email}</p>
                     </td>
-                    <td className="px-5 py-4 text-[12px] text-white/70 max-w-[160px] truncate">{order.product_name}</td>
+                    <td className="px-5 py-4">
+                      <div className="flex items-center gap-3">
+                        <div className="relative w-11 h-11 rounded-sm bg-[#f5f0eb] border border-white/[0.08] overflow-hidden flex-shrink-0 flex items-center justify-center shadow-sm">
+                          {resolveProductImage(order.product_name) ? (
+                            <Image
+                              src={resolveProductImage(order.product_name)!}
+                              alt={order.product_name}
+                              fill
+                              className="object-contain p-1"
+                              sizes="44px"
+                            />
+                          ) : (
+                            <Package size={16} className="text-neutral-500" />
+                          )}
+                        </div>
+                        <span className="text-[12.5px] font-semibold text-white/90 max-w-[220px] line-clamp-2 leading-snug">
+                          {order.product_name}
+                        </span>
+                      </div>
+                    </td>
                     <td className="px-5 py-4 text-[13px] font-bold text-white">₹{(order.amount ?? 0).toLocaleString("en-IN")}</td>
                     <td className="px-5 py-4 text-[12px] text-white/40">
                       {new Date(order.created_at).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
@@ -218,7 +284,29 @@ export default function OrdersPage() {
                   {expanded === order.id && (
                     <tr>
                       <td colSpan={7} className="px-6 py-5 bg-[#0e0e0e] border-b border-white/[0.06]">
-                        <div className="flex flex-wrap items-start gap-8">
+                        <div className="flex flex-wrap items-center gap-8">
+                          {/* Product Thumbnail Card */}
+                          <div className="flex items-center gap-3.5 bg-[#141414] p-3 rounded-sm border border-white/[0.06] min-w-[260px] max-w-sm">
+                            <div className="relative w-14 h-14 rounded-sm bg-[#f5f0eb] border border-white/[0.08] overflow-hidden flex-shrink-0 flex items-center justify-center shadow-inner">
+                              {resolveProductImage(order.product_name) ? (
+                                <Image
+                                  src={resolveProductImage(order.product_name)!}
+                                  alt={order.product_name}
+                                  fill
+                                  className="object-contain p-1.5"
+                                  sizes="56px"
+                                />
+                              ) : (
+                                <Package size={20} className="text-neutral-500" />
+                              )}
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <p className="text-[9px] font-bold text-white/30 uppercase tracking-widest">Purchased Item</p>
+                              <p className="text-[12.5px] font-bold text-white line-clamp-1">{order.product_name}</p>
+                              <p className="text-[11px] text-[#c8874a] font-semibold mt-0.5">₹{(order.amount ?? 0).toLocaleString("en-IN")}</p>
+                            </div>
+                          </div>
+
                           <div className="min-w-[160px]">
                             <p className="text-[9px] font-bold text-white/30 uppercase tracking-widest mb-1.5">Shipping To</p>
                             <p className="text-[13px] font-bold text-white">{order.customer_name}</p>
@@ -238,7 +326,7 @@ export default function OrdersPage() {
                                   key={s}
                                   onClick={(e) => { e.stopPropagation(); updateStatus(order.id, s); }}
                                   disabled={updatingId === order.id}
-                                  className="px-3.5 py-2 text-[11px] font-bold capitalize rounded-sm border border-[#c8874a]/40 text-[#c8874a] hover:bg-[#c8874a] hover:text-white hover:border-[#c8874a] transition-all flex items-center gap-1.5 disabled:opacity-50"
+                                  className="px-3.5 py-2 text-[11px] font-bold capitalize rounded-sm border border-[#c8874a]/40 text-[#c8874a] hover:bg-[#c8874a] hover:text-white hover:border-[#c8874a] transition-all flex items-center gap-1.5 disabled:opacity-50 cursor-pointer"
                                 >
                                   {updatingId === order.id && <Loader2 size={11} className="animate-spin" />}
                                   Mark as {s}

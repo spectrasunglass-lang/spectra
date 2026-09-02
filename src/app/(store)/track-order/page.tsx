@@ -99,7 +99,7 @@ function TrackOrderContent() {
           <p className="text-[10px] font-bold tracking-[0.3em] uppercase text-[#c8874a] mb-2">
             SPECTRA Delivery Tracking
           </p>
-          <h1 className="font-stencil text-2xl sm:text-4xl text-white tracking-[0.08em] uppercase">
+          <h1 className="text-2xl sm:text-4xl font-bold text-white tracking-tight uppercase">
             Track Your Order
           </h1>
           <p className="text-neutral-400 text-xs sm:text-sm mt-2 max-w-md mx-auto">

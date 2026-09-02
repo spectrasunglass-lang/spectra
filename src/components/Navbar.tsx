@@ -3,15 +3,32 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Menu, X, Search, Heart, ShoppingBag } from "lucide-react";
+import { usePathname } from "next/navigation";
+import { Menu, X, Search, Heart, ShoppingBag, User } from "lucide-react";
 import SearchOverlay from "./SearchOverlay";
 import { useCart } from "./CartContext";
+import { createClient } from "@/lib/supabase/client";
 
 export default function Navbar() {
+  const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const { count: cartCount, openCart } = useCart();
+
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setIsLoggedIn(Boolean(session?.user));
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsLoggedIn(Boolean(session?.user));
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   // Scroll effect
   useEffect(() => {
@@ -41,7 +58,7 @@ export default function Navbar() {
     { name: "HOME", href: "/" },
     { name: "MEN", href: "/men" },
     { name: "WOMEN", href: "/women" },
-    { name: "SUNGLASSES", href: "/sunglasses" },
+    { name: "COLLECTIONS", href: "/collections" },
     { name: "POLARIZED", href: "/polarized" },
     { name: "GIFTS", href: "/gifts" }
   ];
@@ -51,9 +68,8 @@ export default function Navbar() {
     { name: "NEW ARRIVALS", href: "/new-arrivals" },
     { name: "MEN", href: "/men" },
     { name: "WOMEN", href: "/women" },
-    { name: "SUNGLASSES", href: "/sunglasses" },
+    { name: "SPECTRA COLLECTIONS", href: "/collections" },
     { name: "POLARIZED", href: "/polarized" },
-    { name: "COLLECTIONS", href: "/collections" },
     { name: "GIFTS", href: "/gifts" },
   ];
 
@@ -61,6 +77,11 @@ export default function Navbar() {
     { name: "ABOUT", href: "/about" },
     { name: "CONTACT", href: "/contact" },
   ];
+
+  const isItemActive = (href: string) => {
+    if (href === "/") return pathname === "/";
+    return pathname === href || pathname.startsWith(`${href}/`);
+  };
 
   return (
     <>
@@ -115,16 +136,25 @@ export default function Navbar() {
 
             {/* Center Area: Desktop Navigation (centered on md+) */}
             <nav className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-6 lg:gap-8 text-neutral-300">
-              {desktopNavItems.map((item) => (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className="text-[10.5px] lg:text-[11.5px] font-semibold tracking-[0.22em] text-neutral-300 hover:text-white transition-colors duration-200 uppercase py-1 relative group"
-                >
-                  {item.name}
-                  <span className="absolute bottom-0 left-0 w-0 h-[1.5px] bg-[#c8874a] transition-all duration-300 group-hover:w-full" />
-                </Link>
-              ))}
+              {desktopNavItems.map((item) => {
+                const active = isItemActive(item.href);
+                return (
+                  <Link
+                    key={item.name}
+                    href={item.href}
+                    className={`text-[10.5px] lg:text-[11.5px] font-semibold tracking-[0.22em] transition-colors duration-200 uppercase py-1 relative group whitespace-nowrap ${
+                      active ? "text-white font-bold" : "text-neutral-300 hover:text-white"
+                    }`}
+                  >
+                    {item.name}
+                    <span
+                      className={`absolute bottom-0 left-0 h-[2px] bg-[#c8874a] transition-all duration-300 ${
+                        active ? "w-full shadow-sm shadow-[#c8874a]/60" : "w-0 group-hover:w-full"
+                      }`}
+                    />
+                  </Link>
+                );
+              })}
             </nav>
 
             {/* Right Area: Action icons */}
@@ -146,6 +176,19 @@ export default function Navbar() {
                   aria-label="Wishlist"
                 >
                   <Heart className="w-[17px] h-[17px] stroke-[1.5] group-hover:scale-110 transition-transform" />
+                </Link>
+
+                {/* Account / Login */}
+                <Link
+                  href={isLoggedIn ? "/account" : "/login"}
+                  className="hover:text-white p-1 transition-colors group relative"
+                  aria-label={isLoggedIn ? "My Account" : "Sign In"}
+                  title={isLoggedIn ? "My Account" : "Sign In / Register"}
+                >
+                  <User className="w-[17px] h-[17px] stroke-[1.5] group-hover:scale-110 transition-transform" />
+                  {isLoggedIn && (
+                    <span className="absolute top-1 right-1 w-1.5 h-1.5 bg-[#c8874a] rounded-full ring-1 ring-[#0a0a0a]" />
+                  )}
                 </Link>
 
                 {/* Cart */}
@@ -215,17 +258,28 @@ export default function Navbar() {
           <nav className="flex-1 overflow-y-auto no-scrollbar px-5 py-6 space-y-6">
             <div className="space-y-1">
               <p className="text-[9px] font-bold text-neutral-500 tracking-[0.3em] uppercase pb-2">All Sections</p>
-              {allNavItems.map((item) => (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  onClick={() => setIsMenuOpen(false)}
-                  className="flex items-center justify-between py-2 text-[11px] font-bold tracking-[0.2em] text-neutral-300 hover:text-white hover:translate-x-1 transition-all duration-200 uppercase group"
-                >
-                  {item.name}
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#c8874a] opacity-0 group-hover:opacity-100 transition-opacity" />
-                </Link>
-              ))}
+              {allNavItems.map((item) => {
+                const active = isItemActive(item.href);
+                return (
+                  <Link
+                    key={item.name}
+                    href={item.href}
+                    onClick={() => setIsMenuOpen(false)}
+                    className={`flex items-center justify-between py-2 text-[11px] font-bold tracking-[0.2em] transition-all duration-200 uppercase group ${
+                      active
+                        ? "text-[#c8874a] translate-x-1 font-black"
+                        : "text-neutral-300 hover:text-white hover:translate-x-1"
+                    }`}
+                  >
+                    {item.name}
+                    <span
+                      className={`w-1.5 h-1.5 rounded-full bg-[#c8874a] transition-opacity ${
+                        active ? "opacity-100 shadow-sm shadow-[#c8874a]" : "opacity-0 group-hover:opacity-100"
+                      }`}
+                    />
+                  </Link>
+                );
+              })}
             </div>
 
             <div className="h-px bg-neutral-800" />
@@ -246,13 +300,22 @@ export default function Navbar() {
           </nav>
 
           {/* Drawer Footer */}
-          <div className="px-5 py-4 border-t border-neutral-800/80 space-y-3">
+          <div className="px-5 py-4 border-t border-neutral-800/80 space-y-2.5">
+            <Link
+              href={isLoggedIn ? "/account" : "/login"}
+              onClick={() => setIsMenuOpen(false)}
+              className="w-full flex items-center justify-center gap-2 bg-[#181818] border border-white/[0.08] text-white text-[11px] font-bold py-2.5 rounded-sm tracking-wider uppercase hover:bg-[#202020] transition-colors"
+            >
+              <User size={13} className="text-[#c8874a]" />
+              {isLoggedIn ? "My Account" : "Client Sign In / Register"}
+            </Link>
+
             <button
               onClick={() => { setIsMenuOpen(false); openCart(); }}
-              className="w-full flex items-center justify-center gap-2 bg-[#c8874a] text-white text-[11px] font-bold py-3 rounded-sm tracking-wide hover:bg-[#b87840] transition-colors"
+              className="w-full flex items-center justify-center gap-2 bg-[#c8874a] text-white text-[11px] font-bold py-2.5 rounded-sm tracking-wide hover:bg-[#b87840] transition-colors"
             >
               <ShoppingBag size={14} />
-              Cart
+              Shopping Cart
               {cartCount > 0 && (
                 <span className="bg-white text-[#c8874a] text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center">
                   {cartCount}

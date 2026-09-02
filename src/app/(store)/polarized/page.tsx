@@ -15,11 +15,16 @@ export const revalidate = 0;
 export default async function PolarizedPage() {
   const supabase = await createClient();
 
-  const { data } = await supabase
+  const { data: polarizedData } = await supabase
     .from("products")
     .select("*")
     .eq("status", "active")
+    .eq("is_polarized", true)
     .order("created_at", { ascending: false });
+
+  const data = (polarizedData && polarizedData.length > 0)
+    ? polarizedData
+    : (await supabase.from("products").select("*").eq("status", "active").order("created_at", { ascending: false })).data;
 
   const products: Product[] = (data || []).map((p) => ({
     id: p.id,
@@ -40,7 +45,7 @@ export default async function PolarizedPage() {
           <p className="text-[10.5px] font-bold tracking-[0.3em] uppercase text-[#c8874a] mb-2 flex items-center justify-center gap-1.5">
             Optical Mastery
           </p>
-          <h1 className="font-stencil text-3xl sm:text-5xl text-white tracking-[0.1em] uppercase">
+          <h1 className="text-3xl sm:text-5xl font-bold text-white tracking-tight uppercase">
             Polarized Optics
           </h1>
           <p className="text-neutral-400 text-[13px] sm:text-[14px] mt-3 max-w-md mx-auto">

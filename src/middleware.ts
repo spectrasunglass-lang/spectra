@@ -1,8 +1,30 @@
-import { type NextRequest } from 'next/server'
+import { type NextRequest, NextResponse } from 'next/server'
 import { updateSession } from '@/lib/supabase/middleware'
 
 export async function middleware(request: NextRequest) {
-  return await updateSession(request)
+  const { pathname } = request.nextUrl;
+
+  // Handle Admin Route Protection
+  if (pathname.startsWith('/admin')) {
+    const adminSession = request.cookies.get('spectra_admin_session')?.value;
+    const isLoginPage = pathname === '/admin/login';
+
+    if (!adminSession && !isLoginPage) {
+      const loginUrl = new URL('/admin/login', request.url);
+      return NextResponse.redirect(loginUrl);
+    }
+
+    if (adminSession && isLoginPage) {
+      const adminUrl = new URL('/admin', request.url);
+      return NextResponse.redirect(adminUrl);
+    }
+
+    if (isLoginPage) {
+      return NextResponse.next();
+    }
+  }
+
+  return await updateSession(request);
 }
 
 export const config = {

@@ -25,9 +25,9 @@ export default function AboutPage() {
             <p className="text-[10.5px] font-bold tracking-[0.3em] uppercase text-[#c8874a]">
               The Maison
             </p>
-            <h1 className="font-stencil text-3xl sm:text-4xl lg:text-5xl uppercase tracking-[0.06em] leading-tight">
-              Built To Be Seen
-            </h1>
+            <h1 className="text-4xl sm:text-6xl font-bold text-white tracking-tight uppercase">
+            Built To Be Seen
+          </h1>
             <p className="text-neutral-400 text-sm sm:text-[15px] leading-relaxed">
               SPECTRA was founded on a singular conviction: luxury eyewear shouldn&apos;t just frame the world — it should elevate how you move through it.
             </p>
@@ -52,7 +52,7 @@ export default function AboutPage() {
             <p className="text-[10px] font-bold tracking-[0.3em] uppercase text-[#c8874a]">
               Our Mission
             </p>
-            <h2 className="font-stencil text-2xl sm:text-3xl uppercase tracking-wider text-white">
+            <h2 className="text-2xl sm:text-3xl font-bold uppercase tracking-tight text-white">
               Optical Excellence
             </h2>
             <p className="text-sm text-neutral-400 leading-relaxed">
@@ -65,7 +65,7 @@ export default function AboutPage() {
             <p className="text-[10px] font-bold tracking-[0.3em] uppercase text-[#c8874a]">
               Our Vision
             </p>
-            <h2 className="font-stencil text-2xl sm:text-3xl uppercase tracking-wider text-white">
+            <h2 className="text-2xl sm:text-3xl font-bold uppercase tracking-tight text-white">
               Global Distinction
             </h2>
             <p className="text-sm text-neutral-400 leading-relaxed">

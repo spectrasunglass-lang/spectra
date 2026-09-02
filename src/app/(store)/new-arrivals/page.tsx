@@ -36,11 +36,10 @@ export default async function NewArrivalsPage() {
     <div className="bg-[#0a0a0a] min-h-screen">
       <div className="relative border-b border-white/[0.08] bg-gradient-to-b from-[#141414] to-[#0a0a0a] py-16 sm:py-20 text-center">
         <div className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12">
-          <p className="text-[10.5px] font-bold tracking-[0.3em] uppercase text-[#c8874a] mb-2 flex items-center justify-center gap-1.5">
-            <Sparkles size={14} />
+          <p className="text-[10.5px] font-bold tracking-[0.3em] uppercase text-[#c8874a] mb-2 flex items-center justify-center">
             Fresh Releases 2026
           </p>
-          <h1 className="font-stencil text-3xl sm:text-5xl text-white tracking-[0.1em] uppercase">
+          <h1 className="text-3xl sm:text-5xl font-bold text-white tracking-tight uppercase">
             New Arrivals
           </h1>
           <p className="text-neutral-400 text-[13px] sm:text-[14px] mt-3 max-w-md mx-auto">

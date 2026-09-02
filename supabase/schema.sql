@@ -17,10 +17,17 @@ CREATE TABLE IF NOT EXISTS public.products (
     image_url TEXT,
     images TEXT[] DEFAULT ARRAY[]::TEXT[],
     is_new BOOLEAN DEFAULT true,
+    is_polarized BOOLEAN DEFAULT false,
+    is_gift BOOLEAN DEFAULT false,
     status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'draft')),
     created_at TIMESTAMPTZ DEFAULT now(),
     updated_at TIMESTAMPTZ DEFAULT now()
 );
+
+-- Migration helpers if table already exists
+ALTER TABLE public.products ADD COLUMN IF NOT EXISTS is_polarized BOOLEAN DEFAULT false;
+ALTER TABLE public.products ADD COLUMN IF NOT EXISTS is_gift BOOLEAN DEFAULT false;
+
 
 -- 2. ORDERS TABLE
 CREATE TABLE IF NOT EXISTS public.orders (
@@ -54,6 +61,14 @@ CREATE TABLE IF NOT EXISTS public.settings (
     updated_at TIMESTAMPTZ DEFAULT now()
 );
 
+-- 5. SUBSCRIBERS TABLE (VIP Newsletter & Email Marketing)
+CREATE TABLE IF NOT EXISTS public.subscribers (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    email TEXT UNIQUE NOT NULL,
+    status TEXT NOT NULL DEFAULT 'subscribed' CHECK (status IN ('subscribed', 'unsubscribed')),
+    created_at TIMESTAMPTZ DEFAULT now()
+);
+
 -- ==============================================================================
 -- ROW LEVEL SECURITY (RLS) POLICIES
 -- ==============================================================================
@@ -63,6 +78,17 @@ ALTER TABLE public.products ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.order_items ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.settings ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.subscribers ENABLE ROW LEVEL SECURITY;
+
+-- Subscribers Policies: Public can insert/upsert, full access
+CREATE POLICY "Allow public insert on subscribers"
+    ON public.subscribers FOR INSERT
+    WITH CHECK (true);
+
+CREATE POLICY "Allow full access on subscribers"
+    ON public.subscribers FOR ALL
+    USING (true)
+    WITH CHECK (true);
 
 -- Products Policies: Public read, full access for all operations
 CREATE POLICY "Allow public read access on products"
@@ -92,7 +118,9 @@ CREATE POLICY "Allow full access on settings"
     USING (true)
     WITH CHECK (true);
 
--- Enable Realtime for live updates on products and orders
+-- Enable Realtime for live updates on products, orders, settings, subscribers
 ALTER PUBLICATION supabase_realtime ADD TABLE public.products;
 ALTER PUBLICATION supabase_realtime ADD TABLE public.orders;
 ALTER PUBLICATION supabase_realtime ADD TABLE public.settings;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.subscribers;
+

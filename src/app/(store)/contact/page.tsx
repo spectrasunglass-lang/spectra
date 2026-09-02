@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
-import { Mail, Phone, MapPin, Clock, Check, Send, Sparkles } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Mail, Phone, MapPin, Check, Send, MessageCircle } from "lucide-react";
 
 export default function ContactPage() {
   const [submitted, setSubmitted] = useState(false);
@@ -11,6 +11,36 @@ export default function ContactPage() {
     subject: "Order Inquiry",
     message: "",
   });
+
+  const [contacts, setContacts] = useState({
+    email: "spectrasunglass@gmail.com",
+    phone: "+91 81299 50341",
+    whatsapp: "https://wa.me/c/918129950341",
+  });
+
+  useEffect(() => {
+    async function loadContacts() {
+      try {
+        const { createClient } = await import("@/lib/supabase/client");
+        const supabase = createClient();
+        const { data } = await supabase.from("settings").select("key, value");
+        if (data && data.length > 0) {
+          const map: Record<string, string> = {};
+          data.forEach((r) => {
+            if (r.value) map[r.key] = r.value;
+          });
+          setContacts((prev) => ({
+            email: map.contact_email || prev.email,
+            phone: map.contact_phone || prev.phone,
+            whatsapp: map.whatsapp_url || prev.whatsapp,
+          }));
+        }
+      } catch (err) {
+        console.error("Contact page settings load err", err);
+      }
+    }
+    loadContacts();
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,10 +56,10 @@ export default function ContactPage() {
       {/* Banner */}
       <div className="relative border-b border-white/[0.08] bg-gradient-to-b from-[#161616] to-[#0a0a0a] py-16 sm:py-20 text-center">
         <div className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12">
-          <p className="text-[10.5px] font-bold tracking-[0.3em] uppercase text-[#c8874a] mb-2 flex items-center justify-center gap-1.5">
+          <p className="text-[10.5px] font-bold tracking-[0.3em] uppercase text-[#c8874a] mb-2 flex items-center justify-center">
             Client Relations
           </p>
-          <h1 className="font-stencil text-3xl sm:text-5xl text-white tracking-[0.1em] uppercase">
+          <h1 className="text-3xl sm:text-5xl font-bold text-white tracking-tight uppercase">
             Client Concierge
           </h1>
           <p className="text-neutral-400 text-[13px] sm:text-[14px] mt-3 max-w-md mx-auto">
@@ -59,8 +89,8 @@ export default function ContactPage() {
                 </div>
                 <div>
                   <p className="font-bold text-white uppercase text-[11px] tracking-wider">Email Concierge</p>
-                  <a href="mailto:concierge@spectrasunglass.com" className="text-neutral-400 hover:text-[#c8874a] transition-colors">
-                    concierge@spectrasunglass.com
+                  <a href={`mailto:${contacts.email}`} className="text-neutral-400 hover:text-[#c8874a] transition-colors break-all">
+                    {contacts.email}
                   </a>
                 </div>
               </div>
@@ -71,8 +101,20 @@ export default function ContactPage() {
                 </div>
                 <div>
                   <p className="font-bold text-white uppercase text-[11px] tracking-wider">Direct Assistance</p>
-                  <a href="tel:+919876543210" className="text-neutral-400 hover:text-[#c8874a] transition-colors">
-                    +91 98765 43210 (Mon – Sat, 10am – 7pm IST)
+                  <a href={`tel:${contacts.phone.replace(/\s+/g, "")}`} className="text-neutral-400 hover:text-[#c8874a] transition-colors">
+                    {contacts.phone} (Mon – Sat, 10am – 7pm IST)
+                  </a>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-4 p-4 rounded-sm bg-[#121212]">
+                <div className="w-10 h-10 rounded-sm bg-[#1c1c1c] flex items-center justify-center text-[#25D366] flex-shrink-0">
+                  <MessageCircle size={18} />
+                </div>
+                <div>
+                  <p className="font-bold text-white uppercase text-[11px] tracking-wider">WhatsApp Concierge</p>
+                  <a href={contacts.whatsapp} target="_blank" rel="noopener noreferrer" className="text-neutral-400 hover:text-[#25D366] transition-colors font-medium">
+                    Chat with an Advisor on WhatsApp &rarr;
                   </a>
                 </div>
               </div>
@@ -122,7 +164,7 @@ export default function ContactPage() {
                       required
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      placeholder="e.g. Aryan Sharma"
+                      placeholder="Enter your name"
                       className="w-full bg-[#181818] rounded-sm px-4 py-3 text-[13px] text-white placeholder-neutral-500 focus:outline-none transition-colors"
                     />
                   </div>
@@ -136,7 +178,7 @@ export default function ContactPage() {
                       required
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      placeholder="e.g. aryan@example.com"
+                      placeholder="Enter your email address"
                       className="w-full bg-[#181818] rounded-sm px-4 py-3 text-[13px] text-white placeholder-neutral-500 focus:outline-none transition-colors"
                     />
                   </div>

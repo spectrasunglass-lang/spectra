@@ -17,7 +17,7 @@ export default function WishlistPage() {
             <Heart size={14} />
             Personal Collection
           </p>
-          <h1 className="font-stencil text-3xl sm:text-5xl text-white tracking-[0.1em] uppercase">
+          <h1 className="text-3xl sm:text-5xl font-bold text-white tracking-tight uppercase">
             Your Wishlist
           </h1>
           <p className="text-neutral-400 text-[13px] sm:text-[14px] mt-3 max-w-md mx-auto">

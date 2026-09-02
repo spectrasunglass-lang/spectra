@@ -2,13 +2,14 @@
 
 import React, { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { Save, Loader2, CheckCircle2, Globe, Mail, Phone, Link2, Share2, RefreshCw } from "lucide-react";
+import { Save, Loader2, CheckCircle2, Globe, Mail, Phone, Link2, Share2, RefreshCw, MessageCircle } from "lucide-react";
 
 interface SettingsForm {
   store_name: string;
   tagline: string;
   contact_email: string;
   contact_phone: string;
+  whatsapp_url: string;
   instagram_url: string;
   facebook_url: string;
   currency: string;
@@ -22,10 +23,11 @@ interface SettingsForm {
 const defaults: SettingsForm = {
   store_name: "SPECTRA",
   tagline: "See Beyond Limits",
-  contact_email: "",
-  contact_phone: "",
-  instagram_url: "",
-  facebook_url: "",
+  contact_email: "spectrasunglass@gmail.com",
+  contact_phone: "+91 81299 50341",
+  whatsapp_url: "https://wa.me/c/918129950341",
+  instagram_url: "https://instagram.com",
+  facebook_url: "https://facebook.com",
   currency: "INR",
   free_shipping_threshold: "0",
   return_window_days: "14",
@@ -128,15 +130,20 @@ export default function SettingsPage() {
 
         {/* Contact */}
         <Section title="Contact Information" icon={<Mail size={16} />}>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
             <Field label="Contact Email">
               <IconInput icon={<Mail size={14} className="text-white/40" />}>
-                <input type="email" value={form.contact_email} onChange={(e) => set("contact_email", e.target.value)} className="flex-1 px-3 py-2.5 text-[13px] outline-none text-white bg-transparent placeholder-white/30" placeholder="hello@spectra.in" />
+                <input type="email" value={form.contact_email} onChange={(e) => set("contact_email", e.target.value)} className="flex-1 px-3 py-2.5 text-[13px] outline-none text-white bg-transparent placeholder-white/30" placeholder="spectrasunglass@gmail.com" />
               </IconInput>
             </Field>
             <Field label="Contact Phone">
               <IconInput icon={<Phone size={14} className="text-white/40" />}>
-                <input type="tel" value={form.contact_phone} onChange={(e) => set("contact_phone", e.target.value)} className="flex-1 px-3 py-2.5 text-[13px] outline-none text-white bg-transparent placeholder-white/30" placeholder="+91 98765 43210" />
+                <input type="tel" value={form.contact_phone} onChange={(e) => set("contact_phone", e.target.value)} className="flex-1 px-3 py-2.5 text-[13px] outline-none text-white bg-transparent placeholder-white/30" placeholder="+91 81299 50341" />
+              </IconInput>
+            </Field>
+            <Field label="WhatsApp URL / Number">
+              <IconInput icon={<MessageCircle size={14} className="text-emerald-400" />}>
+                <input type="url" value={form.whatsapp_url} onChange={(e) => set("whatsapp_url", e.target.value)} className="flex-1 px-3 py-2.5 text-[13px] outline-none text-white bg-transparent placeholder-white/30" placeholder="https://wa.me/c/918129950341" />
               </IconInput>
             </Field>
           </div>

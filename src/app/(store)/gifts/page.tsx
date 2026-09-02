@@ -15,12 +15,17 @@ export const revalidate = 0;
 export default async function GiftsPage() {
   const supabase = await createClient();
 
-  const { data } = await supabase
+  const { data: giftData } = await supabase
     .from("products")
     .select("*")
     .eq("status", "active")
+    .eq("is_gift", true)
     .order("created_at", { ascending: false })
     .limit(8);
+
+  const data = (giftData && giftData.length > 0)
+    ? giftData
+    : (await supabase.from("products").select("*").eq("status", "active").order("created_at", { ascending: false }).limit(8)).data;
 
   const products: Product[] = (data || []).map((p) => ({
     id: p.id,
@@ -59,7 +64,7 @@ export default async function GiftsPage() {
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-[#e5a872] text-[11px] font-bold tracking-widest uppercase mb-2">
             The Art of Gifting
           </div>
-          <h1 className="font-stencil text-3xl sm:text-5xl text-white tracking-[0.1em] uppercase">
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold text-white tracking-tight uppercase">
             Curated Luxury Gifts
           </h1>
           <p className="text-neutral-300 text-[13px] sm:text-[14px] mt-3 max-w-md mx-auto leading-relaxed">

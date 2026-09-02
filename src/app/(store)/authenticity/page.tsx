@@ -40,7 +40,7 @@ export default function AuthenticityPage() {
           <p className="text-[10.5px] font-bold tracking-[0.3em] uppercase text-[#c8874a] mb-2">
             Maison Standards
           </p>
-          <h1 className="font-stencil text-2xl sm:text-3xl md:text-4xl lg:text-[44px] text-white tracking-[0.04em] sm:tracking-[0.06em] uppercase whitespace-nowrap">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white tracking-tight uppercase">
             Authenticity Guarantee
           </h1>
           <p className="text-neutral-400 text-xs sm:text-sm mt-3 max-w-md mx-auto">

@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowRight, Check, ChevronDown, Mail, Phone } from "lucide-react";
+import { ArrowRight, Check, ChevronDown, Mail, Phone, MessageCircle } from "lucide-react";
 
 const footerSections = [
   {
@@ -14,7 +14,7 @@ const footerSections = [
       { name: "New Arrivals", href: "/new-arrivals" },
       { name: "Men's Sunglasses", href: "/men" },
       { name: "Women's Sunglasses", href: "/women" },
-      { name: "All Sunglasses", href: "/sunglasses" },
+      { name: "Spectra Collections", href: "/collections" },
       { name: "Polarized Lenses", href: "/polarized" },
       { name: "Luxury Gift Sets", href: "/gifts" },
     ],
@@ -44,17 +44,71 @@ const footerSections = [
 
 export default function Footer() {
   const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
   const [subscribed, setSubscribed] = useState(false);
+  const [feedbackMsg, setFeedbackMsg] = useState("");
   const [openSection, setOpenSection] = useState<string | null>(null);
 
-  const handleSubscribe = (e: React.FormEvent) => {
+  const [contacts, setContacts] = useState({
+    email: "spectrasunglass@gmail.com",
+    phone: "+91 81299 50341",
+    whatsapp: "https://wa.me/c/918129950341",
+    instagram: "https://instagram.com",
+    facebook: "https://facebook.com",
+  });
+
+  useEffect(() => {
+    async function loadContacts() {
+      try {
+        const { createClient } = await import("@/lib/supabase/client");
+        const supabase = createClient();
+        const { data } = await supabase.from("settings").select("key, value");
+        if (data && data.length > 0) {
+          const map: Record<string, string> = {};
+          data.forEach((r) => {
+            if (r.value) map[r.key] = r.value;
+          });
+          setContacts((prev) => ({
+            email: map.contact_email || prev.email,
+            phone: map.contact_phone || prev.phone,
+            whatsapp: map.whatsapp_url || prev.whatsapp,
+            instagram: map.instagram_url || prev.instagram,
+            facebook: map.facebook_url || prev.facebook,
+          }));
+        }
+      } catch (err) {
+        console.error("Footer contacts load err", err);
+      }
+    }
+    loadContacts();
+  }, []);
+
+  const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email) return;
-    setSubscribed(true);
-    setTimeout(() => {
-      setEmail("");
-      setSubscribed(false);
-    }, 4000);
+    if (!email || loading) return;
+    setLoading(true);
+    try {
+      const res = await fetch("/api/subscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setSubscribed(true);
+        setFeedbackMsg(data.message || "Welcome to SPECTRA. You are now on the VIP list.");
+        setEmail("");
+        setTimeout(() => {
+          setSubscribed(false);
+        }, 5000);
+      } else {
+        alert(data.error || "Subscription failed. Please try again.");
+      }
+    } catch {
+      alert("Network error. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const toggleSection = (id: string) => {
@@ -98,7 +152,7 @@ Crafted for visionaries. Designed to stand apart. Luxury eyewear with timeless s
               {subscribed ? (
                 <div className="flex items-center gap-2 bg-[#c8874a]/15 border border-[#c8874a]/30 text-[#e5a872] px-4 py-3 rounded-xl text-[12px] font-bold">
                   <Check size={16} />
-                  Welcome to SPECTRA. You are now on the VIP list.
+                  {feedbackMsg}
                 </div>
               ) : (
                 <form onSubmit={handleSubscribe} className="flex items-center gap-2">
@@ -109,14 +163,16 @@ Crafted for visionaries. Designed to stand apart. Luxury eyewear with timeless s
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="Enter your email address"
                       required
-                      className="w-full bg-[#121212] rounded-sm px-4 py-3 text-[12.5px] text-white placeholder-neutral-500 focus:outline-none focus:border-[#c8874a] transition-colors"
+                      disabled={loading}
+                      className="w-full bg-[#121212] rounded-sm px-4 py-3 text-[12.5px] text-white placeholder-neutral-500 focus:outline-none focus:border-[#c8874a] transition-colors disabled:opacity-50"
                     />
                   </div>
                   <button
                     type="submit"
-                    className="bg-[#c8874a] hover:bg-[#b87840] text-white px-5 py-3 rounded-sm text-[12px] font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all shadow-md shadow-[#c8874a]/20 flex-shrink-0 cursor-pointer"
+                    disabled={loading}
+                    className="bg-[#c8874a] hover:bg-[#b87840] text-white px-5 py-3 rounded-sm text-[12px] font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all shadow-md shadow-[#c8874a]/20 flex-shrink-0 cursor-pointer disabled:opacity-60"
                   >
-                    Subscribe
+                    {loading ? "Joining..." : "Subscribe"}
                     <ArrowRight size={14} />
                   </button>
                 </form>
@@ -161,14 +217,20 @@ Crafted for visionaries. Designed to stand apart. Luxury eyewear with timeless s
                         <li className="pt-2 space-y-2 text-[12px] text-neutral-400">
                           <div className="flex items-center gap-2">
                             <Mail size={13} className="text-[#c8874a]" />
-                            <a href="mailto:concierge@spectrasunglass.com" className="hover:text-white transition-colors">
-                              concierge@spectrasunglass.com
+                            <a href={`mailto:${contacts.email}`} className="hover:text-white transition-colors">
+                              {contacts.email}
                             </a>
                           </div>
                           <div className="flex items-center gap-2">
                             <Phone size={13} className="text-[#c8874a]" />
-                            <a href="tel:+919876543210" className="hover:text-white transition-colors">
-                              +91 98765 43210
+                            <a href={`tel:${contacts.phone.replace(/\s+/g, "")}`} className="hover:text-white transition-colors">
+                              {contacts.phone}
+                            </a>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <MessageCircle size={13} className="text-[#25D366]" />
+                            <a href={contacts.whatsapp} target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
+                              WhatsApp Concierge
                             </a>
                           </div>
                         </li>
@@ -192,7 +254,7 @@ Crafted for visionaries. Designed to stand apart. Luxury eyewear with timeless s
                 { name: "New Arrivals", href: "/new-arrivals" },
                 { name: "Men's Sunglasses", href: "/men" },
                 { name: "Women's Sunglasses", href: "/women" },
-                { name: "All Sunglasses", href: "/sunglasses" },
+                { name: "Spectra Collections", href: "/collections" },
                 { name: "Polarized Lenses", href: "/polarized" },
                 { name: "Luxury Gift Sets", href: "/gifts" },
               ].map((link) => (
@@ -250,15 +312,21 @@ Crafted for visionaries. Designed to stand apart. Luxury eyewear with timeless s
             {/* Direct Contact */}
             <div className="pt-2 space-y-2 text-[12px] text-neutral-400">
               <div className="flex items-center gap-2">
-                <Mail size={13} className="text-[#c8874a]" />
-                <a href="mailto:concierge@spectrasunglass.com" className="hover:text-white transition-colors">
-                  concierge@spectrasunglass.com
+                <Mail size={13} className="text-[#c8874a] flex-shrink-0" />
+                <a href={`mailto:${contacts.email}`} className="hover:text-white transition-colors break-all">
+                  {contacts.email}
                 </a>
               </div>
               <div className="flex items-center gap-2">
-                <Phone size={13} className="text-[#c8874a]" />
-                <a href="tel:+919876543210" className="hover:text-white transition-colors">
-                  +91 98765 43210
+                <Phone size={13} className="text-[#c8874a] flex-shrink-0" />
+                <a href={`tel:${contacts.phone.replace(/\s+/g, "")}`} className="hover:text-white transition-colors">
+                  {contacts.phone}
+                </a>
+              </div>
+              <div className="flex items-center gap-2">
+                <MessageCircle size={13} className="text-[#25D366] flex-shrink-0" />
+                <a href={contacts.whatsapp} target="_blank" rel="noopener noreferrer" className="hover:text-[#25D366] transition-colors">
+                  WhatsApp Concierge
                 </a>
               </div>
             </div>
@@ -289,7 +357,16 @@ Crafted for visionaries. Designed to stand apart. Luxury eyewear with timeless s
           <div className="flex flex-wrap items-center justify-center md:justify-end gap-3 w-full md:w-auto">
             <div className="flex items-center gap-2.5">
               <a
-                href="https://instagram.com"
+                href={contacts.whatsapp}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-8 h-8 rounded-lg bg-[#141414] border border-white/[0.08] flex items-center justify-center text-neutral-400 hover:text-[#25D366] hover:border-[#25D366]/50 transition-colors"
+                aria-label="WhatsApp"
+              >
+                <MessageCircle size={14} />
+              </a>
+              <a
+                href={contacts.instagram}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-8 h-8 rounded-lg bg-[#141414] border border-white/[0.08] flex items-center justify-center text-neutral-400 hover:text-white hover:border-[#c8874a]/50 transition-colors"
@@ -302,7 +379,7 @@ Crafted for visionaries. Designed to stand apart. Luxury eyewear with timeless s
                 </svg>
               </a>
               <a
-                href="https://facebook.com"
+                href={contacts.facebook}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-8 h-8 rounded-lg bg-[#141414] border border-white/[0.08] flex items-center justify-center text-neutral-400 hover:text-white hover:border-[#c8874a]/50 transition-colors"
