@@ -3,7 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { X, Plus, Minus, ShoppingBag, Trash2, ArrowRight } from "lucide-react";
+import { X, Plus, Minus, ShoppingBag, Trash2, ArrowRight, Gift } from "lucide-react";
 import { useCart } from "./CartContext";
 
 export default function CartDrawer() {
@@ -70,7 +70,7 @@ export default function CartDrawer() {
             <div className="space-y-4">
               {items.map((item) => (
                 <div
-                  key={item.id}
+                  key={`${item.id}-${item.gift_package?.id || "std"}`}
                   className="flex gap-4 p-4 rounded-2xl bg-white/[0.04] border border-white/[0.06] hover:border-white/[0.1] transition-colors group"
                 >
                   {/* Product image */}
@@ -97,15 +97,24 @@ export default function CartDrawer() {
                       </p>
                       <p className="text-[11px] text-white/40 mt-0.5">{item.subtitle}</p>
                     </Link>
+
+                    {/* Gift Package Indicator */}
+                    {item.gift_package && (
+                      <div className="inline-flex items-center gap-1.5 mt-1 px-2 py-0.5 rounded-md bg-[#c8874a]/15 border border-[#c8874a]/30 text-[#e5a872] text-[10px] font-bold">
+                        <Gift size={10} className="text-[#c8874a] flex-shrink-0" />
+                        <span className="truncate">{item.gift_package.name} (+₹{item.gift_package.price})</span>
+                      </div>
+                    )}
+
                     <p className="text-[14px] font-bold text-[#c8874a] mt-2">
-                      ₹{item.price.toLocaleString("en-IN")}
+                      ₹{((Number(item.price) + (item.gift_package ? Number(item.gift_package.price) : 0)) * item.quantity).toLocaleString("en-IN")}
                     </p>
 
                     {/* Qty + Remove */}
                     <div className="flex items-center justify-between mt-3">
                       <div className="flex items-center gap-1 bg-white/[0.06] rounded-lg p-1">
                         <button
-                          onClick={() => updateQty(item.id, item.quantity - 1)}
+                          onClick={() => updateQty(item.id, item.quantity - 1, item.gift_package?.id)}
                           className="w-6 h-6 rounded-md flex items-center justify-center text-white/60 hover:text-white hover:bg-white/[0.1] transition-colors"
                         >
                           <Minus size={11} />
@@ -114,14 +123,14 @@ export default function CartDrawer() {
                           {item.quantity}
                         </span>
                         <button
-                          onClick={() => updateQty(item.id, item.quantity + 1)}
+                          onClick={() => updateQty(item.id, item.quantity + 1, item.gift_package?.id)}
                           className="w-6 h-6 rounded-md flex items-center justify-center text-white/60 hover:text-white hover:bg-white/[0.1] transition-colors"
                         >
                           <Plus size={11} />
                         </button>
                       </div>
                       <button
-                        onClick={() => removeItem(item.id)}
+                        onClick={() => removeItem(item.id, item.gift_package?.id)}
                         className="p-1.5 rounded-lg text-white/20 hover:text-red-400 hover:bg-red-500/10 transition-colors"
                       >
                         <Trash2 size={14} />

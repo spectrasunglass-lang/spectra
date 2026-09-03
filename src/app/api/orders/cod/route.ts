@@ -21,7 +21,11 @@ export async function POST(req: NextRequest) {
     }
 
     const productSummary = items
-      .map((i: { name: string; quantity: number }) => `${i.name} (x${i.quantity})`)
+      .map((i: { name: string; quantity: number; gift_package?: { name: string; price: number } }) =>
+        i.gift_package
+          ? `${i.name} (x${i.quantity}) [🎁 ${i.gift_package.name}]`
+          : `${i.name} (x${i.quantity})`
+      )
       .join(", ");
 
     const paymentNote = `[CASH ON DELIVERY - FULL AMOUNT ₹${total} TO BE COLLECTED AT DOORSTEP]`;

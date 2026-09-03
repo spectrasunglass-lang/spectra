@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useCart } from "@/components/CartContext";
-import { Plus, Minus, Trash2, ShoppingBag, ArrowRight, ArrowLeft, CheckCircle2, Loader2, AlertCircle } from "lucide-react";
+import { Plus, Minus, Trash2, ShoppingBag, ArrowRight, ArrowLeft, CheckCircle2, Loader2, AlertCircle, Gift } from "lucide-react";
 import CartAddressForm, { AddressData } from "@/components/CartAddressForm";
 import CartPaymentMethod, { PaymentOption } from "@/components/CartPaymentMethod";
 import { createClient } from "@/lib/supabase/client";
@@ -392,7 +392,7 @@ export default function CartPage() {
             <div className="space-y-3 max-h-[360px] overflow-y-auto pr-1">
               {items.map((item) => (
                 <div
-                  key={item.id}
+                  key={`${item.id}-${item.gift_package?.id || "std"}`}
                   className="flex items-center gap-3.5 p-3 bg-white/[0.03] rounded-sm"
                 >
                   <Link href={`/products/${item.slug}`} className="flex-shrink-0">
@@ -413,10 +413,18 @@ export default function CartPage() {
                     </Link>
                     <p className="text-[11px] text-white/40 truncate">{item.subtitle}</p>
 
+                    {/* Gift Package Indicator */}
+                    {item.gift_package && (
+                      <div className="inline-flex items-center gap-1.5 mt-1 px-2 py-0.5 rounded-full bg-[#c8874a]/15 border border-[#c8874a]/30 text-[#e5a872] text-[10.5px] font-bold">
+                        <Gift size={11} className="text-[#c8874a] flex-shrink-0" />
+                        <span className="truncate">Includes: {item.gift_package.name} (+₹{item.gift_package.price})</span>
+                      </div>
+                    )}
+
                     <div className="flex items-center justify-between mt-2">
                       <div className="flex items-center gap-1 bg-white/[0.06] rounded-sm px-1 py-0.5">
                         <button
-                          onClick={() => updateQty(item.id, item.quantity - 1)}
+                          onClick={() => updateQty(item.id, item.quantity - 1, item.gift_package?.id)}
                           className="w-5 h-5 rounded-sm flex items-center justify-center text-white/50 hover:text-white hover:bg-white/[0.1] transition-colors"
                         >
                           <Minus size={10} />
@@ -425,7 +433,7 @@ export default function CartPage() {
                           {item.quantity}
                         </span>
                         <button
-                          onClick={() => updateQty(item.id, item.quantity + 1)}
+                          onClick={() => updateQty(item.id, item.quantity + 1, item.gift_package?.id)}
                           className="w-5 h-5 rounded-sm flex items-center justify-center text-white/50 hover:text-white hover:bg-white/[0.1] transition-colors"
                         >
                           <Plus size={10} />
@@ -434,10 +442,10 @@ export default function CartPage() {
 
                       <div className="flex items-center gap-2">
                         <p className="text-[13.5px] font-bold text-[#c8874a]">
-                          &#8377;{(item.price * item.quantity).toLocaleString("en-IN")}
+                          &#8377;{((Number(item.price) + (item.gift_package ? Number(item.gift_package.price) : 0)) * item.quantity).toLocaleString("en-IN")}
                         </p>
                         <button
-                          onClick={() => removeItem(item.id)}
+                          onClick={() => removeItem(item.id, item.gift_package?.id)}
                           className="text-white/20 hover:text-red-400 transition-colors p-1"
                         >
                           <Trash2 size={13} />

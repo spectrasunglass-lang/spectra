@@ -4,6 +4,8 @@ import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useCart } from "@/components/CartContext";
+import GiftPackageSelector from "@/components/GiftPackageSelector";
+import { GiftPackage } from "@/lib/giftPackages";
 import {
   ShoppingBag,
   Zap,
@@ -42,6 +44,7 @@ export default function ProductDetailClient({ product }: { product: ProductData 
   const [selectedImage, setSelectedImage] = useState(product.image_url);
   const [added, setAdded] = useState(false);
   const [activeTab, setActiveTab] = useState<string | null>("details");
+  const [selectedGiftPackage, setSelectedGiftPackage] = useState<GiftPackage | null>(null);
 
   const images = [product.image_url, ...(product.gallery_urls || [])].filter(Boolean);
 
@@ -58,6 +61,14 @@ export default function ProductDetailClient({ product }: { product: ProductData 
       price: Number(product.price),
       image_url: product.image_url,
       subtitle: product.subtitle || "",
+      gift_package: selectedGiftPackage
+        ? {
+            id: selectedGiftPackage.id,
+            name: selectedGiftPackage.name,
+            price: Number(selectedGiftPackage.price),
+            image_url: selectedGiftPackage.image_url || undefined,
+          }
+        : null,
     });
     setAdded(true);
     setTimeout(() => setAdded(false), 2500);
@@ -168,8 +179,16 @@ export default function ProductDetailClient({ product }: { product: ProductData 
             )}
           </div>
 
+          {/* Luxury Gift Packaging Option */}
+          <div className="pt-2">
+            <GiftPackageSelector
+              selectedPackage={selectedGiftPackage}
+              onSelectPackage={setSelectedGiftPackage}
+            />
+          </div>
+
           {/* Add to Cart / Buy Now CTAs */}
-          <div className="space-y-3 pt-2">
+          <div className="space-y-3 pt-1">
             <button
               type="button"
               onClick={handleAddToCart}

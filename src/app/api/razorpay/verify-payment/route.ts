@@ -54,7 +54,13 @@ export async function POST(req: NextRequest) {
     // 3. Construct Order Data
     const isCod = paymentMethod === "cod";
     const productSummary = Array.isArray(items)
-      ? items.map((i: { name: string; quantity: number }) => `${i.name} (x${i.quantity})`).join(", ")
+      ? items
+          .map((i: { name: string; quantity: number; gift_package?: { name: string } }) =>
+            i.gift_package
+              ? `${i.name} (x${i.quantity}) [🎁 ${i.gift_package.name}]`
+              : `${i.name} (x${i.quantity})`
+          )
+          .join(", ")
       : "SPECTRA Eyewear Order";
 
     const paymentNote = isCod
