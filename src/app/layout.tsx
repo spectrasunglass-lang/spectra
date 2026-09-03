@@ -104,6 +104,9 @@ export const metadata: Metadata = {
     statusBarStyle: "black-translucent",
     title: "SPECTRA",
   },
+  verification: {
+    google: "1dqdv4cFWmybGaMSu6HMgYkEeYDwhNDNhgfUoU5xisg",
+  },
   other: {
     "geo.region": "IN-KL",
     "geo.placename": "Malappuram, Kerala, India",
