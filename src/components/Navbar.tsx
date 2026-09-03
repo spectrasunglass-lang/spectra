@@ -71,6 +71,7 @@ export default function Navbar() {
     { name: "SPECTRA COLLECTIONS", href: "/collections" },
     { name: "POLARIZED", href: "/polarized" },
     { name: "GIFTS", href: "/gifts" },
+    { name: "MY WISHLIST", href: "/wishlist" },
   ];
 
   const infoNavItems = [
@@ -121,14 +122,14 @@ export default function Navbar() {
             </div>
 
             {/* Mobile Logo: Centered exclusively on mobile (< md) */}
-            <div className="absolute left-1/2 -translate-x-1/2 md:hidden flex items-center">
+            <div className="absolute left-1/2 -translate-x-1/2 md:hidden flex items-center pointer-events-auto">
               <Link href="/" className="flex items-center hover:opacity-80 transition-opacity">
                 <Image
                   src="/logo/logo.png"
                   alt="SPECTRA Logo"
-                  width={130}
-                  height={32}
-                  className="h-6 w-auto object-contain"
+                  width={116}
+                  height={28}
+                  className="h-5 sm:h-6 w-auto object-contain"
                   priority
                 />
               </Link>
@@ -169,19 +170,19 @@ export default function Navbar() {
                   <Search className="w-[17px] h-[17px] stroke-[1.5] group-hover:scale-110 transition-transform" />
                 </button>
 
-                {/* Wishlist */}
+                {/* Wishlist - hidden on mobile, visible on sm+ */}
                 <Link
                   href="/wishlist"
-                  className="hover:text-white p-1 transition-colors group"
+                  className="hidden sm:flex hover:text-white p-1 transition-colors group"
                   aria-label="Wishlist"
                 >
                   <Heart className="w-[17px] h-[17px] stroke-[1.5] group-hover:scale-110 transition-transform" />
                 </Link>
 
-                {/* Account / Login */}
+                {/* Account / Login - hidden on mobile, visible on sm+ */}
                 <Link
                   href={isLoggedIn ? "/account" : "/login"}
-                  className="hover:text-white p-1 transition-colors group relative"
+                  className="hidden sm:flex hover:text-white p-1 transition-colors group relative"
                   aria-label={isLoggedIn ? "My Account" : "Sign In"}
                   title={isLoggedIn ? "My Account" : "Sign In / Register"}
                 >
