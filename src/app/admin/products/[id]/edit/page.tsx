@@ -1,18 +1,27 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, use } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Save, Loader2, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, Save, Loader2, CheckCircle2, Trash2 } from "lucide-react";
 import MultiImageUpload from "@/components/admin/MultiImageUpload";
+import { createClient } from "@/lib/supabase/client";
 
 const categories = ["Men", "Women", "Sunglasses", "Unisex", "Kids"];
 const shapes = ["Oval", "Rectangle", "Wayfarer", "Round", "Aviator", "Square", "Cat Eye"];
 
 const DEFAULT_WHATS_IN_THE_BOX = `• 1x SPECTRA Handcrafted Eyewear\n• 1x Signature Matte-Black Hardcase\n• 1x High-Density Microfiber Cleaning Cloth\n• 1x Authenticity & Warranty Card`;
 
-export default function NewProductPage() {
+interface EditProductPageProps {
+  params: Promise<{ id: string }>;
+}
+
+export default function EditProductPage({ params }: EditProductPageProps) {
+  const resolvedParams = use(params);
+  const productId = resolvedParams.id;
   const router = useRouter();
+
+  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -45,6 +54,73 @@ export default function NewProductPage() {
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/^-|-$/g, "");
 
+  // Load product on mount
+  useEffect(() => {
+    async function loadProduct() {
+      setLoading(true);
+      try {
+        const supabase = createClient();
+        const { data, error: fetchErr } = await supabase
+          .from("products")
+          .select("*")
+          .eq("id", productId)
+          .single();
+
+        if (fetchErr || !data) {
+          throw new Error(fetchErr?.message || "Product not found");
+        }
+
+        let desc = data.description || "";
+        let box = DEFAULT_WHATS_IN_THE_BOX;
+
+        if (desc.includes("---WHATS_IN_THE_BOX---")) {
+          const parts = desc.split("---WHATS_IN_THE_BOX---");
+          desc = parts[0]?.trim() || "";
+          box = parts[1]?.trim() || DEFAULT_WHATS_IN_THE_BOX;
+        }
+
+        // Also check if whats_in_the_box column exists on data
+        if ((data as any).whats_in_the_box) {
+          box = (data as any).whats_in_the_box;
+        }
+
+        const gallery = Array.isArray(data.images) ? data.images : [];
+
+        setForm({
+          name: data.name || "",
+          subtitle: data.subtitle || "",
+          slug: data.slug || "",
+          price: data.price ? String(data.price) : "",
+          compare_price: data.compare_price ? String(data.compare_price) : "",
+          category:
+            categories.find(
+              (c) => c.toLowerCase() === (data.category || "").toLowerCase()
+            ) || "Men",
+          shape:
+            shapes.find(
+              (s) => s.toLowerCase() === (data.shape || "").toLowerCase()
+            ) || "Rectangle",
+          description: desc,
+          whats_in_the_box: box,
+          is_new: Boolean(data.is_new),
+          is_polarized: Boolean(data.is_polarized),
+          is_gift: Boolean(data.is_gift),
+          status: (data.status as "active" | "draft") || "active",
+          image_url: data.image_url || null,
+          gallery_images: gallery,
+        });
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Failed to load product");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    if (productId) {
+      loadProduct();
+    }
+  }, [productId]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.name || !form.price) {
@@ -54,15 +130,15 @@ export default function NewProductPage() {
     setSaving(true);
     setError(null);
     try {
-      const { createClient } = await import("@/lib/supabase/client");
       const supabase = createClient();
 
       const combinedDescription = form.whats_in_the_box?.trim()
         ? `${form.description.trim()}\n\n---WHATS_IN_THE_BOX---\n${form.whats_in_the_box.trim()}`
         : form.description.trim();
 
-      const { error: dbError } = await supabase.from("products").insert([
-        {
+      const { error: dbError } = await supabase
+        .from("products")
+        .update({
           name: form.name,
           subtitle: form.subtitle,
           slug: form.slug || autoSlug(form.name),
@@ -77,17 +153,28 @@ export default function NewProductPage() {
           status: form.status,
           image_url: form.image_url,
           images: form.gallery_images,
-        },
-      ]);
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", productId);
+
       if (dbError) throw new Error(dbError.message);
       setSaved(true);
-      setTimeout(() => router.push("/admin/products"), 1200);
+      setTimeout(() => router.push("/admin/products"), 1000);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to save product");
+      setError(err instanceof Error ? err.message : "Failed to update product");
     } finally {
       setSaving(false);
     }
   };
+
+  if (loading) {
+    return (
+      <div className="max-w-4xl mx-auto py-24 flex flex-col items-center justify-center gap-3">
+        <Loader2 size={24} className="animate-spin text-[#c8874a]" />
+        <p className="text-neutral-400 text-sm">Loading product details...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
@@ -101,10 +188,10 @@ export default function NewProductPage() {
         </Link>
         <div>
           <h1 className="text-[22px] font-bold text-white tracking-tight">
-            Add New Product
+            Edit Product
           </h1>
           <p className="text-[13px] text-white/40 mt-0.5">
-            Create and publish a new sunglass listing
+            Modify details, pricing, frame optics, and package contents
           </p>
         </div>
       </div>
@@ -398,17 +485,17 @@ export default function NewProductPage() {
             {saving ? (
               <>
                 <Loader2 size={15} className="animate-spin" />
-                Saving Product...
+                Updating Product...
               </>
             ) : saved ? (
               <>
                 <CheckCircle2 size={15} />
-                Product Saved!
+                Changes Saved!
               </>
             ) : (
               <>
                 <Save size={15} />
-                Save & Publish
+                Save Changes
               </>
             )}
           </button>

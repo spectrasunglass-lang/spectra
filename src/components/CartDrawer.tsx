@@ -3,7 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { X, Plus, Minus, ShoppingBag, Trash2, ArrowRight, Gift } from "lucide-react";
+import { X, Plus, Minus, Bookmark, Trash2, ArrowRight, Gift } from "lucide-react";
 import { useCart } from "./CartContext";
 
 export default function CartDrawer() {
@@ -28,9 +28,9 @@ export default function CartDrawer() {
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-5 border-b border-white/[0.07]">
           <div className="flex items-center gap-3">
-            <ShoppingBag size={18} className="text-[#c8874a]" />
+            <Bookmark size={18} className="text-[#c8874a]" />
             <span className="text-[14px] font-bold text-white tracking-wide uppercase">
-              Your Cart
+              Your Bag / List
             </span>
             {count > 0 && (
               <span className="w-5 h-5 rounded-full bg-[#c8874a] text-white text-[10px] font-bold flex items-center justify-center">
@@ -51,19 +51,19 @@ export default function CartDrawer() {
           {items.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full gap-5 text-center">
               <div className="w-20 h-20 rounded-2xl bg-white/[0.05] flex items-center justify-center">
-                <ShoppingBag size={32} className="text-white/20" />
+                <Bookmark size={32} className="text-white/20" />
               </div>
               <div>
-                <p className="text-[15px] font-bold text-white/60">Your cart is empty</p>
+                <p className="text-[15px] font-bold text-white/60">Your list is empty</p>
                 <p className="text-[13px] text-white/30 mt-1">
-                  Add some sunglasses to get started
+                  Save some sunglasses to get started
                 </p>
               </div>
               <button
                 onClick={closeCart}
                 className="btn-gold mt-2"
               >
-                Continue Shopping
+                Explore Collection
               </button>
             </div>
           ) : (
@@ -84,7 +84,7 @@ export default function CartDrawer() {
                           className="object-contain p-2"
                         />
                       ) : (
-                        <ShoppingBag size={20} className="absolute inset-0 m-auto text-gray-400" />
+                        <Bookmark size={20} className="absolute inset-0 m-auto text-gray-400" />
                       )}
                     </div>
                   </Link>

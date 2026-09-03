@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { Menu, X, Search, Heart, ShoppingBag, User } from "lucide-react";
+import { Menu, X, Search, Heart, Bookmark, User } from "lucide-react";
 import SearchOverlay from "./SearchOverlay";
 import { useCart } from "./CartContext";
 import { createClient } from "@/lib/supabase/client";
@@ -192,14 +192,14 @@ export default function Navbar() {
                   )}
                 </Link>
 
-                {/* Cart */}
+                {/* Cart / Saved List */}
                 <button
                   type="button"
                   onClick={openCart}
                   className="hover:text-white p-1 transition-colors relative group cursor-pointer"
-                  aria-label="Shopping Cart"
+                  aria-label="Saved List"
                 >
-                  <ShoppingBag className="w-[17px] h-[17px] stroke-[1.5] group-hover:scale-110 transition-transform" />
+                  <Bookmark className="w-[17px] h-[17px] stroke-[1.5] group-hover:scale-110 transition-transform" />
                   {cartCount > 0 && (
                     <span className="absolute -top-1 -right-1.5 bg-[#c8874a] text-white text-[9px] font-bold h-4 min-w-4 px-0.5 rounded-full flex items-center justify-center leading-none animate-in zoom-in duration-200">
                       {cartCount}
@@ -315,8 +315,8 @@ export default function Navbar() {
               onClick={() => { setIsMenuOpen(false); openCart(); }}
               className="w-full flex items-center justify-center gap-2 bg-[#c8874a] text-white text-[11px] font-bold py-2.5 rounded-sm tracking-wide hover:bg-[#b87840] transition-colors"
             >
-              <ShoppingBag size={14} />
-              Shopping Cart
+              <Bookmark size={14} />
+              Saved List
               {cartCount > 0 && (
                 <span className="bg-white text-[#c8874a] text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center">
                   {cartCount}

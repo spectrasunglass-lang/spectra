@@ -38,10 +38,10 @@ export default function ShopByShapeSection({
   }
 
   return (
-    <section className="bg-white pt-14 pb-7 md:py-16">
+    <section className="bg-white pt-8 pb-10 md:pt-14 md:pb-14">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8 md:mb-12">
+        <div className="flex items-center justify-between mb-4 md:mb-6">
           <div>
             <h2 className="text-xs md:text-sm font-bold tracking-[0.3em] uppercase text-neutral-900">
               Shop By Shape
@@ -61,7 +61,7 @@ export default function ShopByShapeSection({
         </div>
 
         {/* Shapes single-line horizontally scrollable container */}
-        <div className="flex items-center overflow-x-auto no-scrollbar gap-3 sm:gap-6 pb-4 pt-4 px-1 -mx-1">
+        <div className="flex items-center overflow-x-auto no-scrollbar gap-2.5 sm:gap-6 pb-3 pt-2 px-1 -mx-1">
           {displayShapes.map((shape) => {
             const imageUrl = shape.image_url || iconUrls[shape.slug];
             const href = `/sunglasses?shape=${shape.slug}`;
@@ -72,24 +72,24 @@ export default function ShopByShapeSection({
                 href={href}
                 className="flex flex-col items-center group flex-shrink-0"
               >
-                {/* Floating Pedestal Box */}
-                <div className="w-36 h-36 sm:w-44 sm:h-44 md:w-56 md:h-56 flex items-center justify-center relative mb-3 bg-gradient-to-b from-[#fafafc] via-[#f2f3f7] to-[#e6e7ec] border border-gray-200 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] group-hover:-translate-y-1.5 transition-all duration-300 ease-out rounded-sm">
+                {/* Floating Pedestal Box - Compact on mobile, grand old look on laptop */}
+                <div className="w-24 h-24 sm:w-44 sm:h-44 md:w-56 md:h-56 flex items-center justify-center relative mb-2.5 bg-gradient-to-b from-[#fafafc] via-[#f2f3f7] to-[#e6e7ec] border border-gray-200 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] group-hover:-translate-y-1.5 transition-all duration-300 ease-out rounded-sm">
                   {imageUrl ? (
                     <Image
                       src={imageUrl}
                       alt={shape.name}
                       fill
-                      className="object-contain p-3 sm:p-5 group-hover:scale-105 transition-transform duration-500 ease-out"
-                      sizes="(max-width: 640px) 144px, (max-width: 768px) 176px, 224px"
+                      className="object-contain p-2 sm:p-5 group-hover:scale-105 transition-transform duration-500 ease-out"
+                      sizes="(max-width: 640px) 96px, (max-width: 768px) 176px, 224px"
                     />
                   ) : null}
                 </div>
 
                 {/* Shape Name & Gold indicator */}
-                <span className="text-[11px] sm:text-[12px] font-bold tracking-[0.18em] uppercase text-neutral-900 group-hover:text-[#c8874a] transition-colors text-center">
+                <span className="text-[10px] sm:text-[12px] font-bold tracking-[0.16em] sm:tracking-[0.18em] uppercase text-neutral-900 group-hover:text-[#c8874a] transition-colors text-center">
                   {shape.name}
                 </span>
-                <span className="block h-[2px] w-4 bg-[#c8874a] opacity-0 group-hover:opacity-100 transition-all duration-300 mt-1" />
+                <span className="block h-[2px] w-3.5 sm:w-4 bg-[#c8874a] opacity-0 group-hover:opacity-100 transition-all duration-300 mt-1" />
               </Link>
             );
           })}

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useCart } from "@/components/CartContext";
@@ -16,7 +16,14 @@ import {
   Check,
   Heart,
   Share2,
-  Sparkles
+  Sparkles,
+  Bookmark,
+  Maximize2,
+  ZoomIn,
+  ZoomOut,
+  ChevronLeft,
+  ChevronRight,
+  X
 } from "lucide-react";
 
 interface ProductData {
@@ -89,6 +96,113 @@ export default function ProductDetailClient({ product }: { product: ProductData 
     setActiveTab((prev) => (prev === tab ? null : tab));
   };
 
+  // Image zoom, mobile drag & lightbox states
+  const [isZooming, setIsZooming] = useState(false);
+  const [zoomPosition, setZoomPosition] = useState({ x: 50, y: 50 });
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+  const [lightboxZoom, setLightboxZoom] = useState(false);
+  const [touchStartX, setTouchStartX] = useState<number | null>(null);
+  const [touchDeltaX, setTouchDeltaX] = useState(0);
+  const imageContainerRef = useRef<HTMLDivElement>(null);
+
+  const activeImageIndex = Math.max(0, images.indexOf(selectedImage));
+
+  const showNextImage = (e?: React.MouseEvent | React.TouchEvent) => {
+    e?.stopPropagation();
+    if (images.length <= 1) return;
+    const nextIdx = (activeImageIndex + 1) % images.length;
+    setSelectedImage(images[nextIdx]);
+  };
+
+  const showPrevImage = (e?: React.MouseEvent | React.TouchEvent) => {
+    e?.stopPropagation();
+    if (images.length <= 1) return;
+    const prevIdx = (activeImageIndex - 1 + images.length) % images.length;
+    setSelectedImage(images[prevIdx]);
+  };
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!imageContainerRef.current) return;
+    const { left, top, width, height } = imageContainerRef.current.getBoundingClientRect();
+    const x = Math.min(Math.max(((e.clientX - left) / width) * 100, 0), 100);
+    const y = Math.min(Math.max(((e.clientY - top) / height) * 100, 0), 100);
+    setZoomPosition({ x, y });
+  };
+
+  const handleMouseEnter = () => {
+    setIsZooming(true);
+  };
+
+  const handleMouseLeave = () => {
+    setIsZooming(false);
+  };
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchStartX(e.touches[0].clientX);
+    setTouchDeltaX(0);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (touchStartX === null) return;
+    setTouchDeltaX(e.touches[0].clientX - touchStartX);
+  };
+
+  const handleTouchEnd = () => {
+    if (touchStartX === null) return;
+    const swipeThreshold = 40;
+    if (touchDeltaX < -swipeThreshold && images.length > 1) {
+      showNextImage();
+    } else if (touchDeltaX > swipeThreshold && images.length > 1) {
+      showPrevImage();
+    }
+    setTouchStartX(null);
+    setTouchDeltaX(0);
+  };
+
+  useEffect(() => {
+    if (!isLightboxOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setIsLightboxOpen(false);
+      if (e.key === "ArrowRight") showNextImage();
+      if (e.key === "ArrowLeft") showPrevImage();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isLightboxOpen, activeImageIndex, images.length]);
+
+  // Parse description into Frame Description & Optics and What's In The Box
+  const rawDescription = product.description || "";
+  let frameDescription = rawDescription;
+  let customBoxItems: string[] = [];
+
+  if (rawDescription.includes("---WHATS_IN_THE_BOX---")) {
+    const parts = rawDescription.split("---WHATS_IN_THE_BOX---");
+    frameDescription = parts[0]?.trim() || "";
+    const boxContent = parts[1]?.trim() || "";
+    if (boxContent) {
+      customBoxItems = boxContent
+        .split("\n")
+        .map((l) => l.trim())
+        .filter(Boolean);
+    }
+  }
+
+  if ((product as any).whats_in_the_box) {
+    const rawBox = (product as any).whats_in_the_box;
+    customBoxItems = typeof rawBox === "string" 
+      ? rawBox.split("\n").map((l: string) => l.trim()).filter(Boolean)
+      : Array.isArray(rawBox) ? rawBox : customBoxItems;
+  }
+
+  const defaultBoxItems = [
+    "• 1x SPECTRA Handcrafted Eyewear",
+    "• 1x Signature Matte-Black Hardcase",
+    "• 1x High-Density Microfiber Cleaning Cloth",
+    "• 1x Authenticity & Warranty Card"
+  ];
+
+  const boxItemsToDisplay = customBoxItems.length > 0 ? customBoxItems : defaultBoxItems;
+
   return (
     <div className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 py-10 sm:py-5">
 
@@ -115,27 +229,95 @@ export default function ProductDetailClient({ product }: { product: ProductData 
             </div>
           )}
 
-          {/* Main Large Image Studio White Showcase */}
-          <div className="relative flex-1 aspect-square sm:aspect-[4/4.5] max-h-[580px] bg-white rounded-sm overflow-hidden border border-white/[0.08] shadow-2xl flex items-center justify-center p-8 group">
+          {/* Main Large Image Studio White Showcase with Desktop Hover Zoom & Mobile Swipe */}
+          <div
+            ref={imageContainerRef}
+            onMouseMove={handleMouseMove}
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+            onClick={() => setIsLightboxOpen(true)}
+            className="relative flex-1 aspect-square sm:aspect-[4/4.5] max-h-[580px] bg-white rounded-sm overflow-hidden border border-white/[0.08] shadow-2xl flex items-center justify-center p-6 sm:p-10 group cursor-zoom-in select-none"
+          >
             {product.is_new && (
-              <span className="absolute top-5 left-5 bg-black text-white text-[10px] font-bold tracking-[0.2em] uppercase px-3 py-1.5 rounded-full z-10">
+              <span className="absolute top-5 left-5 bg-black text-white text-[10px] font-bold tracking-[0.2em] uppercase px-3 py-1.5 rounded-full z-10 pointer-events-none">
                 NEW RELEASE
               </span>
             )}
             {discountPercent && (
-              <span className="absolute top-5 right-5 bg-[#c8874a] text-white text-[10px] font-bold tracking-widest uppercase px-3 py-1.5 rounded-full z-10">
+              <span className="absolute top-5 right-5 bg-[#c8874a] text-white text-[10px] font-bold tracking-widest uppercase px-3 py-1.5 rounded-full z-10 pointer-events-none">
                 -{discountPercent}%
               </span>
             )}
 
-            <Image
-              src={selectedImage}
-              alt={product.name}
-              fill
-              priority
-              className="object-contain p-6 sm:p-10 group-hover:scale-105 transition-transform duration-500"
-              sizes="(max-width: 1024px) 100vw, 60vw"
-            />
+            {/* Desktop Zoomable Inner Image */}
+            <div
+              className="relative w-full h-full flex items-center justify-center pointer-events-none"
+              style={{
+                transform: isZooming ? "scale(2.5)" : "scale(1)",
+                transformOrigin: `${zoomPosition.x}% ${zoomPosition.y}%`,
+                transition: isZooming ? "transform 0.08s ease-out" : "transform 0.35s cubic-bezier(0.2, 0, 0, 1)",
+              }}
+            >
+              <Image
+                src={selectedImage}
+                alt={product.name}
+                fill
+                priority
+                className="object-contain p-4 sm:p-8"
+                sizes="(max-width: 1024px) 100vw, 60vw"
+              />
+            </div>
+
+            {/* Mobile Swipe / Arrow Controls */}
+            {images.length > 1 && (
+              <>
+                <button
+                  type="button"
+                  onClick={showPrevImage}
+                  className="sm:hidden absolute left-2.5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/60 text-white flex items-center justify-center backdrop-blur-md z-20 shadow-md cursor-pointer"
+                  aria-label="Previous image"
+                >
+                  <ChevronLeft size={18} />
+                </button>
+                <button
+                  type="button"
+                  onClick={showNextImage}
+                  className="sm:hidden absolute right-2.5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/60 text-white flex items-center justify-center backdrop-blur-md z-20 shadow-md cursor-pointer"
+                  aria-label="Next image"
+                >
+                  <ChevronRight size={18} />
+                </button>
+
+                {/* Mobile Drag Dot Indicators */}
+                <div className="sm:hidden absolute bottom-3.5 inset-x-0 flex items-center justify-center gap-1.5 z-20 pointer-events-none">
+                  {images.map((_, i) => (
+                    <span
+                      key={i}
+                      className={`h-1.5 rounded-full transition-all duration-300 ${
+                        i === activeImageIndex ? "w-5 bg-[#c8874a]" : "w-1.5 bg-neutral-300"
+                      }`}
+                    />
+                  ))}
+                </div>
+              </>
+            )}
+
+            {/* Full View Button */}
+            <div className="absolute bottom-3.5 right-3.5 z-20 flex items-center gap-1.5 bg-black/70 hover:bg-black text-white text-[10px] font-bold tracking-wider uppercase px-2.5 py-1.5 rounded-full backdrop-blur-md transition-all shadow-md">
+              <Maximize2 size={12} />
+              <span className="hidden sm:inline">Full View</span>
+            </div>
+
+            {/* Desktop Hover Zoom Hint */}
+            {!isZooming && (
+              <div className="hidden md:flex absolute bottom-3.5 left-3.5 z-20 items-center gap-1.5 bg-white/90 text-neutral-700 text-[10px] font-semibold px-2.5 py-1 rounded-full backdrop-blur-sm pointer-events-none border border-neutral-200 shadow-sm">
+                <ZoomIn size={11} className="text-[#c8874a]" />
+                Hover to zoom
+              </div>
+            )}
           </div>
         </div>
 
@@ -211,11 +393,11 @@ export default function ProductDetailClient({ product }: { product: ProductData 
             >
               {added ? (
                 <>
-                  <Check size={16} /> Added to Cart
+                  <Bookmark size={16} className="fill-white" /> Saved to List
                 </>
               ) : (
                 <>
-                  <ShoppingBag size={16} /> Add to Bag
+                  <Bookmark size={16} /> Save to List
                 </>
               )}
             </button>
@@ -258,7 +440,7 @@ export default function ProductDetailClient({ product }: { product: ProductData 
               </button>
               {activeTab === "details" && (
                 <div className="pt-2 text-neutral-400 text-[13px] leading-relaxed space-y-2">
-                  <p>{product.description || "Masterfully designed with premium lightweight craftsmanship and scratch-resistant optical coating. Tailored for all-day comfort and glare-free clarity."}</p>
+                  <p>{frameDescription || "Masterfully designed with premium lightweight craftsmanship and scratch-resistant optical coating. Tailored for all-day comfort and glare-free clarity."}</p>
                 </div>
               )}
             </div>
@@ -274,17 +456,137 @@ export default function ProductDetailClient({ product }: { product: ProductData 
               </button>
               {activeTab === "packaging" && (
                 <div className="pt-2 text-neutral-400 text-[13px] leading-relaxed space-y-1.5">
-                  <p>• 1x SPECTRA Handcrafted Eyewear</p>
-                  <p>• 1x Signature Matte-Black Hardcase</p>
-                  <p>• 1x High-Density Microfiber Cleaning Cloth</p>
-                  <p>• 1x Authenticity & Warranty Card</p>
+                  {boxItemsToDisplay.map((item, idx) => (
+                    <p key={idx}>{item.startsWith("•") ? item : `• ${item}`}</p>
+                  ))}
                 </div>
               )}
             </div>
           </div>
-
         </div>
       </div>
+
+      {/* High-Res Fullscreen Lightbox Modal */}
+      {isLightboxOpen && (
+        <div
+          className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-xl flex flex-col items-center justify-between p-4 sm:p-6 animate-in fade-in duration-200"
+          onClick={() => {
+            setIsLightboxOpen(false);
+            setLightboxZoom(false);
+          }}
+        >
+          {/* Top Bar: Brand, Counter & Close */}
+          <div className="w-full flex items-center justify-between z-30 text-white">
+            <div className="flex items-center gap-3">
+              <span className="text-[11px] sm:text-xs font-bold uppercase tracking-[0.2em] text-[#c8874a]">
+                SPECTRA HIGH-RES VIEW
+              </span>
+              <span className="text-xs text-neutral-400">
+                {activeImageIndex + 1} / {images.length}
+              </span>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setLightboxZoom(!lightboxZoom);
+                }}
+                className="p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer"
+                title={lightboxZoom ? "Zoom Out" : "Zoom In"}
+              >
+                {lightboxZoom ? <ZoomOut size={18} /> : <ZoomIn size={18} />}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setIsLightboxOpen(false);
+                  setLightboxZoom(false);
+                }}
+                className="p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer"
+                title="Close"
+              >
+                <X size={20} />
+              </button>
+            </div>
+          </div>
+
+          {/* Center Image with Click to Toggle Zoom & Touch Swipe */}
+          <div
+            className="relative w-full flex-1 max-w-5xl flex items-center justify-center overflow-hidden my-2"
+            onClick={(e) => {
+              e.stopPropagation();
+              setLightboxZoom(!lightboxZoom);
+            }}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+          >
+            <div
+              className={`relative w-full h-full max-h-[76vh] transition-transform duration-300 ease-out cursor-pointer ${
+                lightboxZoom ? "scale-150 sm:scale-[2]" : "scale-100"
+              }`}
+            >
+              <Image
+                src={selectedImage}
+                alt={product.name}
+                fill
+                priority
+                className="object-contain p-2 sm:p-4 select-none"
+                sizes="100vw"
+              />
+            </div>
+
+            {/* Lightbox Next/Prev Arrows */}
+            {images.length > 1 && (
+              <>
+                <button
+                  type="button"
+                  onClick={showPrevImage}
+                  className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center backdrop-blur-md transition-all z-30 cursor-pointer shadow-lg"
+                  aria-label="Previous image"
+                >
+                  <ChevronLeft size={24} />
+                </button>
+                <button
+                  type="button"
+                  onClick={showNextImage}
+                  className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center backdrop-blur-md transition-all z-30 cursor-pointer shadow-lg"
+                  aria-label="Next image"
+                >
+                  <ChevronRight size={24} />
+                </button>
+              </>
+            )}
+          </div>
+
+          {/* Bottom Filmstrip Thumbnails */}
+          {images.length > 1 && (
+            <div
+              className="flex items-center gap-2 overflow-x-auto max-w-full pb-2 z-30 no-scrollbar"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {images.map((img, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => {
+                    setSelectedImage(img);
+                    setLightboxZoom(false);
+                  }}
+                  className={`relative w-12 h-12 sm:w-14 sm:h-14 rounded-lg overflow-hidden border-2 transition-all flex-shrink-0 cursor-pointer ${
+                    selectedImage === img
+                      ? "border-[#c8874a] scale-105"
+                      : "border-white/20 opacity-50 hover:opacity-100"
+                  }`}
+                >
+                  <Image src={img} alt="" fill className="object-contain p-1" sizes="60px" />
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

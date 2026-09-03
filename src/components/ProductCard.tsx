@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ShoppingBag, Check } from "lucide-react";
+import { ShoppingBag, Check, Bookmark } from "lucide-react";
 import { useCart } from "./CartContext";
 
 export interface Product {
@@ -157,11 +157,11 @@ export function ProductCard(props: ProductCardProps) {
               >
                 {added ? (
                   <>
-                    <Check size={14} /> Added to Cart!
+                    <Bookmark size={14} className="fill-white" /> Saved to List!
                   </>
                 ) : (
                   <>
-                    <ShoppingBag size={14} /> Quick Add
+                    <Bookmark size={14} /> Save to List
                   </>
                 )}
               </button>
@@ -267,11 +267,11 @@ export function ProductCard(props: ProductCardProps) {
             >
               {added ? (
                 <>
-                  <Check size={14} /> Added to Cart!
+                  <Bookmark size={14} className="fill-white" /> Saved to List!
                 </>
               ) : (
                 <>
-                  <ShoppingBag size={14} /> Add to Cart
+                  <Bookmark size={14} /> Save to List
                 </>
               )}
             </button>

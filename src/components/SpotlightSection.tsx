@@ -30,13 +30,13 @@ export default function SpotlightSection({
     "Explore signature handcrafted silhouettes captured in our latest visual concepts.";
 
   return (
-    <section className="bg-white py-7 md:py-20 overflow-hidden select-none">
+    <section className="bg-[#0a0a0a] py-10 md:py-16 border-y border-white/[0.08] overflow-hidden select-none">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Header row */}
-        <div className="flex items-center justify-between mb-8 md:mb-12">
+        <div className="flex items-center justify-between mb-6 md:mb-10">
           <div>
-            <h2 className="text-xs md:text-sm font-bold tracking-[0.3em] uppercase text-neutral-900">
+            <h2 className="text-xs md:text-sm font-bold tracking-[0.3em] uppercase text-white">
               {title}
             </h2>
             {subtitle && (
@@ -59,10 +59,10 @@ export default function SpotlightSection({
               <Link
                 key={card.id}
                 href={destination}
-                className="group relative flex-shrink-0 w-[240px] sm:w-[270px] md:w-[300px] aspect-[9/13.5] rounded-sm overflow-hidden bg-neutral-100 shadow-sm hover:shadow-xl transition-all duration-500 block border border-neutral-200/80 snap-start"
+                className="group relative flex-shrink-0 w-[240px] sm:w-[270px] md:w-[300px] aspect-[9/13.5] rounded-sm overflow-hidden bg-neutral-900 shadow-xl hover:shadow-2xl transition-all duration-500 block border border-white/[0.1] snap-start"
               >
                 {/* Background Image */}
-                <div className="absolute inset-0 w-full h-full bg-neutral-100 overflow-hidden">
+                <div className="absolute inset-0 w-full h-full bg-neutral-900 overflow-hidden">
                   <Image
                     src={card.image_url}
                     alt={card.title || "Campaign"}

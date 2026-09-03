@@ -141,16 +141,14 @@ export default async function Home() {
       {/* 2. Shop By Shape */}
       <ShopByShapeSection categories={shapeCategories} />
 
+      {/* 3. Editorial Spotlight / Curated Drops & Stories */}
+      <SpotlightSection cards={spotlightCards} heading={spotlightHeading} />
 
-
-      {/* 4. New Arrivals */}
+      {/* 4. Newly Added */}
       <NewArrivalsSection products={newArrivals} />
 
-      {/* 5. Our Story */}
+      {/* 5. Our Story (Built to be seen) */}
       <OurStorySection storyImageUrl={storyImage} />
-
-      {/* 3. Editorial Spotlight / Campaigns Section */}
-      <SpotlightSection cards={spotlightCards} heading={spotlightHeading} />
 
       {/* 6. All Products (Initial 8, scroll loads next 8) */}
       <AllProductsSection initialProducts={allProducts} />
