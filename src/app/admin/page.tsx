@@ -202,38 +202,40 @@ export default async function AdminDashboard() {
               <p className="text-[12px] text-white/20">Orders will appear here when placed.</p>
             </div>
           ) : (
-            <table className="w-full text-left">
-              <thead>
-                <tr className="border-b border-white/[0.06] bg-[#0d0d0d]">
-                  {["Order", "Customer", "Product", "Amount", "Status"].map((h) => (
-                    <th key={h} className="px-5 py-3 text-[10px] font-bold text-white/30 uppercase tracking-widest">
-                      {h}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-white/[0.04]">
-                {recentOrders.map((order) => (
-                  <tr key={order.id} className="hover:bg-white/[0.02] transition-colors">
-                    <td className="px-5 py-3.5 text-[11px] font-bold text-[#c8874a]">
-                      #{String(order.id).slice(-6).toUpperCase()}
-                    </td>
-                    <td className="px-5 py-3.5 text-[12px] text-white/80 max-w-[100px] truncate">
-                      {order.customer_name}
-                    </td>
-                    <td className="px-5 py-3.5 text-[12px] text-white/50 max-w-[120px] truncate">
-                      {order.product_name}
-                    </td>
-                    <td className="px-5 py-3.5 text-[12px] font-bold text-white">
-                      {fmt(order.amount)}
-                    </td>
-                    <td className="px-5 py-3.5">
-                      <StatusBadge status={order.status} />
-                    </td>
+            <div className="overflow-x-auto no-scrollbar">
+              <table className="w-full text-left min-w-[500px]">
+                <thead>
+                  <tr className="border-b border-white/[0.06] bg-[#0d0d0d]">
+                    {["Order", "Customer", "Product", "Amount", "Status"].map((h) => (
+                      <th key={h} className="px-5 py-3 text-[10px] font-bold text-white/30 uppercase tracking-widest">
+                        {h}
+                      </th>
+                    ))}
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-white/[0.04]">
+                  {recentOrders.map((order) => (
+                    <tr key={order.id} className="hover:bg-white/[0.02] transition-colors">
+                      <td className="px-5 py-3.5 text-[11px] font-bold text-[#c8874a]">
+                        #{String(order.id).slice(-6).toUpperCase()}
+                      </td>
+                      <td className="px-5 py-3.5 text-[12px] text-white/80 max-w-[100px] truncate">
+                        {order.customer_name}
+                      </td>
+                      <td className="px-5 py-3.5 text-[12px] text-white/50 max-w-[120px] truncate">
+                        {order.product_name}
+                      </td>
+                      <td className="px-5 py-3.5 text-[12px] font-bold text-white">
+                        {fmt(order.amount)}
+                      </td>
+                      <td className="px-5 py-3.5">
+                        <StatusBadge status={order.status} />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
         </div>
 

@@ -241,8 +241,8 @@ export default function SettingsPage() {
           <button
             type="submit"
             disabled={saving || saved}
-            className={`inline-flex items-center gap-2 px-6 py-3.5 rounded-sm text-[13px] font-bold transition-all duration-200 shadow-md ${
-              saved ? "bg-emerald-600 text-white shadow-emerald-900/30" : "bg-[#c8874a] hover:bg-[#b87840] text-white shadow-[#c8874a]/20"
+            className={`w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-sm text-[13px] font-bold transition-all duration-200 shadow-md ${
+              saved ? "bg-emerald-600 text-white shadow-emerald-900/30" : "bg-[#c8874a] hover:bg-[#b87840] text-white shadow-[#c8874a]/20 cursor-pointer"
             } disabled:opacity-70`}
           >
             {saving ? <><Loader2 size={15} className="animate-spin" /> Saving...</> : saved ? <><CheckCircle2 size={15} /> Settings Saved!</> : <><Save size={15} /> Save Settings</>}

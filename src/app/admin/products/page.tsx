@@ -227,54 +227,56 @@ export default function ProductsPage() {
         </div>
       ) : (
         <div className="bg-[#111111] rounded-sm border border-white/[0.07] overflow-hidden">
-          <table className="w-full text-left">
-            <thead>
-              <tr className="border-b border-white/[0.06] bg-[#0d0d0d]">
-                {["Product", "Category", "Shape", "Price", "Status", ""].map((h) => (
-                  <th key={h} className="px-6 py-3.5 text-[10px] font-bold text-white/30 uppercase tracking-widest">{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-white/[0.04]">
-              {filtered.map((product) => (
-                <tr key={product.id} className="hover:bg-white/[0.02] transition-colors">
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-sm bg-[#161616] border border-white/[0.06] flex-shrink-0 overflow-hidden relative">
-                        {product.image_url ? (
-                          <Image src={product.image_url} alt={product.name} fill className="object-contain p-1" />
-                        ) : (
-                          <Package size={16} className="text-white/30 absolute inset-0 m-auto" />
-                        )}
-                      </div>
-                      <div>
-                        <p className="text-[13px] font-bold text-white">{product.name}</p>
-                        <p className="text-[11px] text-white/40">{product.subtitle}</p>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 text-[12px] text-white/70 capitalize">{product.category}</td>
-                  <td className="px-6 py-4 text-[12px] text-white/70 capitalize">{product.shape}</td>
-                  <td className="px-6 py-4 text-[13px] font-bold text-[#c8874a]">₹{product.price.toLocaleString("en-IN")}</td>
-                  <td className="px-6 py-4"><StatusBadge status={product.status} /></td>
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-1">
-                      <Link href={`/admin/products/${product.id}/edit`} className="p-1.5 rounded-sm hover:bg-white/[0.06] text-white/40 hover:text-white transition-colors">
-                        <Edit2 size={14} />
-                      </Link>
-                      <button
-                        onClick={() => handleDelete(product.id, product.name)}
-                        disabled={deletingId === product.id}
-                        className="p-1.5 rounded-sm hover:bg-red-500/10 text-white/40 hover:text-red-400 transition-colors disabled:opacity-50"
-                      >
-                        {deletingId === product.id ? <Loader2 size={14} className="animate-spin" /> : <Trash2 size={14} />}
-                      </button>
-                    </div>
-                  </td>
+          <div className="overflow-x-auto no-scrollbar">
+            <table className="w-full text-left min-w-[620px]">
+              <thead>
+                <tr className="border-b border-white/[0.06] bg-[#0d0d0d]">
+                  {["Product", "Category", "Shape", "Price", "Status", ""].map((h) => (
+                    <th key={h} className="px-6 py-3.5 text-[10px] font-bold text-white/30 uppercase tracking-widest">{h}</th>
+                  ))}
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-white/[0.04]">
+                {filtered.map((product) => (
+                  <tr key={product.id} className="hover:bg-white/[0.02] transition-colors">
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-sm bg-[#161616] border border-white/[0.06] flex-shrink-0 overflow-hidden relative">
+                          {product.image_url ? (
+                            <Image src={product.image_url} alt={product.name} fill className="object-contain p-1" />
+                          ) : (
+                            <Package size={16} className="text-white/30 absolute inset-0 m-auto" />
+                          )}
+                        </div>
+                        <div>
+                          <p className="text-[13px] font-bold text-white">{product.name}</p>
+                          <p className="text-[11px] text-white/40">{product.subtitle}</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 text-[12px] text-white/70 capitalize">{product.category}</td>
+                    <td className="px-6 py-4 text-[12px] text-white/70 capitalize">{product.shape}</td>
+                    <td className="px-6 py-4 text-[13px] font-bold text-[#c8874a]">₹{product.price.toLocaleString("en-IN")}</td>
+                    <td className="px-6 py-4"><StatusBadge status={product.status} /></td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-1">
+                        <Link href={`/admin/products/${product.id}/edit`} className="p-1.5 rounded-sm hover:bg-white/[0.06] text-white/40 hover:text-white transition-colors">
+                          <Edit2 size={14} />
+                        </Link>
+                        <button
+                          onClick={() => handleDelete(product.id, product.name)}
+                          disabled={deletingId === product.id}
+                          className="p-1.5 rounded-sm hover:bg-red-500/10 text-white/40 hover:text-red-400 transition-colors disabled:opacity-50"
+                        >
+                          {deletingId === product.id ? <Loader2 size={14} className="animate-spin" /> : <Trash2 size={14} />}
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
     </div>

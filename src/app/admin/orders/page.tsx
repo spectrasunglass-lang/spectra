@@ -221,130 +221,140 @@ export default function OrdersPage() {
             </div>
           </div>
         ) : (
-          <table className="w-full text-left">
-            <thead>
-              <tr className="border-b border-white/[0.06] bg-[#0d0d0d]">
-                {["", "Order ID", "Customer", "Product", "Amount", "Date", "Status"].map((h) => (
-                  <th key={h} className="px-5 py-3.5 text-[10px] font-bold text-white/30 uppercase tracking-widest">
-                    {h}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-white/[0.04]">
-              {filtered.map((order) => (
-                <React.Fragment key={order.id}>
-                  <tr
-                    className={`hover:bg-white/[0.02] transition-colors cursor-pointer ${expanded === order.id ? "bg-white/[0.03]" : ""}`}
-                    onClick={() => setExpanded(expanded === order.id ? null : order.id)}
-                  >
-                    <td className="px-4 py-4 w-8">
-                      {expanded === order.id
-                        ? <ChevronUp size={14} className="text-white/50" />
-                        : <ChevronDown size={14} className="text-white/20" />
-                      }
-                    </td>
-                    <td className="px-5 py-4 text-[11px] font-bold text-[#c8874a]">
-                      #{String(order.id).slice(-8).toUpperCase()}
-                    </td>
-                    <td className="px-5 py-4">
-                      <p className="text-[12px] font-semibold text-white">{order.customer_name}</p>
-                      <p className="text-[11px] text-white/40">{order.customer_email}</p>
-                    </td>
-                    <td className="px-5 py-4">
-                      <div className="flex items-center gap-3">
-                        <div className="relative w-11 h-11 rounded-sm bg-[#f5f0eb] border border-white/[0.08] overflow-hidden flex-shrink-0 flex items-center justify-center shadow-sm">
-                          {resolveProductImage(order.product_name) ? (
-                            <Image
-                              src={resolveProductImage(order.product_name)!}
-                              alt={order.product_name}
-                              fill
-                              className="object-contain p-1"
-                              sizes="44px"
-                            />
-                          ) : (
-                            <Package size={16} className="text-neutral-500" />
-                          )}
-                        </div>
-                        <span className="text-[12.5px] font-semibold text-white/90 max-w-[220px] line-clamp-2 leading-snug">
-                          {order.product_name}
-                        </span>
-                      </div>
-                    </td>
-                    <td className="px-5 py-4 text-[13px] font-bold text-white">₹{(order.amount ?? 0).toLocaleString("en-IN")}</td>
-                    <td className="px-5 py-4 text-[12px] text-white/40">
-                      {new Date(order.created_at).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
-                    </td>
-                    <td className="px-5 py-4">
-                      <StatusBadge status={order.status} />
-                    </td>
-                  </tr>
-
-                  {/* Expanded Detail Row */}
-                  {expanded === order.id && (
-                    <tr>
-                      <td colSpan={7} className="px-6 py-5 bg-[#0e0e0e] border-b border-white/[0.06]">
-                        <div className="flex flex-wrap items-center gap-8">
-                          {/* Product Thumbnail Card */}
-                          <div className="flex items-center gap-3.5 bg-[#141414] p-3 rounded-sm border border-white/[0.06] min-w-[260px] max-w-sm">
-                            <div className="relative w-14 h-14 rounded-sm bg-[#f5f0eb] border border-white/[0.08] overflow-hidden flex-shrink-0 flex items-center justify-center shadow-inner">
-                              {resolveProductImage(order.product_name) ? (
-                                <Image
-                                  src={resolveProductImage(order.product_name)!}
-                                  alt={order.product_name}
-                                  fill
-                                  className="object-contain p-1.5"
-                                  sizes="56px"
-                                />
-                              ) : (
-                                <Package size={20} className="text-neutral-500" />
-                              )}
-                            </div>
-                            <div className="min-w-0 flex-1">
-                              <p className="text-[9px] font-bold text-white/30 uppercase tracking-widest">Purchased Item</p>
-                              <p className="text-[12.5px] font-bold text-white line-clamp-1">{order.product_name}</p>
-                              <p className="text-[11px] text-[#c8874a] font-semibold mt-0.5">₹{(order.amount ?? 0).toLocaleString("en-IN")}</p>
-                            </div>
-                          </div>
-
-                          <div className="min-w-[160px]">
-                            <p className="text-[9px] font-bold text-white/30 uppercase tracking-widest mb-1.5">Shipping To</p>
-                            <p className="text-[13px] font-bold text-white">{order.customer_name}</p>
-                            {order.customer_phone && <p className="text-[12px] text-white/50">{order.customer_phone}</p>}
-                            {order.city && <p className="text-[12px] text-white/50">{order.city}</p>}
-                            {order.address && <p className="text-[11px] text-white/40 mt-1 max-w-[200px]">{order.address}</p>}
+          <div className="overflow-x-auto no-scrollbar">
+            <table className="w-full text-left min-w-[700px]">
+              <thead>
+                <tr className="border-b border-white/[0.06] bg-[#0d0d0d]">
+                  {["", "Order ID", "Customer", "Product", "Amount", "Date", "Status"].map((h) => (
+                    <th key={h} className="px-5 py-3.5 text-[10px] font-bold text-white/30 uppercase tracking-widest">
+                      {h}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-white/[0.04]">
+                {filtered.map((order) => (
+                  <React.Fragment key={order.id}>
+                    <tr
+                      className={`hover:bg-white/[0.02] transition-colors cursor-pointer ${expanded === order.id ? "bg-white/[0.03]" : ""}`}
+                      onClick={() => setExpanded(expanded === order.id ? null : order.id)}
+                    >
+                      <td className="px-4 py-4 w-8">
+                        {expanded === order.id
+                          ? <ChevronUp size={14} className="text-white/50" />
+                          : <ChevronDown size={14} className="text-white/20" />
+                        }
+                      </td>
+                      <td className="px-5 py-4 text-[11px] font-bold text-[#c8874a]">
+                        #{String(order.id).slice(-8).toUpperCase()}
+                      </td>
+                      <td className="px-5 py-4">
+                        <p className="text-[12px] font-semibold text-white">{order.customer_name}</p>
+                        <p className="text-[11px] text-white/40">{order.customer_email}</p>
+                      </td>
+                      <td className="px-5 py-4">
+                        <div className="flex items-center gap-3">
+                          <div className="relative w-11 h-11 rounded-sm bg-[#f5f0eb] border border-white/[0.08] overflow-hidden flex-shrink-0 flex items-center justify-center shadow-sm">
+                            {resolveProductImage(order.product_name) ? (
+                              <Image
+                                src={resolveProductImage(order.product_name)!}
+                                alt={order.product_name}
+                                fill
+                                className="object-contain p-1"
+                                sizes="44px"
+                              />
+                            ) : (
+                              <Package size={16} className="text-neutral-400" />
+                            )}
                           </div>
                           <div>
-                            <p className="text-[9px] font-bold text-white/30 uppercase tracking-widest mb-1.5">Order Total</p>
-                            <p className="text-[22px] font-bold text-[#c8874a]">₹{(order.amount ?? 0).toLocaleString("en-IN")}</p>
-                          </div>
-                          <div className="ml-auto">
-                            <p className="text-[9px] font-bold text-white/30 uppercase tracking-widest mb-2.5">Update Status</p>
-                            <div className="flex gap-2 flex-wrap">
-                              {(nextStatuses[order.status] ?? []).map((s) => (
-                                <button
-                                  key={s}
-                                  onClick={(e) => { e.stopPropagation(); updateStatus(order.id, s); }}
-                                  disabled={updatingId === order.id}
-                                  className="px-3.5 py-2 text-[11px] font-bold capitalize rounded-sm border border-[#c8874a]/40 text-[#c8874a] hover:bg-[#c8874a] hover:text-white hover:border-[#c8874a] transition-all flex items-center gap-1.5 disabled:opacity-50 cursor-pointer"
-                                >
-                                  {updatingId === order.id && <Loader2 size={11} className="animate-spin" />}
-                                  Mark as {s}
-                                </button>
-                              ))}
-                              {nextStatuses[order.status].length === 0 && (
-                                <span className="text-[12px] text-white/30 italic">No further actions</span>
-                              )}
-                            </div>
+                            <p className="text-[12.5px] font-bold text-white line-clamp-1 max-w-[180px]">
+                              {order.product_name}
+                            </p>
+                            <p className="text-[10.5px] text-white/40">Item ID #{String(order.id).slice(-4)}</p>
                           </div>
                         </div>
                       </td>
+                      <td className="px-5 py-4 text-[13px] font-bold text-white">
+                        ₹{(order.amount ?? 0).toLocaleString("en-IN")}
+                      </td>
+                      <td className="px-5 py-4 text-[11.5px] text-white/40 whitespace-nowrap">
+                        {new Date(order.created_at).toLocaleDateString("en-IN", {
+                          day: "numeric",
+                          month: "short",
+                        })}
+                      </td>
+                      <td className="px-5 py-4">
+                        <StatusBadge status={order.status} />
+                      </td>
                     </tr>
-                  )}
-                </React.Fragment>
-              ))}
-            </tbody>
-          </table>
+
+                    {/* Expanded Detail Row */}
+                    {expanded === order.id && (
+                      <tr>
+                        <td colSpan={7} className="px-6 py-5 bg-[#0e0e0e] border-b border-white/[0.06]">
+                          <div className="flex flex-wrap items-center gap-8">
+                            {/* Product Thumbnail Card */}
+                            <div className="flex items-center gap-3.5 bg-[#141414] p-3 rounded-sm border border-white/[0.06] min-w-[260px] max-w-sm">
+                              <div className="relative w-14 h-14 rounded-sm bg-[#f5f0eb] border border-white/[0.08] overflow-hidden flex-shrink-0 flex items-center justify-center shadow-inner">
+                                {resolveProductImage(order.product_name) ? (
+                                  <Image
+                                    src={resolveProductImage(order.product_name)!}
+                                    alt={order.product_name}
+                                    fill
+                                    className="object-contain p-1.5"
+                                    sizes="56px"
+                                  />
+                                ) : (
+                                  <Package size={20} className="text-neutral-500" />
+                                )}
+                              </div>
+                              <div className="min-w-0 flex-1">
+                                <p className="text-[9px] font-bold text-white/30 uppercase tracking-widest">Purchased Item</p>
+                                <p className="text-[12.5px] font-bold text-white line-clamp-1">{order.product_name}</p>
+                                <p className="text-[11px] text-[#c8874a] font-semibold mt-0.5">₹{(order.amount ?? 0).toLocaleString("en-IN")}</p>
+                              </div>
+                            </div>
+
+                            <div className="min-w-[160px]">
+                              <p className="text-[9px] font-bold text-white/30 uppercase tracking-widest mb-1.5">Shipping To</p>
+                              <p className="text-[13px] font-bold text-white">{order.customer_name}</p>
+                              {order.customer_phone && <p className="text-[12px] text-white/50">{order.customer_phone}</p>}
+                              {order.city && <p className="text-[12px] text-white/50">{order.city}</p>}
+                              {order.address && <p className="text-[11px] text-white/40 mt-1 max-w-[200px]">{order.address}</p>}
+                            </div>
+                            <div>
+                              <p className="text-[9px] font-bold text-white/30 uppercase tracking-widest mb-1.5">Order Total</p>
+                              <p className="text-[22px] font-bold text-[#c8874a]">₹{(order.amount ?? 0).toLocaleString("en-IN")}</p>
+                            </div>
+                            <div className="ml-auto">
+                              <p className="text-[9px] font-bold text-white/30 uppercase tracking-widest mb-2.5">Update Status</p>
+                              <div className="flex gap-2 flex-wrap">
+                                {(nextStatuses[order.status] ?? []).map((s) => (
+                                  <button
+                                    key={s}
+                                    onClick={(e) => { e.stopPropagation(); updateStatus(order.id, s); }}
+                                    disabled={updatingId === order.id}
+                                    className="px-3.5 py-2 text-[11px] font-bold capitalize rounded-sm border border-[#c8874a]/40 text-[#c8874a] hover:bg-[#c8874a] hover:text-white hover:border-[#c8874a] transition-all flex items-center gap-1.5 disabled:opacity-50 cursor-pointer"
+                                  >
+                                    {updatingId === order.id && <Loader2 size={11} className="animate-spin" />}
+                                    Mark as {s}
+                                  </button>
+                                ))}
+                                {nextStatuses[order.status].length === 0 && (
+                                  <span className="text-[12px] text-white/30 italic">No further actions</span>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </React.Fragment>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
     </div>
