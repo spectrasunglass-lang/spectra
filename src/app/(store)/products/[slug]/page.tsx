@@ -5,57 +5,85 @@ import { ProductCard, Product } from "@/components/ProductCard";
 import ProductDetailClient from "./ProductDetailClient";
 import type { Metadata } from "next";
 
-export const revalidate = 60;
+export const dynamic = "force-dynamic";
+export const dynamicParams = true;
 
 interface ProductPageProps {
   params: Promise<{ slug: string }>;
 }
 
+export async function generateStaticParams() {
+  try {
+    const supabase = await createClient();
+    const { data: products } = await supabase.from("products").select("slug");
+    return (products || []).filter((p) => p.slug).map((p) => ({
+      slug: p.slug,
+    }));
+  } catch {
+    return [];
+  }
+}
+
 // Helper to reliably find product by slug, normalized slug, id, or name
 async function findProduct(supabase: any, rawParam: string) {
+  if (!rawParam) return null;
   const decoded = decodeURIComponent(rawParam).trim();
   const normalized = decoded.toLowerCase().replace(/\s+/g, "-");
 
-  // 1. Try normalized slug (e.g. brown-tortoiseshell-wayfarer-sunglasses)
-  let { data } = await supabase
+  // 1. Try normalized slug (e.g. gold-frame-square-aviator-sunglasses)
+  const { data: bySlug } = await supabase
     .from("products")
     .select("*")
     .eq("slug", normalized)
     .maybeSingle();
 
-  if (data) return data;
+  if (bySlug) return bySlug;
 
   // 2. Try raw slug if different
   if (decoded !== normalized) {
-    const res = await supabase
+    const { data: byRawSlug } = await supabase
       .from("products")
       .select("*")
       .eq("slug", decoded)
       .maybeSingle();
-    if (res.data) return res.data;
+    if (byRawSlug) return byRawSlug;
   }
 
   // 3. Try matching by UUID if valid
   const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
   if (uuidRegex.test(decoded)) {
-    const res = await supabase
+    const { data: byId } = await supabase
       .from("products")
       .select("*")
       .eq("id", decoded)
       .maybeSingle();
-    if (res.data) return res.data;
+    if (byId) return byId;
   }
 
   // 4. Try matching product name (replaces hyphens with spaces)
   const nameQuery = decoded.replace(/-/g, " ").trim();
-  const resByName = await supabase
+  const { data: byName } = await supabase
     .from("products")
     .select("*")
     .ilike("name", `%${nameQuery}%`)
     .limit(1)
     .maybeSingle();
 
-  return resByName.data || null;
+  if (byName) return byName;
+
+  // 5. Smart fallback: match by primary keyword in slug
+  const words = normalized.split("-").filter((w: string) => w.length > 3);
+  if (words.length > 0) {
+    const { data: byKeyword } = await supabase
+      .from("products")
+      .select("*")
+      .ilike("slug", `%${words[0]}%`)
+      .limit(1)
+      .maybeSingle();
+    if (byKeyword) return byKeyword;
+  }
+
+  return null;
 }
 
 export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
@@ -105,7 +133,8 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
 }
 
 export default async function ProductDetailPage({ params }: ProductPageProps) {
-  const { slug } = await params;
+  const resolvedParams = await params;
+  const slug = resolvedParams?.slug;
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.spectrasunglassess.in";
   const supabase = await createClient();
   const product = await findProduct(supabase, slug);
