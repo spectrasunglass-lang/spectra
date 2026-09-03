@@ -41,7 +41,7 @@ export default async function NewArrivalsPage() {
             Fresh Releases 2026
           </p>
           <h1 className="text-3xl sm:text-5xl font-bold text-white tracking-tight uppercase">
-            New Arrivals
+            Newly Added
           </h1>
           <p className="text-neutral-400 text-[13px] sm:text-[14px] mt-3 max-w-md mx-auto">
             The newest vision of luxury. Discover our latest design innovations.

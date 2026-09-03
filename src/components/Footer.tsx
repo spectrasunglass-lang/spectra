@@ -11,7 +11,7 @@ const footerSections = [
     title: "Shop Collections",
     links: [
       { name: "Home", href: "/" },
-      { name: "New Arrivals", href: "/new-arrivals" },
+      { name: "Newly Added", href: "/new-arrivals" },
       { name: "Men's Sunglasses", href: "/men" },
       { name: "Women's Sunglasses", href: "/women" },
       { name: "Spectra Collections", href: "/collections" },
@@ -250,7 +250,7 @@ Crafted for visionaries. Designed to stand apart. Luxury eyewear with timeless s
             <ul className="space-y-2.5 text-[12.5px]">
               {[
                 { name: "Home", href: "/" },
-                { name: "New Arrivals", href: "/new-arrivals" },
+                { name: "Newly Added", href: "/new-arrivals" },
                 { name: "Men's Sunglasses", href: "/men" },
                 { name: "Women's Sunglasses", href: "/women" },
                 { name: "Spectra Collections", href: "/collections" },

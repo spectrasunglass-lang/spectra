@@ -15,7 +15,7 @@ export default function NewArrivalsSection({ products }: NewArrivalsSectionProps
         <div className="flex items-center justify-between mb-8 md:mb-12">
           <div>
             <h2 className="text-xs md:text-sm font-bold tracking-[0.3em] uppercase text-neutral-900">
-              New Arrivals
+              Newly Added
             </h2>
             <p className="text-[12px] text-neutral-400 mt-1">
               Explore the latest handcrafted frames

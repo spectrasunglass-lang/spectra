@@ -65,7 +65,7 @@ export default function Navbar() {
 
   const allNavItems = [
     { name: "HOME", href: "/" },
-    { name: "NEW ARRIVALS", href: "/new-arrivals" },
+    { name: "NEWLY ADDED", href: "/new-arrivals" },
     { name: "MEN", href: "/men" },
     { name: "WOMEN", href: "/women" },
     { name: "SPECTRA COLLECTIONS", href: "/collections" },
