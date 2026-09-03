@@ -14,8 +14,32 @@
 }
 
 @layer base {
+  html {
+    overflow-x: hidden;
+    scrollbar-color: rgba(200, 135, 74, 0.4) #0a0a0a;
+    scrollbar-width: thin;
+  }
+
   body {
     font-family: var(--font-quicksand), system-ui, -apple-system, sans-serif;
+    overflow-x: hidden;
+    background-color: #0a0a0a;
+  }
+
+  /* Sleek Luxury Dark Scrollbar for Chrome, Safari & Edge */
+  ::-webkit-scrollbar {
+    width: 7px;
+    height: 7px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #0a0a0a;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(200, 135, 74, 0.4);
+    border-radius: 9999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(200, 135, 74, 0.75);
   }
 
   * {
@@ -148,3 +172,127 @@
   -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;  /* Firefox */
 }
+
+/* ═══════════════════════════════════════════════════════
+   PRE-INTRO — Split-Curtain Luxury Boutique Entrance
+   ═══════════════════════════════════════════════════════ */
+
+#pre-intro-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 999999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+  overflow: hidden;
+  cursor: pointer;
+  user-select: none;
+  transition: opacity 0.4s ease;
+}
+
+/* Zero-flash PreIntro: Instant suppression if already seen in current session */
+html.intro-seen #pre-intro-overlay {
+  display: none !important;
+}
+
+/* Left & Right Door Panels (Split Reveal) */
+.intro-door {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 50%;
+  background-color: #0a0a0a;
+  z-index: 10;
+  transition: transform 0.75s cubic-bezier(0.76, 0, 0.24, 1);
+}
+.intro-door-left {
+  left: 0;
+  transform: translateX(0);
+}
+.intro-door-right {
+  right: 0;
+  transform: translateX(0);
+}
+
+/* Doors open class: Left door glides left, right door glides right */
+.doors-opened .intro-door-left {
+  transform: translateX(-100%);
+}
+.doors-opened .intro-door-right {
+  transform: translateX(100%);
+}
+
+/* Center Content */
+.intro-content {
+  position: relative;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  transition: opacity 0.45s ease, transform 0.45s ease;
+}
+.doors-opened .intro-content {
+  opacity: 0;
+  transform: scale(0.95);
+  pointer-events: none;
+}
+
+/* SPECTRA Logo Box */
+.intro-logo-box {
+  opacity: 0;
+  transform: translateY(14px) scale(0.96);
+  transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.6s ease;
+}
+.intro-phase-1 .intro-logo-box {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+.intro-logo-img {
+  height: 46px;
+  width: auto;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+}
+@media (min-width: 640px) {
+  .intro-logo-img { height: 54px; }
+}
+@media (min-width: 768px) {
+  .intro-logo-img { height: 62px; }
+}
+
+/* Center Gold Divider Bar */
+.intro-gold-bar {
+  width: 44px;
+  height: 2px;
+  background-color: #c8874a;
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+.intro-phase-2 .intro-gold-bar {
+  transform: scaleX(1);
+}
+
+/* Skip Hint */
+.intro-skip-hint {
+  position: absolute;
+  bottom: 28px;
+  font-size: 9.5px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: #666666;
+  z-index: 20;
+  opacity: 0;
+  transition: opacity 0.4s ease 0.3s;
+}
+.intro-phase-1 ~ .intro-skip-hint,
+.intro-skip-hint {
+  opacity: 0.75;
+}
+.doors-opened .intro-skip-hint {
+  opacity: 0 !important;
+}
+
+

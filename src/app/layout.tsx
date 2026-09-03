@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import Script from "next/script";
 import { Quicksand } from "next/font/google";
 import "./globals.css";
 
@@ -218,6 +219,14 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <head>
+        {/* Instant synchronous check for return visitors — zero flash of splash screen */}
+        <Script
+          id="spectra-preintro-gate"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `try{if(sessionStorage.getItem('site_intro_played')==='true'){document.documentElement.classList.add('intro-seen');}}catch(e){}`,
+          }}
+        />
         {/* Organization Schema */}
         <script
           type="application/ld+json"
@@ -234,9 +243,10 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
         />
       </head>
-      <body className="h-full font-sans" suppressHydrationWarning>
+      <body className="h-full font-sans antialiased overflow-x-hidden" suppressHydrationWarning>
         {children}
       </body>
     </html>
   );
 }
+
