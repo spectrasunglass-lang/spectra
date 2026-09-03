@@ -4,7 +4,15 @@ import { updateSession } from '@/lib/supabase/middleware'
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Handle Admin Route Protection
+  // Handle Admin API Route Protection
+  if (pathname.startsWith('/api/admin') && pathname !== '/api/admin/login') {
+    const adminSession = request.cookies.get('spectra_admin_session')?.value;
+    if (!adminSession) {
+      return NextResponse.json({ error: 'Unauthorized access' }, { status: 401 });
+    }
+  }
+
+  // Handle Admin Page Route Protection
   if (pathname.startsWith('/admin')) {
     const adminSession = request.cookies.get('spectra_admin_session')?.value;
     const isLoginPage = pathname === '/admin/login';

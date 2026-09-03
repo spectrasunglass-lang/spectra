@@ -1,8 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import cloudinary from "@/lib/cloudinary";
+import { isSessionAuthenticated } from "@/lib/adminAuth";
 
 export async function POST(req: NextRequest) {
   try {
+    const isAuth = await isSessionAuthenticated();
+    if (!isAuth) {
+      return NextResponse.json({ error: "Unauthorized access" }, { status: 401 });
+    }
+
     const formData = await req.formData();
     const file = formData.get("file") as File | null;
     const folder = (formData.get("folder") as string) || "spectra/uploads";
