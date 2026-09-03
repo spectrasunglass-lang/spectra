@@ -30,7 +30,7 @@ function SearchResults() {
     const supabase = createClient();
     supabase
       .from("products")
-      .select("id, name, subtitle, price, compare_price, image_url, slug, is_new")
+      .select("id, name, subtitle, price, compare_price, image_url, images, slug, is_new")
       .or(`name.ilike.%${q}%,subtitle.ilike.%${q}%,category.ilike.%${q}%,shape.ilike.%${q}%`)
       .eq("status", "active")
       .order("created_at", { ascending: false })

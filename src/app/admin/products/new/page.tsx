@@ -29,6 +29,7 @@ export default function NewProductPage() {
     is_gift: false,
     status: "active" as "active" | "draft",
     image_url: null as string | null,
+    secondary_image_url: null as string | null,
   });
 
   const set = (k: keyof typeof form, v: unknown) =>
@@ -67,6 +68,7 @@ export default function NewProductPage() {
           is_gift: form.is_gift,
           status: form.status,
           image_url: form.image_url,
+          images: form.secondary_image_url ? [form.secondary_image_url] : [],
         },
       ]);
       if (dbError) throw new Error(dbError.message);
@@ -247,7 +249,26 @@ export default function NewProductPage() {
               value={form.image_url}
               onChange={(url) => set("image_url", url)}
               onRemove={() => set("image_url", null)}
-              label="Upload Product Image"
+              label="Upload Primary Product Image"
+              folder="spectra/products"
+            />
+          </div>
+
+          {/* Secondary Hover Image */}
+          <div className="bg-[#111111] rounded-sm border border-white/[0.07] p-6 space-y-3 shadow-xl shadow-black/40">
+            <div>
+              <h2 className="text-[14px] font-bold text-white">
+                Hover Image (Alternate Angle)
+              </h2>
+              <p className="text-[11px] text-white/40 mt-0.5">
+                Smoothly transitions when hovering over product card (side angle, folded, or on-model)
+              </p>
+            </div>
+            <ImageUpload
+              value={form.secondary_image_url}
+              onChange={(url) => set("secondary_image_url", url)}
+              onRemove={() => set("secondary_image_url", null)}
+              label="Upload Hover / Alternate Image"
               folder="spectra/products"
             />
           </div>

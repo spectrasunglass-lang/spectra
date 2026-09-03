@@ -26,7 +26,7 @@ export default function AllProductsSection({
         const supabase = createClient();
         const { data, error } = await supabase
           .from("products")
-          .select("id, name, subtitle, price, compare_price, image_url, slug, is_new, shape, category")
+          .select("id, name, subtitle, price, compare_price, image_url, images, slug, is_new, shape, category")
           .eq("status", "active")
           .order("created_at", { ascending: false })
           .range(0, 7);
@@ -39,6 +39,7 @@ export default function AllProductsSection({
             price: Number(p.price),
             compare_price: p.compare_price ? Number(p.compare_price) : null,
             image_url: p.image_url,
+            images: Array.isArray(p.images) ? p.images : [],
             slug: p.slug,
             is_new: Boolean(p.is_new),
             shape: p.shape,
@@ -64,7 +65,7 @@ export default function AllProductsSection({
 
     const { data, error } = await supabase
       .from("products")
-      .select("id, name, subtitle, price, compare_price, image_url, slug, is_new, shape, category")
+      .select("id, name, subtitle, price, compare_price, image_url, images, slug, is_new, shape, category")
       .eq("status", "active")
       .order("created_at", { ascending: false })
       .range(offset, offset + 7);
@@ -81,6 +82,7 @@ export default function AllProductsSection({
         price: Number(p.price),
         compare_price: p.compare_price ? Number(p.compare_price) : null,
         image_url: p.image_url,
+        images: Array.isArray(p.images) ? p.images : [],
         slug: p.slug,
         is_new: Boolean(p.is_new),
         shape: p.shape,

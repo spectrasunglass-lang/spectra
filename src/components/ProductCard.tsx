@@ -13,6 +13,7 @@ export interface Product {
   price: number;
   compare_price?: number | null;
   image_url: string | null;
+  images?: string[] | null;
   slug: string;
   is_new?: boolean;
   shape?: string;
@@ -26,6 +27,7 @@ export interface ProductCardProps {
   price?: number;
   compare_price?: number | null;
   image_url?: string | null;
+  images?: string[] | null;
   slug?: string;
   is_new?: boolean;
   shape?: string;
@@ -42,6 +44,7 @@ export function ProductCard(props: ProductCardProps) {
     price: props.price || 0,
     compare_price: props.compare_price,
     image_url: props.image_url || null,
+    images: props.images || [],
     slug: props.slug || "",
     is_new: props.is_new,
     shape: props.shape,
@@ -51,6 +54,19 @@ export function ProductCard(props: ProductCardProps) {
   const variant = props.variant || "default";
   const { addItem } = useCart();
   const [added, setAdded] = useState(false);
+
+  // Extract secondary image for smooth hover flip if available
+  const secondaryImage = (() => {
+    const imgList = Array.isArray(p.images) ? p.images : [];
+    if (imgList.length > 0) {
+      const second = imgList.find(
+        (img) => img && typeof img === "string" && img.trim() !== "" && img !== p.image_url
+      );
+      if (second) return second;
+      if (imgList.length > 1 && imgList[1]) return imgList[1];
+    }
+    return null;
+  })();
 
   const safeSlug = (p.slug || p.name || p.id)
     .toString()
@@ -87,13 +103,28 @@ export function ProductCard(props: ProductCardProps) {
           {/* Product Image Area */}
           <div className="relative aspect-square w-full bg-white overflow-hidden flex items-center justify-center p-6">
             {p.image_url ? (
-              <Image
-                src={p.image_url}
-                alt={p.name}
-                fill
-                sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                className="object-contain p-4 transition-transform duration-500 group-hover:scale-105"
-              />
+              <>
+                <Image
+                  src={p.image_url}
+                  alt={p.name}
+                  fill
+                  sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                  className={`object-contain p-4 transition-all duration-500 ease-out ${
+                    secondaryImage
+                      ? "group-hover:opacity-0 group-hover:scale-105"
+                      : "group-hover:scale-105"
+                  }`}
+                />
+                {secondaryImage && (
+                  <Image
+                    src={secondaryImage}
+                    alt={`${p.name} alternate view`}
+                    fill
+                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                    className="object-contain p-4 absolute inset-0 opacity-0 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500 ease-out"
+                  />
+                )}
+              </>
             ) : (
               <div className="flex items-center justify-center w-full h-full bg-neutral-50 text-neutral-300">
                 <ShoppingBag size={36} />
@@ -130,33 +161,31 @@ export function ProductCard(props: ProductCardProps) {
                   </>
                 ) : (
                   <>
-                    <ShoppingBag size={14} /> Add to Cart
+                    <ShoppingBag size={14} /> Quick Add
                   </>
                 )}
               </button>
             </div>
           </div>
 
-          {/* Product Details */}
-          <div className="p-4 flex flex-col flex-1 justify-between bg-white">
+          {/* Product Info */}
+          <div className="p-4 flex flex-col flex-grow justify-between bg-white">
             <div>
-              <h3 className="text-[13px] font-bold text-neutral-900 truncate group-hover:text-[#c8874a] transition-colors uppercase tracking-wide">
+              <p className="text-[10px] uppercase tracking-wider text-neutral-400 font-semibold mb-1">
+                {p.subtitle || "Spectra Eyewear"}
+              </p>
+              <h3 className="font-semibold text-neutral-900 text-sm tracking-tight leading-snug line-clamp-1 group-hover:text-[#c8874a] transition-colors">
                 {p.name}
               </h3>
-              {p.subtitle ? (
-                <p className="text-[11px] text-neutral-500 mt-0.5 truncate">
-                  {p.subtitle}
-                </p>
-              ) : null}
             </div>
 
-            <div className="flex items-center gap-2 mt-2.5">
-              <span className="text-[14px] font-bold text-neutral-900">
-                ₹{p.price.toLocaleString("en-IN")}
+            <div className="mt-3 flex items-baseline gap-2">
+              <span className="text-base font-bold text-neutral-900">
+                &#8377;{p.price.toLocaleString("en-IN")}
               </span>
               {p.compare_price && p.compare_price > p.price && (
-                <span className="text-[12px] text-neutral-400 line-through">
-                  ₹{p.compare_price.toLocaleString("en-IN")}
+                <span className="text-xs text-neutral-400 line-through">
+                  &#8377;{p.compare_price.toLocaleString("en-IN")}
                 </span>
               )}
             </div>
@@ -166,7 +195,7 @@ export function ProductCard(props: ProductCardProps) {
     );
   }
 
-  // ── DEFAULT / SUNGLASS-HUT STYLE (Used in All Products and Collections) ──
+  // ── DEFAULT NEW MODERN MINIMAL STYLE ──
   const isLowStock = !p.is_new && p.compare_price && p.compare_price > p.price;
   const isNew = Boolean(p.is_new);
 
@@ -183,13 +212,28 @@ export function ProductCard(props: ProductCardProps) {
         {/* Product Image Box */}
         <div className="relative aspect-square w-full bg-white overflow-hidden flex items-center justify-center p-4 sm:p-6 rounded-none border border-b-0 border-gray-200">
           {p.image_url ? (
-            <Image
-              src={p.image_url}
-              alt={p.name}
-              fill
-              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-              className="object-contain p-2 sm:p-4 transition-transform duration-300 ease-out group-hover:scale-105"
-            />
+            <>
+              <Image
+                src={p.image_url}
+                alt={p.name}
+                fill
+                sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                className={`object-contain p-2 sm:p-4 transition-all duration-500 ease-out ${
+                  secondaryImage
+                    ? "group-hover:opacity-0 group-hover:scale-105"
+                    : "group-hover:scale-105"
+                }`}
+              />
+              {secondaryImage && (
+                <Image
+                  src={secondaryImage}
+                  alt={`${p.name} alternate view`}
+                  fill
+                  sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                  className="object-contain p-2 sm:p-4 absolute inset-0 opacity-0 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500 ease-out"
+                />
+              )}
+            </>
           ) : (
             <div className="flex items-center justify-center w-full h-full bg-neutral-50 text-neutral-300">
               <ShoppingBag size={32} />

@@ -17,7 +17,7 @@ export default async function GiftsPage() {
 
   const { data: giftData } = await supabase
     .from("products")
-    .select("id, name, subtitle, price, compare_price, image_url, slug, is_new, shape, category")
+    .select("id, name, subtitle, price, compare_price, image_url, images, slug, is_new, shape, category")
     .eq("status", "active")
     .eq("is_gift", true)
     .order("created_at", { ascending: false })
@@ -25,7 +25,7 @@ export default async function GiftsPage() {
 
   const data = (giftData && giftData.length > 0)
     ? giftData
-    : (await supabase.from("products").select("id, name, subtitle, price, compare_price, image_url, slug, is_new, shape, category").eq("status", "active").order("created_at", { ascending: false }).limit(8)).data;
+    : (await supabase.from("products").select("id, name, subtitle, price, compare_price, image_url, images, slug, is_new, shape, category").eq("status", "active").order("created_at", { ascending: false }).limit(8)).data;
 
   const products: Product[] = (data || []).map((p) => ({
     id: p.id,
@@ -34,6 +34,7 @@ export default async function GiftsPage() {
     price: Number(p.price),
     compare_price: p.compare_price ? Number(p.compare_price) : null,
     image_url: p.image_url,
+    images: Array.isArray(p.images) ? p.images : [],
     slug: p.slug,
     is_new: Boolean(p.is_new),
   }));

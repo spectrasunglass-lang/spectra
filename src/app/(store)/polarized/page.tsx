@@ -17,14 +17,14 @@ export default async function PolarizedPage() {
 
   const { data: polarizedData } = await supabase
     .from("products")
-    .select("id, name, subtitle, price, compare_price, image_url, slug, is_new, shape, category")
+    .select("id, name, subtitle, price, compare_price, image_url, images, slug, is_new, shape, category")
     .eq("status", "active")
     .eq("is_polarized", true)
     .order("created_at", { ascending: false });
 
   const data = (polarizedData && polarizedData.length > 0)
     ? polarizedData
-    : (await supabase.from("products").select("id, name, subtitle, price, compare_price, image_url, slug, is_new, shape, category").eq("status", "active").order("created_at", { ascending: false })).data;
+    : (await supabase.from("products").select("id, name, subtitle, price, compare_price, image_url, images, slug, is_new, shape, category").eq("status", "active").order("created_at", { ascending: false })).data;
 
   const products: Product[] = (data || []).map((p) => ({
     id: p.id,
@@ -33,6 +33,7 @@ export default async function PolarizedPage() {
     price: Number(p.price),
     compare_price: p.compare_price ? Number(p.compare_price) : null,
     image_url: p.image_url,
+    images: Array.isArray(p.images) ? p.images : [],
     slug: p.slug,
     is_new: Boolean(p.is_new),
   }));

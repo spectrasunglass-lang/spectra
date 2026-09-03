@@ -28,6 +28,7 @@ interface ProductData {
   price: number;
   compare_price?: number | null;
   image_url: string;
+  images?: string[] | null;
   gallery_urls?: string[] | null;
   category?: string | null;
   shape?: string | null;
@@ -51,7 +52,12 @@ export default function ProductDetailClient({ product }: { product: ProductData 
     window.scrollTo({ top: 0, left: 0, behavior: "instant" });
   }, [product.id]);
 
-  const images = [product.image_url, ...(product.gallery_urls || [])].filter(Boolean);
+  const rawImages = [
+    product.image_url,
+    ...(Array.isArray(product.images) ? product.images : []),
+    ...(Array.isArray(product.gallery_urls) ? product.gallery_urls : []),
+  ].filter(Boolean) as string[];
+  const images = Array.from(new Set(rawImages));
 
   const discountPercent =
     product.compare_price && product.compare_price > product.price
