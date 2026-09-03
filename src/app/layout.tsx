@@ -99,6 +99,11 @@ export const metadata: Metadata = {
       "max-snippet": -1,
     },
   },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "SPECTRA",
+  },
   other: {
     "geo.region": "IN-KL",
     "geo.placename": "Malappuram, Kerala, India",
