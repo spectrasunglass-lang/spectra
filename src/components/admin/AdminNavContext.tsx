@@ -19,8 +19,13 @@ const AdminNavContext = createContext<AdminNavContextType>({
 export function AdminNavProvider({ children }: { children: React.ReactNode }) {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
 
-  const toggleMobileNav = () => setIsMobileOpen((prev) => !prev);
-  const closeMobileNav = () => setIsMobileOpen(false);
+  const toggleMobileNav = React.useCallback(() => {
+    setIsMobileOpen((prev) => !prev);
+  }, []);
+
+  const closeMobileNav = React.useCallback(() => {
+    setIsMobileOpen(false);
+  }, []);
 
   return (
     <AdminNavContext.Provider

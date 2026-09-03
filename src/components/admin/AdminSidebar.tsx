@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -35,11 +36,20 @@ const navItems = [
 export default function AdminSidebar() {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const { isMobileOpen, closeMobileNav } = useAdminNav();
+  const prevPathname = useRef(pathname);
 
-  // Close mobile drawer on route change
   useEffect(() => {
-    closeMobileNav();
+    setMounted(true);
+  }, []);
+
+  // Close mobile drawer ONLY when pathname changes (user navigated)
+  useEffect(() => {
+    if (prevPathname.current !== pathname) {
+      closeMobileNav();
+      prevPathname.current = pathname;
+    }
   }, [pathname, closeMobileNav]);
 
   const isActive = (href: string, exact: boolean) =>
@@ -51,7 +61,7 @@ export default function AdminSidebar() {
   };
 
   const navContent = (isMobile: boolean = false) => (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full select-none">
       {/* Brand Header */}
       <div className="h-[64px] flex-shrink-0 flex items-center justify-between border-b border-white/[0.06] px-4">
         {isMobile || !collapsed ? (
@@ -88,11 +98,12 @@ export default function AdminSidebar() {
         {/* Mobile Close Button */}
         {isMobile && (
           <button
+            type="button"
             onClick={closeMobileNav}
-            className="w-8 h-8 rounded-sm bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-neutral-400 hover:text-white transition-colors"
+            className="w-8 h-8 rounded-sm bg-white/[0.06] hover:bg-white/[0.12] border border-white/[0.08] flex items-center justify-center text-neutral-300 hover:text-white transition-colors cursor-pointer"
             aria-label="Close menu"
           >
-            <X size={15} />
+            <X size={16} />
           </button>
         )}
       </div>
@@ -102,7 +113,7 @@ export default function AdminSidebar() {
         <div className="px-3 space-y-1.5">
           {(isMobile || !collapsed) && (
             <p className="text-[9px] font-bold text-white/20 tracking-[0.3em] uppercase px-2 pb-2 pt-1">
-              Menu
+              Navigation
             </p>
           )}
           {navItems.map((item) => {
@@ -161,7 +172,7 @@ export default function AdminSidebar() {
       </nav>
 
       {/* Store link & Logout */}
-      <div className="pb-4 px-3 border-t border-white/[0.05] pt-3 space-y-1">
+      <div className="pb-5 px-3 border-t border-white/[0.05] pt-3 space-y-1.5">
         <Link
           href="/"
           target="_blank"
@@ -183,13 +194,14 @@ export default function AdminSidebar() {
         </Link>
 
         <button
+          type="button"
           onClick={handleLogout}
           title={!isMobile && collapsed ? "Sign Out" : undefined}
-          className={`w-full flex items-center gap-3 py-2 rounded-sm text-red-400/60 hover:text-red-400 hover:bg-red-500/10 transition-all group relative cursor-pointer ${
+          className={`w-full flex items-center gap-3 py-2 rounded-sm text-red-400/70 hover:text-red-400 hover:bg-red-500/10 transition-all group relative cursor-pointer ${
             !isMobile && collapsed ? "justify-center px-2" : "px-3"
           }`}
         >
-          <div className="w-8 h-8 rounded-sm bg-[#161616] group-hover:bg-red-500/15 flex items-center justify-center flex-shrink-0 transition-colors text-red-400/60 group-hover:text-red-400">
+          <div className="w-8 h-8 rounded-sm bg-[#161616] group-hover:bg-red-500/15 flex items-center justify-center flex-shrink-0 transition-colors text-red-400/70 group-hover:text-red-400">
             <LogOut size={14} />
           </div>
           {(isMobile || !collapsed) && <span className="text-[12px] font-semibold">Sign Out</span>}
@@ -205,7 +217,7 @@ export default function AdminSidebar() {
 
   return (
     <>
-      {/* ─── DESKTOP SIDEBAR (hidden on mobile) ─── */}
+      {/* ─── DESKTOP SIDEBAR (hidden on mobile <md) ─── */}
       <aside
         className={`hidden md:flex relative flex-col h-full transition-all duration-300 ease-in-out flex-shrink-0 bg-[#0c0c0c] border-r border-white/[0.06] no-scrollbar ${
           collapsed ? "w-[72px]" : "w-[230px]"
@@ -223,23 +235,33 @@ export default function AdminSidebar() {
         </button>
       </aside>
 
-      {/* ─── MOBILE DRAWER (hidden on desktop) ─── */}
-      {/* Backdrop */}
-      <div
-        onClick={closeMobileNav}
-        className={`md:hidden fixed inset-0 z-40 bg-black/80 backdrop-blur-sm transition-opacity duration-300 ${
-          isMobileOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
-        }`}
-      />
+      {/* ─── MOBILE DRAWER (Portal to document.body, outside layout restrictions) ─── */}
+      {mounted &&
+        createPortal(
+          <div
+            className={`md:hidden fixed inset-0 z-[99999] transition-all duration-300 ${
+              isMobileOpen ? "visible pointer-events-auto" : "invisible pointer-events-none"
+            }`}
+          >
+            {/* Backdrop */}
+            <div
+              onClick={closeMobileNav}
+              className={`absolute inset-0 bg-black/80 backdrop-blur-sm transition-opacity duration-300 ${
+                isMobileOpen ? "opacity-100" : "opacity-0"
+              }`}
+            />
 
-      {/* Drawer */}
-      <div
-        className={`md:hidden fixed inset-y-0 left-0 z-50 w-[270px] max-w-[85vw] bg-[#0c0c0c] border-r border-white/10 shadow-2xl transition-transform duration-300 ease-out flex flex-col ${
-          isMobileOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
-      >
-        {navContent(true)}
-      </div>
+            {/* Slide-out Drawer */}
+            <aside
+              className={`absolute inset-y-0 left-0 w-[280px] max-w-[85vw] h-full bg-[#0c0c0c] border-r border-white/10 shadow-2xl transition-transform duration-300 ease-out flex flex-col ${
+                isMobileOpen ? "translate-x-0" : "-translate-x-full"
+              }`}
+            >
+              {navContent(true)}
+            </aside>
+          </div>,
+          document.body
+        )}
     </>
   );
 }

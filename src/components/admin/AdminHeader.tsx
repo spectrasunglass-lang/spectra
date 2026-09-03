@@ -29,7 +29,11 @@ export default function AdminHeader() {
         {/* Mobile Hamburger Menu Toggle */}
         <button
           type="button"
-          onClick={toggleMobileNav}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            toggleMobileNav();
+          }}
           className="md:hidden w-9 h-9 flex items-center justify-center rounded-sm bg-[#161616] border border-white/[0.08] text-neutral-300 hover:text-white transition-colors cursor-pointer"
           aria-label="Toggle navigation menu"
         >
