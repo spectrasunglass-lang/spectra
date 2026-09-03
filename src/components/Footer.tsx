@@ -37,7 +37,6 @@ const footerSections = [
     links: [
       { name: "Our Heritage & Story", href: "/about" },
       { name: "Contact Concierge", href: "/contact" },
-      { name: "Admin Portal", href: "/admin" },
     ],
   },
 ];
@@ -299,7 +298,6 @@ Crafted for visionaries. Designed to stand apart. Luxury eyewear with timeless s
               {[
                 { name: "Our Heritage & Story", href: "/about" },
                 { name: "Contact Concierge", href: "/contact" },
-                { name: "Admin Portal", href: "/admin" },
               ].map((link) => (
                 <li key={link.name}>
                   <Link href={link.href} className="text-neutral-400 hover:text-white hover:translate-x-1 transition-all inline-block duration-200">
