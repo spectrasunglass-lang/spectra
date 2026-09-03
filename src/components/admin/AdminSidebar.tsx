@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { createPortal } from "react-dom";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -36,15 +35,10 @@ const navItems = [
 export default function AdminSidebar() {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
-  const [mounted, setMounted] = useState(false);
   const { isMobileOpen, closeMobileNav } = useAdminNav();
   const prevPathname = useRef(pathname);
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  // Close mobile drawer ONLY when pathname changes (user navigated)
+  // Close mobile drawer ONLY when pathname changes (user navigated to new page)
   useEffect(() => {
     if (prevPathname.current !== pathname) {
       closeMobileNav();
@@ -235,33 +229,32 @@ export default function AdminSidebar() {
         </button>
       </aside>
 
-      {/* ─── MOBILE DRAWER (Portal to document.body, outside layout restrictions) ─── */}
-      {mounted &&
-        createPortal(
-          <div
-            className={`md:hidden fixed inset-0 z-[99999] transition-all duration-300 ${
-              isMobileOpen ? "visible pointer-events-auto" : "invisible pointer-events-none"
-            }`}
-          >
-            {/* Backdrop */}
-            <div
-              onClick={closeMobileNav}
-              className={`absolute inset-0 bg-black/80 backdrop-blur-sm transition-opacity duration-300 ${
-                isMobileOpen ? "opacity-100" : "opacity-0"
-              }`}
-            />
+      {/* ─── MOBILE DRAWER (Identical rock-solid pattern as Navbar.tsx) ─── */}
+      <div
+        className={`md:hidden fixed inset-0 z-[100] transition-[visibility] duration-300 ${
+          isMobileOpen ? "visible" : "invisible pointer-events-none"
+        }`}
+        aria-modal="true"
+        role="dialog"
+        aria-label="Admin navigation menu"
+      >
+        {/* Backdrop */}
+        <div
+          onClick={closeMobileNav}
+          className={`fixed inset-0 bg-black/80 backdrop-blur-sm transition-opacity duration-300 ease-in-out ${
+            isMobileOpen ? "opacity-100" : "opacity-0"
+          }`}
+        />
 
-            {/* Slide-out Drawer */}
-            <aside
-              className={`absolute inset-y-0 left-0 w-[280px] max-w-[85vw] h-full bg-[#0c0c0c] border-r border-white/10 shadow-2xl transition-transform duration-300 ease-out flex flex-col ${
-                isMobileOpen ? "translate-x-0" : "-translate-x-full"
-              }`}
-            >
-              {navContent(true)}
-            </aside>
-          </div>,
-          document.body
-        )}
+        {/* Slide-out Drawer Panel */}
+        <aside
+          className={`fixed inset-y-0 left-0 w-[275px] max-w-[85vw] h-full bg-[#0c0c0c] border-r border-white/10 shadow-2xl flex flex-col justify-between transition-transform duration-300 ease-in-out z-10 ${
+            isMobileOpen ? "translate-x-0" : "-translate-x-full"
+          }`}
+        >
+          {navContent(true)}
+        </aside>
+      </div>
     </>
   );
 }
