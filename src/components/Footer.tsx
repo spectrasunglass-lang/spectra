@@ -333,8 +333,15 @@ Crafted for visionaries. Designed to stand apart. Luxury eyewear with timeless s
           </div>
         </div>
 
+        {/* SEO Geographic Anchor Bar */}
+        <div className="pt-6 pb-2 border-t border-white/[0.04] text-center">
+          <p className="text-[11px] text-neutral-500 font-medium tracking-wide">
+            SPECTRA Luxury Eyewear & Polarized Sunglasses &bull; Malappuram, Kerala, India &bull; Express Delivery across Malappuram, Calicut, Kochi & Pan-India
+          </p>
+        </div>
+
         {/* Bottom Bar: Copyright, Crafted By & Payment Badges */}
-        <div className="pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-[11px] text-neutral-500 text-center md:text-left">
+        <div className="pt-4 flex flex-col md:flex-row items-center justify-between gap-4 text-[11px] text-neutral-500 text-center md:text-left">
           {/* Left: Copyright */}
           <div>
             <p>&copy; {new Date().getFullYear()} SPECTRA Eyewear. All rights reserved.</p>

@@ -22,6 +22,11 @@ const faqs: FAQItem[] = [
     a: "You can track your order at any time on our Track Your Order page by simply entering your Order ID (e.g. 7422BC25). You will also receive real-time SMS and email dispatch notifications.",
   },
   {
+    category: "Orders & Shipping",
+    q: "Do you offer Cash on Delivery and express delivery in Malappuram and across Kerala?",
+    a: "Yes. SPECTRA provides fast 24–48 hour express courier delivery and Cash on Delivery across Malappuram, Kozhikode, Kochi, Kannur, Thrissur, and all 14 districts of Kerala, as well as Pan-India with real-time tracking.",
+  },
+  {
     category: "Optics & Quality",
     q: "Are all SPECTRA sunglasses polarized with UV protection?",
     a: "Yes. Every SPECTRA optical lens is equipped with UV400 filtration blocking 100% of UVA and UVB rays, featuring multi-layer anti-reflective coatings and high-contrast polarization.",
@@ -39,7 +44,7 @@ const faqs: FAQItem[] = [
   {
     category: "Assistance",
     q: "How can I contact Client Concierge for assistance?",
-    a: "Our eyewear advisors are available via WhatsApp and email on our Contact Concierge page to assist with bespoke sizing, styling advice, and order modifications.",
+    a: "Our eyewear advisors are available via WhatsApp (+91 81299 50341) and email (spectrasunglass@gmail.com) on our Contact Concierge page to assist with bespoke sizing, styling advice, and order modifications.",
   },
 ];
 
@@ -50,8 +55,26 @@ export default function FAQPage() {
     setOpenIndex(openIndex === idx ? null : idx);
   };
 
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqs.map((f) => ({
+      "@type": "Question",
+      name: f.q,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: f.a,
+      },
+    })),
+  };
+
   return (
     <div className="bg-[#0a0a0a] min-h-screen text-white pb-20">
+      {/* FAQPage Schema for Google Search Accordions */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
       {/* Header Banner */}
       <div className="bg-gradient-to-b from-[#141414] to-[#0a0a0a] py-16 sm:py-20 text-center">
         <div className="max-w-5xl mx-auto px-4">

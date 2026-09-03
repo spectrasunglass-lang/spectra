@@ -13,10 +13,11 @@ interface ProductPageProps {
 
 export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
   const { slug } = await params;
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://spectrasunglass.com";
   const supabase = await createClient();
   const { data: product } = await supabase
     .from("products")
-    .select("name, subtitle, description")
+    .select("name, subtitle, description, image_url, price, category, shape")
     .eq("slug", slug)
     .single();
 
@@ -24,14 +25,45 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
     return { title: "Product Not Found — SPECTRA" };
   }
 
+  const title = `${product.name} — Luxury Polarized Sunglasses | SPECTRA`;
+  const description =
+    product.description ||
+    `${product.name} by SPECTRA Eyewear. Premium handcrafted polarized sunglasses. Fast express delivery across Malappuram, Kerala & India.`;
+
   return {
-    title: `${product.name} — SPECTRA Eyewear`,
-    description: product.subtitle || product.description || "SPECTRA Luxury Eyewear",
+    title,
+    description,
+    keywords: [
+      product.name,
+      `${product.name} sunglasses`,
+      `${product.category} sunglasses kerala`,
+      `${product.shape} sunglasses malappuram`,
+      "spectra sunglasses",
+      "luxury sunglasses kerala",
+      "polarized eyewear india",
+    ],
+    alternates: {
+      canonical: `${siteUrl}/products/${slug}`,
+    },
+    openGraph: {
+      title,
+      description,
+      url: `${siteUrl}/products/${slug}`,
+      siteName: "SPECTRA Luxury Eyewear",
+      images: product.image_url ? [{ url: product.image_url, width: 800, height: 800, alt: product.name }] : [],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: product.image_url ? [product.image_url] : [],
+    },
   };
 }
 
 export default async function ProductDetailPage({ params }: ProductPageProps) {
   const { slug } = await params;
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://spectrasunglass.com";
   const supabase = await createClient();
 
   const { data: product } = await supabase
@@ -43,6 +75,33 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
   if (!product) {
     notFound();
   }
+
+  const productSchema = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: product.name,
+    image: product.image_url ? [product.image_url] : [],
+    description: product.description || product.subtitle || "SPECTRA Luxury Handcrafted Eyewear",
+    sku: `SPEC-${product.id.slice(0, 8).toUpperCase()}`,
+    brand: {
+      "@type": "Brand",
+      name: "SPECTRA",
+    },
+    category: "Apparel & Accessories > Eyewear > Sunglasses",
+    offers: {
+      "@type": "Offer",
+      url: `${siteUrl}/products/${slug}`,
+      priceCurrency: "INR",
+      price: product.price,
+      priceValidUntil: "2027-12-31",
+      itemCondition: "https://schema.org/NewCondition",
+      availability: "https://schema.org/InStock",
+      seller: {
+        "@type": "Organization",
+        name: "SPECTRA Luxury Eyewear Malappuram",
+      },
+    },
+  };
 
   // Fetch related products in the same category
   const { data: relatedData } = await supabase
@@ -65,6 +124,12 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
 
   return (
     <div className="bg-[#0a0a0a] min-h-screen">
+      {/* Product JSON-LD Structured Data for Google Rich Snippets */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }}
+      />
+
       <ProductDetailClient product={product} />
 
       {/* Related Products */}
