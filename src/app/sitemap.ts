@@ -4,7 +4,7 @@ import { createClient } from "@supabase/supabase-js";
 export const revalidate = 3600; // Cache sitemap for 1 hour to protect Supabase free limits
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://spectrasunglass.com";
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.spectrasunglassess.in";
   const now = new Date().toISOString();
 
   // Core High-Priority Pages

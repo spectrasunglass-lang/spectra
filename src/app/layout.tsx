@@ -10,7 +10,7 @@ const quicksand = Quicksand({
   display: "swap",
 });
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://spectrasunglass.com";
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.spectrasunglassess.in";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),

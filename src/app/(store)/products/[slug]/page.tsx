@@ -13,7 +13,7 @@ interface ProductPageProps {
 
 export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://spectrasunglass.com";
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.spectrasunglassess.in";
   const supabase = await createClient();
   const { data: product } = await supabase
     .from("products")
@@ -63,7 +63,7 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
 
 export default async function ProductDetailPage({ params }: ProductPageProps) {
   const { slug } = await params;
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://spectrasunglass.com";
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.spectrasunglassess.in";
   const supabase = await createClient();
 
   const { data: product } = await supabase

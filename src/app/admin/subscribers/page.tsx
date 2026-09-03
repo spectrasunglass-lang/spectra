@@ -41,7 +41,7 @@ export default function SubscribersPage() {
   const [targetEmail, setTargetEmail] = useState<string>("all");
   const [emailSubject, setEmailSubject] = useState("Exclusive VIP Invitation — SPECTRA Eyewear");
   const [emailBody, setEmailBody] = useState(
-    "Dear VIP,\n\nWe are pleased to present an exclusive private preview of our newest 2026 Collection.\n\nExplore handcrafted titanium frames and precision optical lenses crafted for visionaries.\n\nVisit: https://spectrasunglass.com\n\nWarm regards,\nThe SPECTRA Maison"
+    "Dear VIP,\n\nWe are pleased to present an exclusive private preview of our newest 2026 Collection.\n\nExplore handcrafted titanium frames and precision optical lenses crafted for visionaries.\n\nVisit: https://www.spectrasunglassess.in\n\nWarm regards,\nThe SPECTRA Maison"
   );
 
   const fetchSubscribers = useCallback(async () => {
