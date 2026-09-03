@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useCart } from "@/components/CartContext";
@@ -45,6 +45,11 @@ export default function ProductDetailClient({ product }: { product: ProductData 
   const [added, setAdded] = useState(false);
   const [activeTab, setActiveTab] = useState<string | null>("details");
   const [selectedGiftPackage, setSelectedGiftPackage] = useState<GiftPackage | null>(null);
+
+  // Auto scroll to top when product loads or switches
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+  }, [product.id]);
 
   const images = [product.image_url, ...(product.gallery_urls || [])].filter(Boolean);
 

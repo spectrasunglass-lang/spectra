@@ -384,73 +384,86 @@ export default function CartPage() {
         {/* Right Side: Items List & Order Summary */}
         <div className="lg:col-span-5 space-y-4">
           {/* Items Preview */}
-          <div className="bg-white/[0.03] p-4 rounded-sm space-y-3">
+          <div className="bg-white/[0.03] border border-white/[0.06] p-4 sm:p-5 rounded-xl space-y-3">
             <h2 className="text-[14px] font-bold text-white uppercase tracking-wider px-1 pb-1">
               Order Items ({count})
             </h2>
 
-            <div className="space-y-3 max-h-[360px] overflow-y-auto pr-1">
+            <div className="space-y-3 max-h-[380px] overflow-y-auto pr-1">
               {items.map((item) => (
                 <div
                   key={`${item.id}-${item.gift_package?.id || "std"}`}
-                  className="flex items-center gap-3.5 p-3 bg-white/[0.03] rounded-sm"
+                  className="p-3.5 bg-white/[0.02] border border-white/[0.05] rounded-xl space-y-3"
                 >
-                  <Link href={`/products/${item.slug}`} className="flex-shrink-0">
-                    <div className="w-16 h-16 rounded-sm bg-[#f5f0eb] overflow-hidden relative">
-                      {item.image_url ? (
-                        <Image src={item.image_url} alt={item.name} fill className="object-contain p-1.5" />
-                      ) : (
-                        <ShoppingBag size={18} className="absolute inset-0 m-auto text-gray-400" />
+                  <div className="flex items-start gap-3">
+                    <Link href={`/products/${item.slug}`} className="flex-shrink-0">
+                      <div className="w-16 h-16 sm:w-18 sm:h-18 rounded-lg bg-[#f5f0eb] overflow-hidden relative">
+                        {item.image_url ? (
+                          <Image src={item.image_url} alt={item.name} fill className="object-contain p-1.5" />
+                        ) : (
+                          <ShoppingBag size={18} className="absolute inset-0 m-auto text-gray-400" />
+                        )}
+                      </div>
+                    </Link>
+
+                    <div className="flex-1 min-w-0">
+                      <Link href={`/products/${item.slug}`}>
+                        <p className="text-[13px] font-bold text-white hover:text-[#c8874a] transition-colors leading-snug">
+                          {item.name}
+                        </p>
+                      </Link>
+                      {item.subtitle && (
+                        <p className="text-[11px] text-white/40 mt-0.5 truncate">{item.subtitle}</p>
+                      )}
+
+                      {/* Addon Gift Text - Clean, well-spaced, distinct on mobile */}
+                      {item.gift_package && (
+                        <div className="mt-2 py-1 px-2.5 rounded-md bg-[#c8874a]/10 border border-[#c8874a]/25 text-[11px] text-[#f3c89b] flex items-center justify-between gap-2">
+                          <span className="leading-tight font-medium truncate">
+                            Gift Box: <strong className="text-white font-semibold">{item.gift_package.name}</strong>
+                          </span>
+                          <span className="text-[#c8874a] font-bold flex-shrink-0">
+                            +₹{item.gift_package.price}
+                          </span>
+                        </div>
                       )}
                     </div>
-                  </Link>
+                  </div>
 
-                  <div className="flex-1 min-w-0">
-                    <Link href={`/products/${item.slug}`}>
-                      <p className="text-[13px] font-bold text-white hover:text-[#c8874a] transition-colors truncate">
-                        {item.name}
+                  {/* Quantity & Item Total Row */}
+                  <div className="flex items-center justify-between pt-2 border-t border-white/[0.04]">
+                    <div className="flex items-center gap-1.5 bg-white/[0.05] border border-white/[0.06] rounded-md px-1.5 py-1">
+                      <button
+                        onClick={() => updateQty(item.id, item.quantity - 1, item.gift_package?.id)}
+                        className="w-6 h-6 rounded-sm flex items-center justify-center text-white/50 hover:text-white hover:bg-white/[0.1] transition-colors"
+                        aria-label="Decrease quantity"
+                      >
+                        <Minus size={11} />
+                      </button>
+                      <span className="w-6 text-center text-[12px] font-bold text-white">
+                        {item.quantity}
+                      </span>
+                      <button
+                        onClick={() => updateQty(item.id, item.quantity + 1, item.gift_package?.id)}
+                        className="w-6 h-6 rounded-sm flex items-center justify-center text-white/50 hover:text-white hover:bg-white/[0.1] transition-colors"
+                        aria-label="Increase quantity"
+                      >
+                        <Plus size={11} />
+                      </button>
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                      <p className="text-[14px] font-bold text-[#c8874a]">
+                        &#8377;{((Number(item.price) + (item.gift_package ? Number(item.gift_package.price) : 0)) * item.quantity).toLocaleString("en-IN")}
                       </p>
-                    </Link>
-                    <p className="text-[11px] text-white/40 truncate">{item.subtitle}</p>
-
-                    {/* Gift Package Indicator */}
-                    {item.gift_package && (
-                      <div className="inline-flex items-center gap-1.5 mt-1 px-2 py-0.5 rounded-full bg-[#c8874a]/15 border border-[#c8874a]/30 text-[#e5a872] text-[10.5px] font-bold">
-                        <Gift size={11} className="text-[#c8874a] flex-shrink-0" />
-                        <span className="truncate">Includes: {item.gift_package.name} (+₹{item.gift_package.price})</span>
-                      </div>
-                    )}
-
-                    <div className="flex items-center justify-between mt-2">
-                      <div className="flex items-center gap-1 bg-white/[0.06] rounded-sm px-1 py-0.5">
-                        <button
-                          onClick={() => updateQty(item.id, item.quantity - 1, item.gift_package?.id)}
-                          className="w-5 h-5 rounded-sm flex items-center justify-center text-white/50 hover:text-white hover:bg-white/[0.1] transition-colors"
-                        >
-                          <Minus size={10} />
-                        </button>
-                        <span className="w-6 text-center text-[11.5px] font-bold text-white">
-                          {item.quantity}
-                        </span>
-                        <button
-                          onClick={() => updateQty(item.id, item.quantity + 1, item.gift_package?.id)}
-                          className="w-5 h-5 rounded-sm flex items-center justify-center text-white/50 hover:text-white hover:bg-white/[0.1] transition-colors"
-                        >
-                          <Plus size={10} />
-                        </button>
-                      </div>
-
-                      <div className="flex items-center gap-2">
-                        <p className="text-[13.5px] font-bold text-[#c8874a]">
-                          &#8377;{((Number(item.price) + (item.gift_package ? Number(item.gift_package.price) : 0)) * item.quantity).toLocaleString("en-IN")}
-                        </p>
-                        <button
-                          onClick={() => removeItem(item.id, item.gift_package?.id)}
-                          className="text-white/20 hover:text-red-400 transition-colors p-1"
-                        >
-                          <Trash2 size={13} />
-                        </button>
-                      </div>
+                      <button
+                        onClick={() => removeItem(item.id, item.gift_package?.id)}
+                        className="text-white/25 hover:text-red-400 transition-colors p-1 cursor-pointer"
+                        title="Remove Item"
+                        aria-label="Remove item"
+                      >
+                        <Trash2 size={14} />
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -459,7 +472,7 @@ export default function CartPage() {
           </div>
 
           {/* Order Summary Card */}
-          <div className="bg-white/[0.03] rounded-sm p-6 space-y-4">
+          <div className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-5 sm:p-6 space-y-4">
             <h2 className="text-[14px] font-bold text-white uppercase tracking-wider">
               Order Summary
             </h2>

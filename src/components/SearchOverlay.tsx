@@ -151,13 +151,20 @@ export default function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                   <span className="text-[#c8874a]">{results.length} found</span>
                 </div>
 
-                {results.map((product) => (
-                  <Link
-                    key={product.id}
-                    href={`/products/${product.slug}`}
-                    onClick={onClose}
-                    className="flex items-center gap-3.5 px-5 py-3 hover:bg-white/[0.04] transition-colors border-b border-white/[0.04] group"
-                  >
+                {results.map((product) => {
+                  const safeSlug = (product.slug || product.name || product.id)
+                    .toLowerCase()
+                    .trim()
+                    .replace(/[^a-z0-9]+/g, "-")
+                    .replace(/^-+|-+$/g, "");
+                  return (
+                    <Link
+                      key={product.id}
+                      href={`/products/${safeSlug}`}
+                      scroll={true}
+                      onClick={onClose}
+                      className="flex items-center gap-3.5 px-5 py-3 hover:bg-white/[0.04] transition-colors border-b border-white/[0.04] group"
+                    >
                     {/* Product Thumbnail */}
                     <div className="w-12 h-12 flex-shrink-0 overflow-hidden relative">
                       {product.image_url ? (
@@ -193,7 +200,8 @@ export default function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                       />
                     </div>
                   </Link>
-                ))}
+                );
+              })}
 
                 {/* View All Matching */}
                 <Link

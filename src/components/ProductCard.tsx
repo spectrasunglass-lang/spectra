@@ -52,6 +52,13 @@ export function ProductCard(props: ProductCardProps) {
   const { addItem } = useCart();
   const [added, setAdded] = useState(false);
 
+  const safeSlug = (p.slug || p.name || p.id)
+    .toString()
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -61,7 +68,7 @@ export function ProductCard(props: ProductCardProps) {
       subtitle: p.subtitle || "",
       price: p.price,
       image_url: p.image_url,
-      slug: p.slug,
+      slug: safeSlug,
     });
     setAdded(true);
     setTimeout(() => setAdded(false), 2000);
@@ -75,7 +82,7 @@ export function ProductCard(props: ProductCardProps) {
   // ── CLASSIC / OLD STYLE (Used in New Arrivals) ──
   if (variant === "classic") {
     return (
-      <Link href={`/products/${p.slug}`} className="group block h-full border">
+      <Link href={`/products/${safeSlug}`} scroll={true} className="group block h-full border">
         <div className="relative flex flex-col border border-gray-200 h-full overflow-hidden rounded-md bg-white ">
           {/* Product Image Area */}
           <div className="relative aspect-square w-full bg-white overflow-hidden flex items-center justify-center p-6">
@@ -170,7 +177,7 @@ export function ProductCard(props: ProductCardProps) {
     : null;
 
   return (
-    <Link href={`/products/${p.slug}`} className="group block h-full select-none">
+    <Link href={`/products/${safeSlug}`} scroll={true} className="group block h-full select-none">
       <div className="relative flex flex-col h-full bg-white transition-all duration-200">
         
         {/* Product Image Box */}

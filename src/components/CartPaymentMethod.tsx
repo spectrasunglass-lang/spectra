@@ -19,7 +19,7 @@ export default function CartPaymentMethod({
   codAdvanceAmount = "199",
 }: CartPaymentMethodProps) {
   return (
-    <div className="space-y-4 sm:bg-white/[0.03] sm:p-6 sm:rounded-sm">
+    <div className="space-y-4 bg-white/[0.03] border border-white/[0.06] p-4 sm:p-6 rounded-xl">
       <div className="flex items-center gap-2 pb-2">
         <CreditCard size={16} className="text-[#c8874a]" />
         <h2 className="text-[15px] font-bold text-white tracking-wide uppercase">
@@ -32,10 +32,10 @@ export default function CartPaymentMethod({
         <button
           type="button"
           onClick={() => onChange("online")}
-          className={`flex items-start gap-3.5 p-4 rounded-sm text-left transition-all cursor-pointer ${
+          className={`flex items-start gap-3.5 p-4 rounded-xl border text-left transition-all cursor-pointer ${
             selected === "online"
-              ? "bg-white/[0.09] text-white ring-1 ring-[#c8874a]"
-              : "bg-white/[0.04] text-white/70 hover:bg-white/[0.06] hover:text-white"
+              ? "bg-white/[0.09] border-[#c8874a] text-white shadow-md shadow-[#c8874a]/10"
+              : "bg-white/[0.04] border-white/[0.06] text-white/70 hover:bg-white/[0.06] hover:text-white"
           }`}
         >
           <div className="mt-0.5 p-2 rounded-sm bg-white/[0.06] text-[#c8874a]">

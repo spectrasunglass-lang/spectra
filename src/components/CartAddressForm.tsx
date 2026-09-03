@@ -25,10 +25,10 @@ export default function CartAddressForm({
   errors = {},
 }: CartAddressFormProps) {
   const inputClass =
-    "w-full bg-white/[0.04] text-white text-[13px] px-3.5 py-3 rounded-sm border-none outline-none placeholder-white/25 focus:bg-white/[0.07] transition-colors";
+    "w-full bg-[#141414] border border-white/[0.08] text-white text-[13px] px-3.5 py-3 rounded-lg outline-none placeholder-white/25 focus:border-[#c8874a] focus:bg-[#181818] transition-all";
 
   return (
-    <div className="space-y-4 sm:bg-white/[0.03] sm:p-6 sm:rounded-sm">
+    <div className="space-y-4 bg-white/[0.03] border border-white/[0.06] p-4 sm:p-6 rounded-xl">
       <div className="flex items-center gap-2 pb-2">
         <MapPin size={16} className="text-[#c8874a]" />
         <h2 className="text-[15px] font-bold text-white tracking-wide uppercase">

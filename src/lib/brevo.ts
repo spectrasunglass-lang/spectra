@@ -207,7 +207,12 @@ export async function addOrUpdateBrevoContact(payload: BrevoContactPayload): Pro
 
 /**
  * Send order notification to BOTH User (Customer) and Admin
- * (Full White Theme, No Alert Icon, No Order/Payment ID, Product Image + Name + Quantity only)
+ * Professional Amazon/Flipkart/Luxury eCommerce standard:
+ * - Real official SPECTRA logo header with gold accent
+ * - Uncropped 72x72 product images with contain fit
+ * - Complete gift package and specs info
+ * - Clear delivery address and payment invoice breakdown
+ * - Track order button & WhatsApp concierge
  */
 export async function sendOrderEmails(details: OrderEmailDetails): Promise<{
   customer: BrevoResponse;
@@ -221,31 +226,60 @@ export async function sendOrderEmails(details: OrderEmailDetails): Promise<{
     };
   }
 
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.spectrasunglassess.in";
+  const logoUrl = `${siteUrl}/logo/logo.png`;
   const formattedTotal = `₹${Number(details.totalAmount || 0).toLocaleString("en-IN")}`;
   const isCod = details.paymentMethod === "cod";
+  const orderId = details.orderId || `ORD-${Date.now().toString().slice(-6)}`;
+  const orderDate = new Date().toLocaleDateString("en-IN", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+  const trackUrl = `${siteUrl}/track-order?id=${encodeURIComponent(orderId)}`;
+
   const fullAddress = details.address
     ? `${details.address.street}, ${details.address.city}, ${details.address.state} - ${details.address.pincode}`
     : "Address on file";
 
-  // Build items rows with Image, Name, and Quantity ONLY
+  // Build items rows with high-res image, clear specs, gift packaging, and price
   const itemsHtml = Array.isArray(details.items) && details.items.length > 0
     ? details.items.map((item) => {
-        const itemImg = item.image_url || item.image;
+        let itemImg = item.image_url || item.image;
+        if (itemImg && itemImg.startsWith("/")) {
+          itemImg = `${siteUrl}${itemImg}`;
+        }
+        const giftInfo = (item as any).gift_package;
         const imgBlock = itemImg
-          ? `<img src="${itemImg}" alt="${item.name}" width="54" height="54" style="display: block; width: 54px; height: 54px; object-fit: cover; border-radius: 4px; border: 1px solid #e5e7eb;" />`
-          : `<div style="width: 54px; height: 54px; background-color: #f3f4f6; border-radius: 4px; border: 1px solid #e5e7eb; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #9ca3af; text-align: center; line-height: 54px;">No Image</div>`;
+          ? `<img src="${itemImg}" alt="${item.name}" width="72" height="72" style="display: block; width: 72px; height: 72px; object-fit: contain; background-color: #fafafa; border-radius: 8px; border: 1px solid #e5e7eb; padding: 4px;" />`
+          : `<div style="width: 72px; height: 72px; background-color: #fafafa; border-radius: 8px; border: 1px solid #e5e7eb; display: flex; align-items: center; justify-content: center; font-size: 11px; color: #9ca3af; text-align: center; line-height: 72px;">SPECTRA</div>`;
+
+        const itemPrice = item.price ? `₹${Number(item.price).toLocaleString("en-IN")}` : "";
 
         return `
           <tr>
-            <td style="padding: 12px 0; border-bottom: 1px solid #f3f4f6; width: 64px;" valign="middle">
+            <td style="padding: 16px 0; border-bottom: 1px solid #f1f5f9; width: 84px;" valign="top">
               ${imgBlock}
             </td>
-            <td style="padding: 12px 10px; border-bottom: 1px solid #f3f4f6;" valign="middle">
-              <div style="font-weight: 600; font-size: 13.5px; color: #111827;">${item.name}</div>
+            <td style="padding: 16px 14px; border-bottom: 1px solid #f1f5f9;" valign="top">
+              <div style="font-weight: 700; font-size: 14px; color: #0f172a; line-height: 1.35; margin-bottom: 4px;">
+                ${item.name}
+              </div>
+              <div style="font-size: 11.5px; color: #64748b; margin-bottom: 6px;">
+                Premium Polarized Optics &bull; 100% UV400 Protection
+              </div>
+              ${giftInfo ? `
+                <div style="display: inline-block; padding: 3px 8px; background-color: #fffbeb; border: 1px solid #fde68a; border-radius: 4px; font-size: 11px; font-weight: 600; color: #b45309; margin-bottom: 6px;">
+                  🎁 Gift Box: ${giftInfo.name} (+₹${giftInfo.price})
+                </div>
+              ` : ""}
+              <div style="font-size: 12px; font-weight: 600; color: #475569;">
+                Qty: ${item.quantity} ${itemPrice ? `&times; ${itemPrice}` : ""}
+              </div>
             </td>
-            <td style="padding: 12px 0; border-bottom: 1px solid #f3f4f6; text-align: right; width: 80px;" valign="middle">
-              <span style="display: inline-block; padding: 4px 10px; background-color: #f3f4f6; border-radius: 4px; font-size: 12px; font-weight: 700; color: #374151;">
-                Qty: ${item.quantity}
+            <td style="padding: 16px 0; border-bottom: 1px solid #f1f5f9; text-align: right; width: 90px;" valign="top">
+              <span style="font-size: 14px; font-weight: 700; color: #c8874a;">
+                ${itemPrice ? `₹${(Number(item.price || 0) * Number(item.quantity || 1)).toLocaleString("en-IN")}` : ""}
               </span>
             </td>
           </tr>
@@ -253,100 +287,180 @@ export async function sendOrderEmails(details: OrderEmailDetails): Promise<{
       }).join("")
     : `
       <tr>
-        <td colspan="3" style="padding: 12px 0; color: #374151; font-size: 13px;">
-          ${details.productSummary || "SPECTRA Eyewear"}
+        <td colspan="3" style="padding: 16px 0; color: #374151; font-size: 13px;">
+          ${details.productSummary || "SPECTRA Luxury Eyewear"}
         </td>
       </tr>
     `;
 
-  // 1. Customer Order Confirmation Email (100% Pure White Theme)
+  // 1. Customer Order Confirmation Email (Amazon / Flipkart / Luxury standard)
   const customerHtml = `
     <!DOCTYPE html>
     <html>
     <head>
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Order Confirmation - SPECTRA</title>
+      <title>Order Confirmed — SPECTRA</title>
     </head>
-    <body style="margin: 0; padding: 25px 15px; background-color: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #1f2937;">
-      <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #ffffff;">
+    <body style="margin: 0; padding: 30px 12px; background-color: #f4f4f5; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #18181b;">
+      <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f4f4f5;">
         <tr>
           <td align="center">
-            <table width="100%" max-width="580" cellpadding="0" cellspacing="0" style="max-width: 580px; background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
+            <table width="100%" cellpadding="0" cellspacing="0" style="max-width: 600px; background-color: #ffffff; border: 1px solid #e4e4e7; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.06);">
               
-              <!-- Header (Clean White Mode) -->
+              <!-- Brand Header (Luxury Dark Bar with Real Official Logo) -->
               <tr>
-                <td style="padding: 24px 28px; background-color: #ffffff; border-bottom: 2px solid #c8874a;">
+                <td style="background-color: #0a0a0a; padding: 22px 28px;">
                   <table width="100%" cellpadding="0" cellspacing="0">
                     <tr>
                       <td valign="middle">
-                        <h1 style="margin: 0; font-size: 22px; font-weight: 800; letter-spacing: 0.15em; text-transform: uppercase; color: #111827;">SPECTRA</h1>
-                        <p style="margin: 2px 0 0; font-size: 9.5px; font-weight: 700; letter-spacing: 0.25em; text-transform: uppercase; color: #c8874a;">MAISON DE L'OPTIQUE</p>
+                        <a href="${siteUrl}" target="_blank" style="text-decoration: none; display: inline-block;">
+                          <img src="${logoUrl}" alt="SPECTRA" width="130" style="display: block; border: 0; width: 130px; height: auto; filter: brightness(0) invert(1);" />
+                        </a>
                       </td>
                       <td align="right" valign="middle">
-                        <span style="display: inline-block; padding: 5px 12px; background-color: #f3f4f6; color: #111827; font-size: 11px; font-weight: 700; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.05em; border: 1px solid #e5e7eb;">
-                          Order Confirmed
+                        <span style="display: inline-block; padding: 6px 14px; background-color: #1a1612; color: #c8874a; font-size: 10.5px; font-weight: 700; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.08em; border: 1px solid rgba(200, 135, 74, 0.4);">
+                          &#10003; Order Confirmed
                         </span>
                       </td>
                     </tr>
                   </table>
                 </td>
               </tr>
-
-              <!-- Greeting -->
+              <!-- Gold Accent Line -->
               <tr>
-                <td style="padding: 24px 28px 8px;">
-                  <h2 style="margin: 0 0 6px; font-size: 16px; font-weight: 700; color: #111827;">Thank You for Your Order</h2>
-                  <p style="margin: 0; font-size: 13.5px; color: #6b7280; line-height: 1.5;">
-                    Hello ${details.customerName}, we have received your order and are preparing your handcrafted eyewear for delivery.
+                <td height="3" style="background: linear-gradient(90deg, #c8874a, #e5a872, #c8874a); font-size: 0; line-height: 0;">&nbsp;</td>
+              </tr>
+
+              <!-- Greeting & Order Status -->
+              <tr>
+                <td style="padding: 28px 28px 16px;">
+                  <h1 style="margin: 0 0 6px; font-size: 20px; font-weight: 800; color: #09090b; letter-spacing: -0.02em;">
+                    Thank You for Your Order!
+                  </h1>
+                  <p style="margin: 0 0 18px; font-size: 13.5px; color: #71717a; line-height: 1.55;">
+                    Hi <strong>${details.customerName}</strong>, we have received your order and are carefully preparing your handcrafted polarized eyewear for delivery.
                   </p>
+
+                  <!-- Amazon/Flipkart Style Order Metadata Strip -->
+                  <table width="100%" cellpadding="12" cellspacing="0" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 12.5px;">
+                    <tr>
+                      <td width="33%" style="border-right: 1px solid #e2e8f0;">
+                        <div style="font-size: 10px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em;">Order Number</div>
+                        <div style="font-size: 13px; font-weight: 700; color: #0f172a; margin-top: 2px;">${orderId}</div>
+                      </td>
+                      <td width="33%" style="padding-left: 14px; border-right: 1px solid #e2e8f0;">
+                        <div style="font-size: 10px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em;">Order Date</div>
+                        <div style="font-size: 13px; font-weight: 700; color: #0f172a; margin-top: 2px;">${orderDate}</div>
+                      </td>
+                      <td width="34%" style="padding-left: 14px;">
+                        <div style="font-size: 10px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em;">Estimated Delivery</div>
+                        <div style="font-size: 13px; font-weight: 700; color: #16a34a; margin-top: 2px;">3&ndash;5 Business Days</div>
+                      </td>
+                    </tr>
+                  </table>
                 </td>
               </tr>
 
-              <!-- Ordered Products (Image + Name + Quantity Only) -->
+              <!-- Items Table -->
               <tr>
-                <td style="padding: 12px 28px;">
-                  <h3 style="margin: 0 0 10px; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #6b7280;">Ordered Products</h3>
+                <td style="padding: 10px 28px 18px;">
+                  <h2 style="margin: 0 0 10px; font-size: 11.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: #64748b;">
+                    Items in Your Order
+                  </h2>
                   <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #ffffff;">
                     ${itemsHtml}
                   </table>
                 </td>
               </tr>
 
-              <!-- Delivery Destination -->
+              <!-- Delivery & Payment Cards (2 Columns) -->
               <tr>
-                <td style="padding: 12px 28px;">
-                  <h3 style="margin: 0 0 10px; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #6b7280;">Delivery Destination</h3>
-                  <div style="background-color: #fafafa; border: 1px solid #f0f0f0; border-radius: 6px; padding: 12px 14px; font-size: 13px; color: #111827; line-height: 1.4;">
-                    <p style="margin: 0 0 4px; font-weight: 600;">${details.customerName}</p>
-                    <p style="margin: 0 0 4px; color: #4b5563;">${fullAddress}</p>
-                    ${details.customerPhone ? `<p style="margin: 0; color: #6b7280; font-size: 12px;">Phone: ${details.customerPhone}</p>` : ""}
-                  </div>
-                </td>
-              </tr>
-
-              <!-- Payment Summary Section -->
-              <tr>
-                <td style="padding: 12px 28px 24px;">
-                  <table width="100%" cellpadding="12" cellspacing="0" style="background-color: #fafafa; border: 1px solid #f0f0f0; border-radius: 6px; font-size: 13px;">
+                <td style="padding: 0 28px 24px;">
+                  <table width="100%" cellpadding="0" cellspacing="0">
                     <tr>
-                      <td style="color: #6b7280; font-weight: 600;">Payment Mode</td>
-                      <td style="color: #111827; text-align: right; font-weight: 600;">
-                        ${isCod ? `COD (Advance Paid: ₹${details.chargeAmount || 0}, Due: ₹${details.balanceDue || 0})` : "Online Full Paid"}
+                      <!-- Delivery Destination -->
+                      <td width="50%" valign="top" style="padding-right: 8px;">
+                        <div style="background-color: #fafafa; border: 1px solid #f1f5f9; border-radius: 8px; padding: 14px; height: 100%;">
+                          <div style="font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: #64748b; margin-bottom: 6px;">
+                            Delivery Address
+                          </div>
+                          <div style="font-size: 13px; font-weight: 700; color: #0f172a; margin-bottom: 3px;">
+                            ${details.customerName}
+                          </div>
+                          <div style="font-size: 12px; color: #475569; line-height: 1.45; margin-bottom: 6px;">
+                            ${fullAddress}
+                          </div>
+                          ${details.customerPhone ? `<div style="font-size: 11.5px; color: #64748b;">Phone: <strong>${details.customerPhone}</strong></div>` : ""}
+                        </div>
                       </td>
-                    </tr>
-                    <tr>
-                      <td style="color: #111827; font-weight: 700; font-size: 14px; border-top: 1px solid #f0f0f0;">Total Amount</td>
-                      <td style="color: #c8874a; text-align: right; font-weight: 800; font-size: 16px; border-top: 1px solid #f0f0f0;">${formattedTotal}</td>
+
+                      <!-- Payment Breakdown -->
+                      <td width="50%" valign="top" style="padding-left: 8px;">
+                        <div style="background-color: #fafafa; border: 1px solid #f1f5f9; border-radius: 8px; padding: 14px;">
+                          <div style="font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: #64748b; margin-bottom: 8px;">
+                            Payment Summary
+                          </div>
+                          <table width="100%" cellpadding="2" cellspacing="0" style="font-size: 12px; color: #475569;">
+                            <tr>
+                              <td>Shipping:</td>
+                              <td align="right" style="color: #16a34a; font-weight: 700;">FREE (Express)</td>
+                            </tr>
+                            <tr>
+                              <td>Payment Mode:</td>
+                              <td align="right" style="font-weight: 600; color: #0f172a;">
+                                ${isCod ? "Cash on Delivery" : "Online Paid (Razorpay)"}
+                              </td>
+                            </tr>
+                            ${isCod && details.chargeAmount ? `
+                              <tr>
+                                <td>Advance Paid:</td>
+                                <td align="right" style="font-weight: 600; color: #16a34a;">₹${details.chargeAmount}</td>
+                              </tr>
+                              <tr>
+                                <td>Due on Delivery:</td>
+                                <td align="right" style="font-weight: 700; color: #b45309;">₹${details.balanceDue || 0}</td>
+                              </tr>
+                            ` : ""}
+                            <tr>
+                              <td colspan="2" style="padding-top: 8px; border-top: 1px solid #e2e8f0;">
+                                <table width="100%" cellpadding="0" cellspacing="0">
+                                  <tr>
+                                    <td style="font-size: 13px; font-weight: 700; color: #0f172a;">Total Order Value:</td>
+                                    <td align="right" style="font-size: 16px; font-weight: 800; color: #c8874a;">${formattedTotal}</td>
+                                  </tr>
+                                </table>
+                              </td>
+                            </tr>
+                          </table>
+                        </div>
+                      </td>
                     </tr>
                   </table>
                 </td>
               </tr>
 
+              <!-- Primary CTA: Track Your Order Button -->
+              <tr>
+                <td align="center" style="padding: 0 28px 26px;">
+                  <a href="${trackUrl}" target="_blank" style="display: block; max-width: 320px; background-color: #0a0a0a; color: #ffffff; text-decoration: none; font-size: 12.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; padding: 14px 24px; border-radius: 6px; text-align: center; border: 1px solid #27272a;">
+                    Track Your Order &rarr;
+                  </a>
+                </td>
+              </tr>
+
+              <!-- Concierge Support Box -->
+              <tr>
+                <td style="padding: 16px 28px; background-color: #f8fafc; border-top: 1px solid #f1f5f9; text-align: center; font-size: 12px; color: #64748b; line-height: 1.6;">
+                  Questions or need to update your address? Reply to this email or chat with our luxury concierge on WhatsApp at <a href="https://wa.me/918129950341" style="color: #c8874a; text-decoration: none; font-weight: 700;">+91 81299 50341</a>.
+                </td>
+              </tr>
+
               <!-- Footer -->
               <tr>
-                <td style="padding: 16px 28px; background-color: #fafafa; border-top: 1px solid #f0f0f0; text-align: center; font-size: 11px; color: #9ca3af;">
-                  Need assistance with your delivery or sizing? Email us at <a href="mailto:spectrasunglass@gmail.com" style="color: #c8874a; text-decoration: none;">spectrasunglass@gmail.com</a>
+                <td style="padding: 18px 28px; background-color: #0a0a0a; text-align: center; font-size: 11px; color: #71717a;">
+                  <div style="font-weight: 700; color: #d4d4d8; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 4px;">SPECTRA LUXURY EYEWEAR</div>
+                  <div>Malappuram, Kerala 676505, India &bull; <a href="${siteUrl}" style="color: #c8874a; text-decoration: none;">www.spectrasunglassess.in</a></div>
                 </td>
               </tr>
             </table>
@@ -357,99 +471,117 @@ export async function sendOrderEmails(details: OrderEmailDetails): Promise<{
     </html>
   `;
 
-  // 2. Admin Notification Email (100% Pure White Theme)
+  // 2. Admin Order Notification Email
   const adminHtml = `
     <!DOCTYPE html>
     <html>
     <head>
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>New Order Received - SPECTRA</title>
+      <title>New Order Alert — SPECTRA Admin</title>
     </head>
-    <body style="margin: 0; padding: 25px 15px; background-color: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #1f2937;">
-      <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #ffffff;">
+    <body style="margin: 0; padding: 30px 12px; background-color: #f4f4f5; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #18181b;">
+      <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f4f4f5;">
         <tr>
           <td align="center">
-            <table width="100%" max-width="580" cellpadding="0" cellspacing="0" style="max-width: 580px; background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
+            <table width="100%" cellpadding="0" cellspacing="0" style="max-width: 600px; background-color: #ffffff; border: 1px solid #e4e4e7; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.06);">
               
-              <!-- Header (Clean White Mode) -->
+              <!-- Brand Header -->
               <tr>
-                <td style="padding: 24px 28px; background-color: #ffffff; border-bottom: 2px solid #c8874a;">
+                <td style="background-color: #0a0a0a; padding: 22px 28px;">
                   <table width="100%" cellpadding="0" cellspacing="0">
                     <tr>
                       <td valign="middle">
-                        <h1 style="margin: 0; font-size: 22px; font-weight: 800; letter-spacing: 0.15em; text-transform: uppercase; color: #111827;">SPECTRA</h1>
-                        <p style="margin: 2px 0 0; font-size: 9.5px; font-weight: 700; letter-spacing: 0.25em; text-transform: uppercase; color: #c8874a;">MAISON DE L'OPTIQUE</p>
+                        <img src="${logoUrl}" alt="SPECTRA" width="130" style="display: block; border: 0; width: 130px; height: auto; filter: brightness(0) invert(1);" />
                       </td>
                       <td align="right" valign="middle">
-                        <span style="display: inline-block; padding: 5px 12px; background-color: #f3f4f6; color: #111827; font-size: 11px; font-weight: 700; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.05em; border: 1px solid #e5e7eb;">
-                          New Order
+                        <span style="display: inline-block; padding: 6px 14px; background-color: #1a1612; color: #e5a872; font-size: 10.5px; font-weight: 700; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.08em; border: 1px solid rgba(200, 135, 74, 0.4);">
+                          &#9889; New Order Received
                         </span>
                       </td>
                     </tr>
                   </table>
                 </td>
               </tr>
+              <tr>
+                <td height="3" style="background: linear-gradient(90deg, #c8874a, #e5a872, #c8874a); font-size: 0; line-height: 0;">&nbsp;</td>
+              </tr>
 
-              <!-- Customer Info Section -->
+              <!-- Header Summary -->
               <tr>
                 <td style="padding: 24px 28px 12px;">
-                  <h2 style="margin: 0 0 12px; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #6b7280;">Customer Information</h2>
-                  <table width="100%" cellpadding="8" cellspacing="0" style="background-color: #fafafa; border: 1px solid #f0f0f0; border-radius: 6px; font-size: 13px;">
-                    <tr>
-                      <td style="color: #6b7280; width: 130px; border-bottom: 1px solid #f0f0f0;">Customer Name:</td>
-                      <td style="color: #111827; font-weight: 600; border-bottom: 1px solid #f0f0f0;">${details.customerName}</td>
-                    </tr>
-                    <tr>
-                      <td style="color: #6b7280; border-bottom: 1px solid #f0f0f0;">Email:</td>
-                      <td style="border-bottom: 1px solid #f0f0f0;">
-                        <a href="mailto:${details.customerEmail}" style="color: #c8874a; text-decoration: none; font-weight: 500;">${details.customerEmail}</a>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td style="color: #6b7280; border-bottom: 1px solid #f0f0f0;">Phone:</td>
-                      <td style="color: #111827; border-bottom: 1px solid #f0f0f0;">${details.customerPhone || "N/A"}</td>
-                    </tr>
-                    <tr>
-                      <td style="color: #6b7280;">Delivery Address:</td>
-                      <td style="color: #111827; line-height: 1.4;">${fullAddress}</td>
-                    </tr>
-                  </table>
+                  <h1 style="margin: 0 0 6px; font-size: 18px; font-weight: 800; color: #09090b;">
+                    New Order Alert: ${orderId}
+                  </h1>
+                  <p style="margin: 0; font-size: 13.5px; color: #71717a;">
+                    A new order for <strong>${formattedTotal}</strong> has been placed by <strong>${details.customerName}</strong>.
+                  </p>
                 </td>
               </tr>
 
-              <!-- Ordered Products (Image + Name + Quantity Only) -->
+              <!-- Customer Dispatch Info -->
               <tr>
-                <td style="padding: 12px 28px;">
-                  <h2 style="margin: 0 0 10px; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #6b7280;">Ordered Products</h2>
+                <td style="padding: 8px 28px 16px;">
+                  <div style="background-color: #fafafa; border: 1px solid #f1f5f9; border-radius: 8px; padding: 14px;">
+                    <div style="font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: #64748b; margin-bottom: 8px;">
+                      Customer & Dispatch Details
+                    </div>
+                    <table width="100%" cellpadding="3" cellspacing="0" style="font-size: 12.5px; color: #334155;">
+                      <tr>
+                        <td width="110" style="color: #64748b;">Customer:</td>
+                        <td style="font-weight: 700; color: #0f172a;">${details.customerName}</td>
+                      </tr>
+                      <tr>
+                        <td style="color: #64748b;">Email:</td>
+                        <td><a href="mailto:${details.customerEmail}" style="color: #c8874a; text-decoration: none;">${details.customerEmail}</a></td>
+                      </tr>
+                      <tr>
+                        <td style="color: #64748b;">Phone:</td>
+                        <td>
+                          <a href="tel:${details.customerPhone}" style="color: #0f172a; font-weight: 600; text-decoration: none;">${details.customerPhone || "N/A"}</a>
+                          ${details.customerPhone ? ` &bull; <a href="https://wa.me/${details.customerPhone.replace(/[^0-9]/g, '')}" target="_blank" style="color: #16a34a; font-weight: 700; text-decoration: none;">Chat WhatsApp &rarr;</a>` : ""}
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style="color: #64748b;" valign="top">Ship To:</td>
+                        <td style="color: #0f172a; line-height: 1.45;">${fullAddress}</td>
+                      </tr>
+                      <tr>
+                        <td style="color: #64748b;">Payment:</td>
+                        <td style="font-weight: 700; color: #0f172a;">
+                          ${isCod ? `Cash on Delivery (Advance: ₹${details.chargeAmount || 0}, Collect Due: ₹${details.balanceDue || 0})` : "Online Full Paid (Razorpay)"}
+                        </td>
+                      </tr>
+                    </table>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Items -->
+              <tr>
+                <td style="padding: 8px 28px 20px;">
+                  <h2 style="margin: 0 0 10px; font-size: 11.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: #64748b;">
+                    Packing Checklist
+                  </h2>
                   <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #ffffff;">
                     ${itemsHtml}
                   </table>
                 </td>
               </tr>
 
-              <!-- Payment Summary Section -->
+              <!-- Admin Action CTA -->
               <tr>
-                <td style="padding: 12px 28px 24px;">
-                  <table width="100%" cellpadding="12" cellspacing="0" style="background-color: #fafafa; border: 1px solid #f0f0f0; border-radius: 6px; font-size: 13px;">
-                    <tr>
-                      <td style="color: #6b7280; font-weight: 600;">Payment Mode</td>
-                      <td style="color: #111827; text-align: right; font-weight: 600;">
-                        ${isCod ? `COD (Advance Paid: ₹${details.chargeAmount || 0}, Due: ₹${details.balanceDue || 0})` : "Online Full Paid"}
-                      </td>
-                    </tr>
-                    <tr>
-                      <td style="color: #111827; font-weight: 700; font-size: 14px; border-top: 1px solid #f0f0f0;">Total Amount</td>
-                      <td style="color: #c8874a; text-align: right; font-weight: 800; font-size: 16px; border-top: 1px solid #f0f0f0;">${formattedTotal}</td>
-                    </tr>
-                  </table>
+                <td align="center" style="padding: 0 28px 24px;">
+                  <a href="${siteUrl}/admin/orders" target="_blank" style="display: block; max-width: 320px; background-color: #c8874a; color: #ffffff; text-decoration: none; font-size: 12.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; padding: 13px 24px; border-radius: 6px; text-align: center;">
+                    View in Admin Dashboard &rarr;
+                  </a>
                 </td>
               </tr>
 
               <!-- Footer -->
               <tr>
-                <td style="padding: 16px 28px; background-color: #fafafa; border-top: 1px solid #f0f0f0; text-align: center; font-size: 11px; color: #9ca3af;">
-                  SPECTRA Eyewear &bull; Store Administration Notification
+                <td style="padding: 16px 28px; background-color: #0a0a0a; text-align: center; font-size: 11px; color: #71717a;">
+                  SPECTRA Eyewear Automated Dispatch Notification
                 </td>
               </tr>
             </table>
@@ -464,13 +596,13 @@ export async function sendOrderEmails(details: OrderEmailDetails): Promise<{
   const [customerResult, adminResult] = await Promise.all([
     sendBrevoEmail({
       to: [{ email: details.customerEmail, name: details.customerName }],
-      subject: `Order Confirmation — SPECTRA Eyewear`,
+      subject: `Order Confirmed: ${orderId} — SPECTRA Eyewear`,
       htmlContent: customerHtml,
       tags: ["order_confirmation", "customer_receipt"],
     }),
     sendBrevoEmail({
       to: [{ email: getBrevoAdminEmail(), name: "SPECTRA Store Admin" }],
-      subject: `New Order Received — ${details.customerName} (${formattedTotal})`,
+      subject: `New Order: ${orderId} — ${details.customerName} (${formattedTotal})`,
       htmlContent: adminHtml,
       tags: ["order_alert", "admin_notification"],
     }),

@@ -11,15 +11,58 @@ interface ProductPageProps {
   params: Promise<{ slug: string }>;
 }
 
+// Helper to reliably find product by slug, normalized slug, id, or name
+async function findProduct(supabase: any, rawParam: string) {
+  const decoded = decodeURIComponent(rawParam).trim();
+  const normalized = decoded.toLowerCase().replace(/\s+/g, "-");
+
+  // 1. Try normalized slug (e.g. brown-tortoiseshell-wayfarer-sunglasses)
+  let { data } = await supabase
+    .from("products")
+    .select("*")
+    .eq("slug", normalized)
+    .maybeSingle();
+
+  if (data) return data;
+
+  // 2. Try raw slug if different
+  if (decoded !== normalized) {
+    const res = await supabase
+      .from("products")
+      .select("*")
+      .eq("slug", decoded)
+      .maybeSingle();
+    if (res.data) return res.data;
+  }
+
+  // 3. Try matching by UUID if valid
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  if (uuidRegex.test(decoded)) {
+    const res = await supabase
+      .from("products")
+      .select("*")
+      .eq("id", decoded)
+      .maybeSingle();
+    if (res.data) return res.data;
+  }
+
+  // 4. Try matching product name (replaces hyphens with spaces)
+  const nameQuery = decoded.replace(/-/g, " ").trim();
+  const resByName = await supabase
+    .from("products")
+    .select("*")
+    .ilike("name", `%${nameQuery}%`)
+    .limit(1)
+    .maybeSingle();
+
+  return resByName.data || null;
+}
+
 export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
   const { slug } = await params;
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.spectrasunglassess.in";
   const supabase = await createClient();
-  const { data: product } = await supabase
-    .from("products")
-    .select("name, subtitle, description, image_url, price, category, shape")
-    .eq("slug", slug)
-    .single();
+  const product = await findProduct(supabase, slug);
 
   if (!product) {
     return { title: "Product Not Found — SPECTRA" };
@@ -43,12 +86,12 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
       "polarized eyewear india",
     ],
     alternates: {
-      canonical: `${siteUrl}/products/${slug}`,
+      canonical: `${siteUrl}/products/${product.slug || slug}`,
     },
     openGraph: {
       title,
       description,
-      url: `${siteUrl}/products/${slug}`,
+      url: `${siteUrl}/products/${product.slug || slug}`,
       siteName: "SPECTRA Luxury Eyewear",
       images: product.image_url ? [{ url: product.image_url, width: 800, height: 800, alt: product.name }] : [],
     },
@@ -65,12 +108,7 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
   const { slug } = await params;
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.spectrasunglassess.in";
   const supabase = await createClient();
-
-  const { data: product } = await supabase
-    .from("products")
-    .select("*")
-    .eq("slug", slug)
-    .single();
+  const product = await findProduct(supabase, slug);
 
   if (!product) {
     notFound();
