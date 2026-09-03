@@ -158,12 +158,12 @@ export default function HeroSection({
             NEW COLLECTION 2026
           </p>
 
-          {/* Headline with Exact Stencil Typography */}
-          <h1 className="font-stencil uppercase leading-[1.05] tracking-[0.06em] sm:tracking-[0.1em] mb-3 sm:mb-5">
-            <span className="block text-white text-[28px] sm:text-4xl md:text-6xl lg:text-[68px]">
+          {/* Headline with Clean Luxury Editorial Typography */}
+          <h1 className="font-hero uppercase font-black leading-[0.98] tracking-[0.04em] sm:tracking-[0.06em] mb-3 sm:mb-5">
+            <span className="block text-white text-[32px] sm:text-5xl md:text-6xl lg:text-[72px] font-black drop-shadow-md">
               SEE BEYOND{" "}
             </span>
-            <span className="block text-[#c8874a] text-[28px] sm:text-4xl md:text-6xl lg:text-[68px] mt-1">
+            <span className="block text-[#c8874a] text-[32px] sm:text-5xl md:text-6xl lg:text-[72px] font-black mt-1 drop-shadow-md">
               LIMITS
             </span>
           </h1>
