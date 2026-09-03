@@ -35,6 +35,21 @@ export function verifyRazorpaySignature(
   return generatedSignature === signature;
 }
 
+export function verifyRazorpayWebhookSignature(
+  rawBody: string,
+  signature: string,
+  secret: string
+): boolean {
+  if (!signature || !secret) return false;
+
+  const expectedSignature = crypto
+    .createHmac("sha256", secret)
+    .update(rawBody)
+    .digest("hex");
+
+  return expectedSignature === signature;
+}
+
 export function loadRazorpayScript(): Promise<boolean> {
   return new Promise((resolve) => {
     if (typeof window === "undefined") {

@@ -111,16 +111,51 @@ export default function CartPage() {
     setCheckoutError(null);
 
     try {
-      // 1. Ensure Razorpay client script is loaded
-      const isLoaded = await loadRazorpayScript();
-      if (!isLoaded) {
-        throw new Error("Unable to load Razorpay payment gateway. Please check your internet connection.");
-      }
-
       // Snapshot values for order confirmation before cart is cleared
       const currentTotal = total;
       const currentAddress = { ...address };
       const currentPaymentMethod = paymentMethod;
+
+      // ─── A. Pure Cash on Delivery (Advance Disabled) ───
+      if (currentPaymentMethod === "cod" && !isCodAdvance) {
+        const codRes = await fetch("/api/orders/cod", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            address: currentAddress,
+            items,
+            totalAmount: currentTotal,
+          }),
+        });
+
+        const codData = await codRes.json();
+        if (codRes.ok && codData.success) {
+          setOrderPlaced({
+            id: codData.orderId,
+            paymentId: "CASH_ON_DELIVERY",
+            total: currentTotal,
+            advanceAmount: 0,
+            balanceDue: currentTotal,
+            isCodAdvance: false,
+            paymentMethod: "cod",
+            address: currentAddress,
+          });
+          if (typeof window !== "undefined") {
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          }
+          clearCart();
+        } else {
+          setCheckoutError(codData.error || "Failed to place Cash on Delivery order.");
+        }
+        setSubmitting(false);
+        return;
+      }
+
+      // ─── B. Razorpay (Online Full Payment OR COD Advance Deposit) ───
+      const isLoaded = await loadRazorpayScript();
+      if (!isLoaded) {
+        throw new Error("Unable to load Razorpay payment gateway. Please check your internet connection.");
+      }
 
       // 2. Create Razorpay order via backend
       const res = await fetch("/api/razorpay/create-order", {
