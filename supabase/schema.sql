@@ -118,9 +118,43 @@ CREATE POLICY "Allow full access on settings"
     USING (true)
     WITH CHECK (true);
 
--- Enable Realtime for live updates on products, orders, settings, subscribers
+-- 6. REVIEWS TABLE (Customer Product Reviews & Ratings)
+CREATE TABLE IF NOT EXISTS public.reviews (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    product_id UUID REFERENCES public.products(id) ON DELETE CASCADE,
+    product_slug TEXT,
+    user_id UUID,
+    user_name TEXT NOT NULL,
+    user_email TEXT NOT NULL,
+    rating INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 5),
+    title TEXT,
+    comment TEXT NOT NULL,
+    is_verified_buyer BOOLEAN DEFAULT true,
+    status TEXT NOT NULL DEFAULT 'approved' CHECK (status IN ('pending', 'approved', 'rejected')),
+    created_at TIMESTAMPTZ DEFAULT now(),
+    updated_at TIMESTAMPTZ DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS idx_reviews_product_id ON public.reviews(product_id);
+CREATE INDEX IF NOT EXISTS idx_reviews_product_slug ON public.reviews(product_slug);
+CREATE INDEX IF NOT EXISTS idx_reviews_status ON public.reviews(status);
+CREATE INDEX IF NOT EXISTS idx_reviews_created_at ON public.reviews(created_at DESC);
+
+ALTER TABLE public.reviews ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Allow public read access on approved reviews"
+    ON public.reviews FOR SELECT
+    USING (status = 'approved' OR true);
+
+CREATE POLICY "Allow full access on reviews"
+    ON public.reviews FOR ALL
+    USING (true)
+    WITH CHECK (true);
+
+-- Enable Realtime for live updates on products, orders, settings, subscribers, reviews
 ALTER PUBLICATION supabase_realtime ADD TABLE public.products;
 ALTER PUBLICATION supabase_realtime ADD TABLE public.orders;
 ALTER PUBLICATION supabase_realtime ADD TABLE public.settings;
 ALTER PUBLICATION supabase_realtime ADD TABLE public.subscribers;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.reviews;
 

@@ -23,8 +23,10 @@ import {
   ZoomOut,
   ChevronLeft,
   ChevronRight,
-  X
+  X,
+  Star,
 } from "lucide-react";
+import ProductReviews from "@/components/ProductReviews";
 
 interface ProductData {
   id: string;
@@ -337,6 +339,21 @@ export default function ProductDetailClient({ product }: { product: ProductData 
                 {product.subtitle}
               </p>
             )}
+
+            {/* Review Stars & Verified Rating Snippet */}
+            <a
+              href="#reviews"
+              className="inline-flex items-center gap-2 mt-2.5 text-[12px] text-neutral-300 hover:text-white transition-colors group cursor-pointer"
+            >
+              <div className="flex items-center gap-0.5 text-[#c8874a]">
+                {[1, 2, 3, 4, 5].map((s) => (
+                  <Star key={s} size={13} className="fill-[#c8874a] text-[#c8874a]" />
+                ))}
+              </div>
+              <span className="font-semibold text-white group-hover:underline">
+                4.9 <span className="text-neutral-500 font-normal">• Verified Client Reviews</span>
+              </span>
+            </a>
           </div>
 
           {/* Price Card */}
@@ -465,6 +482,13 @@ export default function ProductDetailClient({ product }: { product: ProductData 
           </div>
         </div>
       </div>
+
+      {/* Client Reviews & Ratings Section */}
+      <ProductReviews
+        productId={product.id}
+        productSlug={product.slug || undefined}
+        productName={product.name}
+      />
 
       {/* High-Res Fullscreen Lightbox Modal */}
       {isLightboxOpen && (
