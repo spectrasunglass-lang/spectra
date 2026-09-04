@@ -16,7 +16,6 @@ import {
   Check,
   Heart,
   Share2,
-  Sparkles,
   Bookmark,
   Maximize2,
   ZoomIn,

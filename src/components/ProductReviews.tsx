@@ -10,7 +10,6 @@ import {
   X,
   MessageSquareQuote,
   Loader2,
-  Sparkles,
   User,
   ShieldCheck,
   ChevronDown,
@@ -213,8 +212,7 @@ export default function ProductReviews({
         {/* Section Header */}
         <div className="flex flex-col sm:flex-row sm:items-end justify-between pb-10 border-b border-white/[0.08] gap-6">
           <div>
-            <p className="text-[10px] sm:text-[10.5px] font-bold tracking-[0.3em] uppercase text-[#c8874a] mb-2 flex items-center gap-2">
-              <Sparkles size={13} />
+            <p className="text-[10px] sm:text-[10.5px] font-bold tracking-[0.3em] uppercase text-[#c8874a] mb-2">
               Authentic Client Testimonials
             </p>
             <h2 className="text-2xl sm:text-4xl font-bold uppercase tracking-tight text-white">
@@ -227,9 +225,8 @@ export default function ProductReviews({
 
           <button
             onClick={handleOpenWriteReview}
-            className="self-start sm:self-auto px-6 py-3 bg-[#c8874a] hover:bg-[#b87840] text-white text-[11px] sm:text-[11.5px] font-bold uppercase tracking-[0.2em] rounded-sm transition-all duration-200 shadow-xl shadow-[#c8874a]/20 flex items-center gap-2 cursor-pointer group"
+            className="self-start sm:self-auto px-6 py-3 bg-[#c8874a] hover:bg-[#b87840] text-white text-[11px] sm:text-[11.5px] font-bold uppercase tracking-[0.2em] rounded-sm transition-all duration-200 shadow-xl shadow-[#c8874a]/20 cursor-pointer"
           >
-            <MessageSquareQuote size={15} className="group-hover:scale-110 transition-transform" />
             Write a Review
           </button>
         </div>
