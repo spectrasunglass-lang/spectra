@@ -243,7 +243,7 @@ export default function ProductDetailClient({ product }: { product: ProductData 
           >
             {product.is_new && (
               <span className="absolute top-5 left-5 bg-black text-white text-[10px] font-bold tracking-[0.2em] uppercase px-3 py-1.5 rounded-full z-10 pointer-events-none">
-                NEW RELEASE
+                NEWLY ADDED
               </span>
             )}
             {discountPercent && (

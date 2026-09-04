@@ -10,6 +10,7 @@ import {
   Package,
   ShoppingBag,
   Heart,
+  Bookmark,
   LogOut,
   ChevronRight,
   Loader2,
@@ -267,8 +268,8 @@ export default function AccountPage() {
                   className="flex items-center justify-between p-3 rounded-sm bg-[#161616] hover:bg-[#1f1f1f] text-neutral-300 hover:text-white transition-colors text-[12px] font-semibold"
                 >
                   <span className="flex items-center gap-2">
-                    <Heart size={14} className="text-[#c8874a]" />
-                    My Saved Wishlist
+                    <Bookmark size={14} className="text-[#c8874a]" />
+                    My Saved List
                   </span>
                   <ChevronRight size={14} className="text-neutral-500" />
                 </Link>

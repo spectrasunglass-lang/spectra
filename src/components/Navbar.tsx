@@ -71,7 +71,7 @@ export default function Navbar() {
     { name: "SPECTRA COLLECTIONS", href: "/collections" },
     { name: "POLARIZED", href: "/polarized" },
     { name: "GIFTS", href: "/gifts" },
-    { name: "MY WISHLIST", href: "/wishlist" },
+    { name: "SAVED LIST", href: "/wishlist" },
   ];
 
   const infoNavItems = [
@@ -170,11 +170,12 @@ export default function Navbar() {
                   <Search className="w-[17px] h-[17px] stroke-[1.5] group-hover:scale-110 transition-transform" />
                 </button>
 
-                {/* Wishlist - hidden on mobile, visible on sm+ */}
+                {/* Saved List link - hidden on mobile, visible on sm+ */}
                 <Link
                   href="/wishlist"
                   className="hidden sm:flex hover:text-white p-1 transition-colors group"
-                  aria-label="Wishlist"
+                  aria-label="Saved List"
+                  title="Saved List"
                 >
                   <Heart className="w-[17px] h-[17px] stroke-[1.5] group-hover:scale-110 transition-transform" />
                 </Link>
@@ -261,6 +262,29 @@ export default function Navbar() {
               <p className="text-[9px] font-bold text-neutral-500 tracking-[0.3em] uppercase pb-2">All Sections</p>
               {allNavItems.map((item) => {
                 const active = isItemActive(item.href);
+                if (item.name === "SAVED LIST") {
+                  return (
+                    <button
+                      key={item.name}
+                      type="button"
+                      onClick={() => {
+                        setIsMenuOpen(false);
+                        openCart();
+                      }}
+                      className="w-full flex items-center justify-between py-2 text-[11px] font-bold tracking-[0.2em] transition-all duration-200 uppercase group text-neutral-300 hover:text-white hover:translate-x-1 cursor-pointer text-left"
+                    >
+                      <span className="flex items-center gap-2">
+                        {item.name}
+                        {cartCount > 0 && (
+                          <span className="bg-[#c8874a] text-white text-[9px] font-bold px-1.5 py-0.2 rounded-full">
+                            {cartCount}
+                          </span>
+                        )}
+                      </span>
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#c8874a] opacity-0 group-hover:opacity-100 transition-opacity" />
+                    </button>
+                  );
+                }
                 return (
                   <Link
                     key={item.name}
