@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useCart } from "@/components/CartContext";
-import { Plus, Minus, Trash2, ShoppingBag, ArrowRight, ArrowLeft, CheckCircle2, Loader2, AlertCircle, Gift } from "lucide-react";
+import { Plus, Minus, Trash2, ShoppingBag, ArrowRight, ArrowLeft, Loader2, AlertCircle } from "lucide-react";
 import CartAddressForm, { AddressData } from "@/components/CartAddressForm";
 import CartPaymentMethod, { PaymentOption } from "@/components/CartPaymentMethod";
 import { createClient } from "@/lib/supabase/client";
@@ -392,7 +392,7 @@ export default function CartPage() {
             <div className="space-y-3 max-h-[380px] overflow-y-auto pr-1">
               {items.map((item) => (
                 <div
-                  key={`${item.id}-${item.gift_package?.id || "std"}`}
+                  key={`${item.id}-${item.gift_package?.id || "std"}-${item.color?.id || "default"}`}
                   className="p-3.5 bg-white/[0.02] border border-white/[0.05] rounded-xl space-y-3"
                 >
                   <div className="flex items-start gap-3">
@@ -416,6 +416,12 @@ export default function CartPage() {
                         <p className="text-[11px] text-white/40 mt-0.5 truncate">{item.subtitle}</p>
                       )}
 
+                      {item.color && (
+                        <div className="mt-1.5 inline-flex rounded-md border border-white/[0.08] bg-white/[0.03] px-2 py-0.5 text-[10px] font-bold text-white/70">
+                          Colour: {item.color.name}
+                        </div>
+                      )}
+
                       {/* Addon Gift Text - Clean, well-spaced, distinct on mobile */}
                       {item.gift_package && (
                         <div className="mt-2 py-1 px-2.5 rounded-md bg-[#c8874a]/10 border border-[#c8874a]/25 text-[11px] text-[#f3c89b] flex items-center justify-between gap-2">
@@ -434,7 +440,7 @@ export default function CartPage() {
                   <div className="flex items-center justify-between pt-2 border-t border-white/[0.04]">
                     <div className="flex items-center gap-1.5 bg-white/[0.05] border border-white/[0.06] rounded-md px-1.5 py-1">
                       <button
-                        onClick={() => updateQty(item.id, item.quantity - 1, item.gift_package?.id)}
+                        onClick={() => updateQty(item.id, item.quantity - 1, item.gift_package?.id, item.color?.id)}
                         className="w-6 h-6 rounded-sm flex items-center justify-center text-white/50 hover:text-white hover:bg-white/[0.1] transition-colors"
                         aria-label="Decrease quantity"
                       >
@@ -444,7 +450,7 @@ export default function CartPage() {
                         {item.quantity}
                       </span>
                       <button
-                        onClick={() => updateQty(item.id, item.quantity + 1, item.gift_package?.id)}
+                        onClick={() => updateQty(item.id, item.quantity + 1, item.gift_package?.id, item.color?.id)}
                         className="w-6 h-6 rounded-sm flex items-center justify-center text-white/50 hover:text-white hover:bg-white/[0.1] transition-colors"
                         aria-label="Increase quantity"
                       >
@@ -457,7 +463,7 @@ export default function CartPage() {
                         &#8377;{((Number(item.price) + (item.gift_package ? Number(item.gift_package.price) : 0)) * item.quantity).toLocaleString("en-IN")}
                       </p>
                       <button
-                        onClick={() => removeItem(item.id, item.gift_package?.id)}
+                        onClick={() => removeItem(item.id, item.gift_package?.id, item.color?.id)}
                         className="text-white/25 hover:text-red-400 transition-colors p-1 cursor-pointer"
                         title="Remove Item"
                         aria-label="Remove item"

@@ -85,6 +85,11 @@ export default function WishlistPage() {
                     <p className="text-[14px] font-bold text-white mt-1">
                       &#8377;{item.price.toLocaleString("en-IN")}
                     </p>
+                    {item.color && (
+                      <p className="mt-1 text-[10px] font-bold uppercase tracking-wider text-white/45">
+                        Colour: {item.color.name}
+                      </p>
+                    )}
                   </div>
 
                   <div className="flex items-center gap-2 sm:gap-3">
@@ -95,7 +100,7 @@ export default function WishlistPage() {
                       Order
                     </button>
                     <button
-                      onClick={() => removeItem(item.id)}
+                      onClick={() => removeItem(item.id, item.gift_package?.id, item.color?.id)}
                       className="p-2 text-neutral-500 hover:text-red-400 transition-colors cursor-pointer"
                       title="Remove from saved list"
                     >

@@ -16,6 +16,7 @@ CREATE TABLE IF NOT EXISTS public.products (
     shape TEXT NOT NULL DEFAULT 'rectangle',
     image_url TEXT,
     images TEXT[] DEFAULT ARRAY[]::TEXT[],
+    color_variants JSONB NOT NULL DEFAULT '[]'::JSONB,
     is_new BOOLEAN DEFAULT true,
     is_polarized BOOLEAN DEFAULT false,
     is_gift BOOLEAN DEFAULT false,
@@ -31,6 +32,7 @@ ALTER TABLE public.products ADD COLUMN IF NOT EXISTS is_polarized BOOLEAN DEFAUL
 ALTER TABLE public.products ADD COLUMN IF NOT EXISTS is_gift BOOLEAN DEFAULT false;
 ALTER TABLE public.products ADD COLUMN IF NOT EXISTS is_computer_glasses BOOLEAN DEFAULT false;
 ALTER TABLE public.products ADD COLUMN IF NOT EXISTS is_accessory BOOLEAN DEFAULT false;
+ALTER TABLE public.products ADD COLUMN IF NOT EXISTS color_variants JSONB NOT NULL DEFAULT '[]'::JSONB;
 
 CREATE INDEX IF NOT EXISTS idx_products_computer_glasses_active
     ON public.products (created_at DESC)

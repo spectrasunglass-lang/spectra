@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { ProductCard, Product } from "@/components/ProductCard";
 import ProductDetailClient from "./ProductDetailClient";
 import type { Metadata } from "next";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 export const dynamic = "force-dynamic";
 export const dynamicParams = true;
@@ -25,7 +26,7 @@ export async function generateStaticParams() {
 }
 
 // Helper to reliably find product by slug, normalized slug, id, or name
-async function findProduct(supabase: any, rawParam: string) {
+async function findProduct(supabase: SupabaseClient, rawParam: string) {
   if (!rawParam) return null;
   const decoded = decodeURIComponent(rawParam).trim();
   const normalized = decoded.toLowerCase().replace(/\s+/g, "-");
@@ -198,7 +199,7 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }}
       />
 
-      <ProductDetailClient product={product} />
+      <ProductDetailClient key={product.id} product={product} />
 
       {/* Related Products */}
       {relatedProducts.length > 0 && (

@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Save, Loader2, CheckCircle2 } from "lucide-react";
 import MultiImageUpload from "@/components/admin/MultiImageUpload";
+import ProductColorVariantsField from "@/components/admin/ProductColorVariantsField";
+import { ProductColorVariant } from "@/lib/productColors";
 
 const categories = ["Men", "Women", "Sunglasses", "Unisex", "Kids"];
 const shapes = ["Oval", "Rectangle", "Wayfarer", "Round", "Aviator", "Square", "Cat Eye"];
@@ -35,6 +37,7 @@ export default function NewProductPage() {
     status: "active" as "active" | "draft",
     image_url: null as string | null,
     gallery_images: [] as string[],
+    color_variants: [] as ProductColorVariant[],
   });
 
   const set = (k: keyof typeof form, v: unknown) =>
@@ -51,6 +54,15 @@ export default function NewProductPage() {
     e.preventDefault();
     if (!form.name || !form.price) {
       setError("Name and price are required.");
+      return;
+    }
+    if (form.color_variants.some((variant) => !variant.name.trim() || !variant.image_url)) {
+      setError("Each colour needs a name and a photo before the product can be saved.");
+      return;
+    }
+    const colourNames = form.color_variants.map((variant) => variant.name.trim().toLowerCase());
+    if (new Set(colourNames).size !== colourNames.length) {
+      setError("Each colour name must be unique for this product.");
       return;
     }
     setSaving(true);
@@ -81,6 +93,10 @@ export default function NewProductPage() {
           status: form.status,
           image_url: form.image_url,
           images: form.gallery_images,
+          color_variants: form.color_variants.map((variant) => ({
+            ...variant,
+            name: variant.name.trim(),
+          })),
         },
       ]);
       if (dbError) throw new Error(dbError.message);
@@ -258,6 +274,11 @@ export default function NewProductPage() {
               </FormField>
             </div>
           </div>
+
+          <ProductColorVariantsField
+            variants={form.color_variants}
+            onChange={(variants) => set("color_variants", variants)}
+          />
         </div>
 
         {/* Right: Image + Status */}

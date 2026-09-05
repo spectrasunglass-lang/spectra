@@ -6,6 +6,8 @@ import Link from "next/link";
 import { ArrowLeft, Save, Loader2, CheckCircle2 } from "lucide-react";
 import MultiImageUpload from "@/components/admin/MultiImageUpload";
 import { createClient } from "@/lib/supabase/client";
+import ProductColorVariantsField from "@/components/admin/ProductColorVariantsField";
+import { normalizeProductColorVariants, ProductColorVariant } from "@/lib/productColors";
 
 const categories = ["Men", "Women", "Sunglasses", "Unisex", "Kids"];
 const shapes = ["Oval", "Rectangle", "Wayfarer", "Round", "Aviator", "Square", "Cat Eye"];
@@ -44,6 +46,7 @@ export default function EditProductPage({ params }: EditProductPageProps) {
     status: "active" as "active" | "draft",
     image_url: null as string | null,
     gallery_images: [] as string[],
+    color_variants: [] as ProductColorVariant[],
   });
 
   const set = (k: keyof typeof form, v: unknown) =>
@@ -113,6 +116,7 @@ export default function EditProductPage({ params }: EditProductPageProps) {
           status: (data.status as "active" | "draft") || "active",
           image_url: data.image_url || null,
           gallery_images: gallery,
+          color_variants: normalizeProductColorVariants(data.color_variants),
         });
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to load product");
@@ -130,6 +134,15 @@ export default function EditProductPage({ params }: EditProductPageProps) {
     e.preventDefault();
     if (!form.name || !form.price) {
       setError("Name and price are required.");
+      return;
+    }
+    if (form.color_variants.some((variant) => !variant.name.trim() || !variant.image_url)) {
+      setError("Each colour needs a name and a photo before the product can be saved.");
+      return;
+    }
+    const colourNames = form.color_variants.map((variant) => variant.name.trim().toLowerCase());
+    if (new Set(colourNames).size !== colourNames.length) {
+      setError("Each colour name must be unique for this product.");
       return;
     }
     setSaving(true);
@@ -160,6 +173,10 @@ export default function EditProductPage({ params }: EditProductPageProps) {
           status: form.status,
           image_url: form.image_url,
           images: form.gallery_images,
+          color_variants: form.color_variants.map((variant) => ({
+            ...variant,
+            name: variant.name.trim(),
+          })),
           updated_at: new Date().toISOString(),
         })
         .eq("id", productId);
@@ -348,6 +365,11 @@ export default function EditProductPage({ params }: EditProductPageProps) {
               </FormField>
             </div>
           </div>
+
+          <ProductColorVariantsField
+            variants={form.color_variants}
+            onChange={(variants) => set("color_variants", variants)}
+          />
         </div>
 
         {/* Right: Image + Status */}

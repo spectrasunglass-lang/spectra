@@ -1,6 +1,3 @@
-import fs from "fs";
-import path from "path";
-
 /**
  * Brevo (formerly Sendinblue) API Integration
  *
@@ -49,6 +46,15 @@ export interface OrderItemEmail {
   price?: number;
   image_url?: string | null;
   image?: string | null;
+  color?: {
+    id?: string;
+    name: string;
+  } | null;
+  gift_package?: {
+    id?: string;
+    name: string;
+    price: number;
+  } | null;
 }
 
 export interface OrderEmailDetails {
@@ -249,7 +255,8 @@ export async function sendOrderEmails(details: OrderEmailDetails): Promise<{
         if (itemImg && itemImg.startsWith("/")) {
           itemImg = `${siteUrl}${itemImg}`;
         }
-        const giftInfo = (item as any).gift_package;
+        const giftInfo = item.gift_package;
+        const colourName = item.color?.name;
         const imgBlock = itemImg
           ? `<img src="${itemImg}" alt="${item.name}" width="72" height="72" style="display: block; width: 72px; height: 72px; object-fit: contain; background-color: #fafafa; border-radius: 8px; border: 1px solid #e5e7eb; padding: 4px;" />`
           : `<div style="width: 72px; height: 72px; background-color: #fafafa; border-radius: 8px; border: 1px solid #e5e7eb; display: flex; align-items: center; justify-content: center; font-size: 11px; color: #9ca3af; text-align: center; line-height: 72px;">SPECTRA</div>`;
@@ -268,6 +275,11 @@ export async function sendOrderEmails(details: OrderEmailDetails): Promise<{
               <div style="font-size: 11.5px; color: #64748b; margin-bottom: 6px;">
                 Premium Polarized Optics &bull; 100% UV400 Protection
               </div>
+              ${colourName ? `
+                <div style="display: inline-block; padding: 3px 8px; background-color: #f8fafc; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 11px; font-weight: 600; color: #334155; margin-bottom: 6px;">
+                  Colour: ${colourName}
+                </div>
+              ` : ""}
               ${giftInfo ? `
                 <div style="display: inline-block; padding: 3px 8px; background-color: #fffbeb; border: 1px solid #fde68a; border-radius: 4px; font-size: 11px; font-weight: 600; color: #b45309; margin-bottom: 6px;">
                   🎁 Gift Box: ${giftInfo.name} (+₹${giftInfo.price})

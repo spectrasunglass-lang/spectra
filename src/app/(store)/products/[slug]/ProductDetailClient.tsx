@@ -1,21 +1,18 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useCart } from "@/components/CartContext";
 import GiftPackageSelector from "@/components/GiftPackageSelector";
 import { GiftPackage } from "@/lib/giftPackages";
+import { normalizeProductColorVariants, ProductColorVariant } from "@/lib/productColors";
 import {
-  ShoppingBag,
   Zap,
   ShieldCheck,
   Truck,
   RefreshCw,
   ChevronDown,
-  Check,
-  Heart,
-  Share2,
   Bookmark,
   Maximize2,
   ZoomIn,
@@ -46,11 +43,21 @@ interface ProductData {
   sku?: string | null;
   stock_quantity?: number | null;
   is_new?: boolean | null;
+  color_variants?: unknown;
+  whats_in_the_box?: string | string[] | null;
 }
 
 export default function ProductDetailClient({ product }: { product: ProductData }) {
   const { addItem } = useCart();
-  const [selectedImage, setSelectedImage] = useState(product.image_url);
+  const colorVariants = useMemo(
+    () => normalizeProductColorVariants(product.color_variants),
+    [product.color_variants]
+  );
+  const [selectedColorId, setSelectedColorId] = useState<string | null>(colorVariants[0]?.id || null);
+  const selectedColor = colorVariants.find((variant) => variant.id === selectedColorId) || null;
+  const [selectedImage, setSelectedImage] = useState(
+    colorVariants[0]?.image_url || product.image_url
+  );
   const [added, setAdded] = useState(false);
   const [activeTab, setActiveTab] = useState<string | null>("details");
   const [selectedGiftPackage, setSelectedGiftPackage] = useState<GiftPackage | null>(null);
@@ -60,12 +67,16 @@ export default function ProductDetailClient({ product }: { product: ProductData 
     window.scrollTo({ top: 0, left: 0, behavior: "instant" });
   }, [product.id]);
 
-  const rawImages = [
-    product.image_url,
-    ...(Array.isArray(product.images) ? product.images : []),
-    ...(Array.isArray(product.gallery_urls) ? product.gallery_urls : []),
-  ].filter(Boolean) as string[];
-  const images = Array.from(new Set(rawImages));
+  const images = useMemo(() => {
+    const rawImages = [
+      product.image_url,
+      ...(Array.isArray(product.images) ? product.images : []),
+      ...(Array.isArray(product.gallery_urls) ? product.gallery_urls : []),
+      ...colorVariants.map((variant) => variant.image_url),
+    ].filter(Boolean) as string[];
+
+    return Array.from(new Set(rawImages));
+  }, [product.image_url, product.images, product.gallery_urls, colorVariants]);
 
   const discountPercent =
     product.compare_price && product.compare_price > product.price
@@ -78,8 +89,9 @@ export default function ProductDetailClient({ product }: { product: ProductData 
       name: product.name,
       slug: product.slug || product.id,
       price: Number(product.price),
-      image_url: product.image_url,
+      image_url: selectedColor?.image_url || product.image_url,
       subtitle: product.subtitle || "",
+      color: selectedColor ? { id: selectedColor.id, name: selectedColor.name } : null,
       gift_package: selectedGiftPackage
         ? {
             id: selectedGiftPackage.id,
@@ -91,6 +103,11 @@ export default function ProductDetailClient({ product }: { product: ProductData 
     });
     setAdded(true);
     setTimeout(() => setAdded(false), 2500);
+  };
+
+  const selectColor = (variant: ProductColorVariant) => {
+    setSelectedColorId(variant.id);
+    setSelectedImage(variant.image_url);
   };
 
   const toggleTab = (tab: string) => {
@@ -108,19 +125,19 @@ export default function ProductDetailClient({ product }: { product: ProductData 
 
   const activeImageIndex = Math.max(0, images.indexOf(selectedImage));
 
-  const showNextImage = (e?: React.MouseEvent | React.TouchEvent) => {
+  const showNextImage = useCallback((e?: React.MouseEvent | React.TouchEvent) => {
     e?.stopPropagation();
     if (images.length <= 1) return;
     const nextIdx = (activeImageIndex + 1) % images.length;
     setSelectedImage(images[nextIdx]);
-  };
+  }, [activeImageIndex, images]);
 
-  const showPrevImage = (e?: React.MouseEvent | React.TouchEvent) => {
+  const showPrevImage = useCallback((e?: React.MouseEvent | React.TouchEvent) => {
     e?.stopPropagation();
     if (images.length <= 1) return;
     const prevIdx = (activeImageIndex - 1 + images.length) % images.length;
     setSelectedImage(images[prevIdx]);
-  };
+  }, [activeImageIndex, images]);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!imageContainerRef.current) return;
@@ -169,7 +186,7 @@ export default function ProductDetailClient({ product }: { product: ProductData 
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isLightboxOpen, activeImageIndex, images.length]);
+  }, [isLightboxOpen, showNextImage, showPrevImage]);
 
   // Parse description into Frame Description & Optics and What's In The Box
   const rawDescription = product.description || "";
@@ -188,8 +205,8 @@ export default function ProductDetailClient({ product }: { product: ProductData 
     }
   }
 
-  if ((product as any).whats_in_the_box) {
-    const rawBox = (product as any).whats_in_the_box;
+  if (product.whats_in_the_box) {
+    const rawBox = product.whats_in_the_box;
     customBoxItems = typeof rawBox === "string" 
       ? rawBox.split("\n").map((l: string) => l.trim()).filter(Boolean)
       : Array.isArray(rawBox) ? rawBox : customBoxItems;
@@ -387,6 +404,50 @@ export default function ProductDetailClient({ product }: { product: ProductData 
               </div>
             )}
           </div>
+
+          {/* Colour selector */}
+          {colorVariants.length > 0 && (
+            <div className="rounded-xl border border-white/[0.07] bg-[#121212] p-4">
+              <div className="mb-3 flex items-baseline justify-between gap-3">
+                <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-white/75">
+                  Colour
+                </p>
+                <p className="text-[11px] font-semibold text-[#c8874a]">
+                  {selectedColor?.name}
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-2.5" role="radiogroup" aria-label="Select product colour">
+                {colorVariants.map((variant) => {
+                  const isSelected = selectedColor?.id === variant.id;
+                  return (
+                    <button
+                      key={variant.id}
+                      type="button"
+                      role="radio"
+                      aria-checked={isSelected}
+                      onClick={() => selectColor(variant)}
+                      className={`group flex items-center gap-2 rounded-lg border py-1.5 pl-1.5 pr-3 text-left transition-all ${
+                        isSelected
+                          ? "border-[#c8874a] bg-[#c8874a]/10 text-white shadow-sm shadow-[#c8874a]/10"
+                          : "border-white/[0.08] bg-white/[0.02] text-white/60 hover:border-white/[0.25] hover:text-white"
+                      }`}
+                    >
+                      <span className="relative h-8 w-8 overflow-hidden rounded-md bg-[#f5f0eb]">
+                        <Image
+                          src={variant.image_url}
+                          alt={`${variant.name} ${product.name}`}
+                          fill
+                          className="object-contain p-0.5"
+                          sizes="32px"
+                        />
+                      </span>
+                      <span className="text-[11px] font-bold">{variant.name}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
 
           {/* Luxury Gift Packaging Option */}
           <div className="pt-2">

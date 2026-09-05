@@ -21,11 +21,11 @@ export async function POST(req: NextRequest) {
     }
 
     const productSummary = items
-      .map((i: { name: string; quantity: number; gift_package?: { name: string; price: number } }) =>
-        i.gift_package
-          ? `${i.name} (x${i.quantity}) [🎁 ${i.gift_package.name}]`
-          : `${i.name} (x${i.quantity})`
-      )
+      .map((i: { name: string; quantity: number; color?: { name: string } | null; gift_package?: { name: string; price: number } }) => {
+        const colour = i.color?.name ? ` [Colour: ${i.color.name}]` : "";
+        const gift = i.gift_package ? ` [🎁 ${i.gift_package.name}]` : "";
+        return `${i.name} (x${i.quantity})${colour}${gift}`;
+      })
       .join(", ");
 
     const paymentNote = `[CASH ON DELIVERY - FULL AMOUNT ₹${total} TO BE COLLECTED AT DOORSTEP]`;

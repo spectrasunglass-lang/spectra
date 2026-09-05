@@ -10,6 +10,10 @@ export interface CartItem {
   image_url: string | null;
   slug: string;
   quantity: number;
+  color?: {
+    id: string;
+    name: string;
+  } | null;
   gift_package?: {
     id: string;
     name: string;
@@ -23,8 +27,8 @@ interface CartContextType {
   count: number;
   total: number;
   addItem: (item: Omit<CartItem, "quantity">) => void;
-  removeItem: (id: string, giftPackageId?: string) => void;
-  updateQty: (id: string, qty: number, giftPackageId?: string) => void;
+  removeItem: (id: string, giftPackageId?: string, colorId?: string) => void;
+  updateQty: (id: string, qty: number, giftPackageId?: string, colorId?: string) => void;
   clearCart: () => void;
   isOpen: boolean;
   openCart: () => void;
@@ -35,16 +39,33 @@ const CartContext = createContext<CartContextType | null>(null);
 
 const STORAGE_KEY = "spectra_cart";
 
+const hasSameConfiguration = (
+  item: CartItem,
+  id: string,
+  giftPackageId?: string,
+  colorId?: string
+) =>
+  item.id === id &&
+  (item.gift_package?.id || null) === (giftPackageId || null) &&
+  (item.color?.id || null) === (colorId || null);
+
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [isOpen, setIsOpen] = useState(false);
 
   // Hydrate from localStorage
   useEffect(() => {
+    let savedItems: CartItem[] | null = null;
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) setItems(JSON.parse(raw));
+      if (raw) savedItems = JSON.parse(raw) as CartItem[];
     } catch {}
+
+    const hydrateTimer = window.setTimeout(() => {
+      if (savedItems) setItems(savedItems);
+    }, 0);
+
+    return () => window.clearTimeout(hydrateTimer);
   }, []);
 
   // Persist to localStorage
@@ -55,11 +76,11 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const addItem = useCallback((product: Omit<CartItem, "quantity">) => {
     setItems((prev) => {
       const existing = prev.find(
-        (i) => i.id === product.id && (i.gift_package?.id || null) === (product.gift_package?.id || null)
+        (item) => hasSameConfiguration(item, product.id, product.gift_package?.id, product.color?.id)
       );
       if (existing) {
         return prev.map((i) =>
-          i.id === product.id && (i.gift_package?.id || null) === (product.gift_package?.id || null)
+          hasSameConfiguration(i, product.id, product.gift_package?.id, product.color?.id)
             ? { ...i, quantity: i.quantity + 1 }
             : i
         );
@@ -69,25 +90,21 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     setIsOpen(true); // open cart drawer on add
   }, []);
 
-  const removeItem = useCallback((id: string, giftPackageId?: string) => {
+  const removeItem = useCallback((id: string, giftPackageId?: string, colorId?: string) => {
     setItems((prev) =>
-      prev.filter(
-        (i) => !(i.id === id && (giftPackageId ? i.gift_package?.id === giftPackageId : true))
-      )
+      prev.filter((item) => !hasSameConfiguration(item, id, giftPackageId, colorId))
     );
   }, []);
 
-  const updateQty = useCallback((id: string, qty: number, giftPackageId?: string) => {
+  const updateQty = useCallback((id: string, qty: number, giftPackageId?: string, colorId?: string) => {
     if (qty < 1) {
       setItems((prev) =>
-        prev.filter(
-          (i) => !(i.id === id && (giftPackageId ? i.gift_package?.id === giftPackageId : true))
-        )
+        prev.filter((item) => !hasSameConfiguration(item, id, giftPackageId, colorId))
       );
     } else {
       setItems((prev) =>
         prev.map((i) =>
-          i.id === id && (giftPackageId ? i.gift_package?.id === giftPackageId : true)
+          hasSameConfiguration(i, id, giftPackageId, colorId)
             ? { ...i, quantity: qty }
             : i
         )
