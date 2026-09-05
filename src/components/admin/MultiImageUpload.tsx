@@ -169,84 +169,124 @@ export default function MultiImageUpload({
         </p>
       )}
 
-      {/* Uploaded Gallery Grid */}
+      {/* Uploaded Gallery Section */}
       {totalImagesCount > 0 && (
-        <div className="space-y-2.5">
-          <div className="flex items-center justify-between text-xs text-white/60">
-            <span className="font-bold text-white uppercase tracking-wider text-[11px]">
-              Uploaded Product Angles ({totalImagesCount})
-            </span>
-            <span className="text-[11px] text-[#c8874a]">
-              ★ First image is the Main Cover
-            </span>
-          </div>
+        <div className="space-y-4 pt-1">
+          {/* Main Cover Showcase Card */}
+          {primaryImage && (
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-xs">
+                <span className="font-bold text-white uppercase tracking-wider text-[11px] flex items-center gap-1.5">
+                  <Star size={13} className="text-[#c8874a] fill-[#c8874a]" /> Main Cover Photo
+                </span>
+                <span className="text-[10px] text-emerald-400 font-medium bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-[2px]">
+                  Active Listing Image
+                </span>
+              </div>
 
-          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
-            {/* Primary Cover Image Card */}
-            {primaryImage && (
-              <div className="relative aspect-square rounded-sm overflow-hidden bg-[#f5f0eb] border-2 border-[#c8874a] shadow-md group">
+              <div className="relative w-full h-48 sm:h-52 rounded-sm overflow-hidden bg-[#f5f0eb] border-2 border-[#c8874a]/80 shadow-md group">
                 <Image
                   src={primaryImage}
                   alt="Main Cover"
                   fill
-                  className="object-contain p-2"
-                  sizes="120px"
+                  priority
+                  unoptimized
+                  className="object-contain p-3 transition-transform duration-300 group-hover:scale-105"
+                  sizes="(max-width: 768px) 100vw, 350px"
                 />
-                <span className="absolute top-1.5 left-1.5 bg-[#c8874a] text-white text-[8px] font-extrabold uppercase px-1.5 py-0.5 rounded-[2px] shadow">
-                  COVER
-                </span>
-                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1.5">
+
+                {/* Hover overlay for Cover actions */}
+                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 backdrop-blur-[2px]">
+                  <label className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#c8874a] hover:bg-[#b87840] text-white text-[11px] font-bold rounded-sm cursor-pointer shadow transition-colors">
+                    <ImagePlus size={13} />
+                    Replace Cover
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="sr-only"
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          try {
+                            setUploadingCount(1);
+                            const url = await uploadSingleFile(file);
+                            if (url) onPrimaryChange(url);
+                          } catch (err) {
+                            setError(err instanceof Error ? err.message : "Upload failed");
+                          } finally {
+                            setUploadingCount(0);
+                          }
+                        }
+                        e.target.value = "";
+                      }}
+                    />
+                  </label>
                   <button
                     type="button"
                     onClick={() => onPrimaryChange(null)}
-                    className="p-1.5 rounded-full bg-red-600 text-white hover:bg-red-700 transition-colors cursor-pointer"
-                    title="Remove Cover"
+                    className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-red-600 hover:bg-red-700 text-white text-[11px] font-bold rounded-sm cursor-pointer shadow transition-colors"
                   >
-                    <X size={13} />
+                    <X size={13} /> Remove
                   </button>
                 </div>
               </div>
-            )}
+            </div>
+          )}
 
-            {/* Additional Gallery Images */}
-            {galleryImages.map((url, idx) => (
-              <div
-                key={idx}
-                className="relative aspect-square rounded-sm overflow-hidden bg-[#f5f0eb] border border-white/[0.1] hover:border-white/30 transition-all group"
-              >
-                <Image
-                  src={url}
-                  alt={`Angle ${idx + 2}`}
-                  fill
-                  className="object-contain p-2"
-                  sizes="120px"
-                />
-                <span className="absolute bottom-1.5 left-1.5 bg-black/70 text-white text-[8.5px] font-bold px-1.5 py-0.5 rounded-[2px]">
-                  Angle {idx + 2}
+          {/* Additional Gallery Angles */}
+          {galleryImages.length > 0 && (
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-xs">
+                <span className="font-bold text-white/70 uppercase tracking-wider text-[11px]">
+                  Additional Angles ({galleryImages.length})
                 </span>
-
-                {/* Hover Actions */}
-                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1.5">
-                  <button
-                    type="button"
-                    onClick={() => setAsCover(url, idx)}
-                    className="p-1.5 rounded-full bg-[#c8874a] text-white hover:bg-[#b87840] transition-colors cursor-pointer"
-                    title="Make Main Cover"
-                  >
-                    <Star size={13} />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => removeGalleryImage(idx)}
-                    className="p-1.5 rounded-full bg-red-600 text-white hover:bg-red-700 transition-colors cursor-pointer"
-                    title="Remove Angle"
-                  >
-                    <X size={13} />
-                  </button>
-                </div>
+                <span className="text-[10px] text-white/40">
+                  Hover to set as cover or remove
+                </span>
               </div>
-            ))}
-          </div>
+
+              <div className="grid grid-cols-3 gap-2.5">
+                {galleryImages.map((url, idx) => (
+                  <div
+                    key={idx}
+                    className="relative aspect-square rounded-sm overflow-hidden bg-[#f5f0eb] border border-white/[0.12] hover:border-white/40 transition-all group shadow-sm"
+                  >
+                    <Image
+                      src={url}
+                      alt={`Angle ${idx + 2}`}
+                      fill
+                      unoptimized
+                      className="object-contain p-2"
+                      sizes="100px"
+                    />
+                    <span className="absolute bottom-1 left-1 bg-black/75 text-white text-[8.5px] font-bold px-1.5 py-0.5 rounded-[2px]">
+                      Angle {idx + 2}
+                    </span>
+
+                    {/* Hover Actions */}
+                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1.5 backdrop-blur-[1px]">
+                      <button
+                        type="button"
+                        onClick={() => setAsCover(url, idx)}
+                        className="p-1.5 rounded-full bg-[#c8874a] text-white hover:bg-[#b87840] transition-colors cursor-pointer shadow"
+                        title="Make Main Cover"
+                      >
+                        <Star size={13} />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => removeGalleryImage(idx)}
+                        className="p-1.5 rounded-full bg-red-600 text-white hover:bg-red-700 transition-colors cursor-pointer shadow"
+                        title="Remove Angle"
+                      >
+                        <X size={13} />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>
