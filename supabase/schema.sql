@@ -19,6 +19,8 @@ CREATE TABLE IF NOT EXISTS public.products (
     is_new BOOLEAN DEFAULT true,
     is_polarized BOOLEAN DEFAULT false,
     is_gift BOOLEAN DEFAULT false,
+    is_computer_glasses BOOLEAN DEFAULT false,
+    is_accessory BOOLEAN DEFAULT false,
     status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'draft')),
     created_at TIMESTAMPTZ DEFAULT now(),
     updated_at TIMESTAMPTZ DEFAULT now()
@@ -27,6 +29,16 @@ CREATE TABLE IF NOT EXISTS public.products (
 -- Migration helpers if table already exists
 ALTER TABLE public.products ADD COLUMN IF NOT EXISTS is_polarized BOOLEAN DEFAULT false;
 ALTER TABLE public.products ADD COLUMN IF NOT EXISTS is_gift BOOLEAN DEFAULT false;
+ALTER TABLE public.products ADD COLUMN IF NOT EXISTS is_computer_glasses BOOLEAN DEFAULT false;
+ALTER TABLE public.products ADD COLUMN IF NOT EXISTS is_accessory BOOLEAN DEFAULT false;
+
+CREATE INDEX IF NOT EXISTS idx_products_computer_glasses_active
+    ON public.products (created_at DESC)
+    WHERE status = 'active' AND is_computer_glasses = true;
+
+CREATE INDEX IF NOT EXISTS idx_products_accessory_active
+    ON public.products (created_at DESC)
+    WHERE status = 'active' AND is_accessory = true;
 
 
 -- 2. ORDERS TABLE

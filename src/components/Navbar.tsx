@@ -70,6 +70,8 @@ export default function Navbar() {
     { name: "WOMEN", href: "/women" },
     { name: "SPECTRA COLLECTIONS", href: "/collections" },
     { name: "POLARIZED", href: "/polarized" },
+    { name: "COMPUTER GLASSES", href: "/computer-glasses" },
+    { name: "ACCESSORIES", href: "/accessories" },
     { name: "GIFTS", href: "/gifts" },
     { name: "SAVED LIST", href: "/wishlist" },
   ];

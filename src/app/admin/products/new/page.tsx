@@ -30,6 +30,8 @@ export default function NewProductPage() {
     is_new: true,
     is_polarized: false,
     is_gift: false,
+    is_computer_glasses: false,
+    is_accessory: false,
     status: "active" as "active" | "draft",
     image_url: null as string | null,
     gallery_images: [] as string[],
@@ -74,6 +76,8 @@ export default function NewProductPage() {
           is_new: form.is_new,
           is_polarized: form.is_polarized,
           is_gift: form.is_gift,
+          is_computer_glasses: form.is_computer_glasses,
+          is_accessory: form.is_accessory,
           status: form.status,
           image_url: form.image_url,
           images: form.gallery_images,
@@ -372,6 +376,60 @@ export default function NewProductPage() {
                 <span
                   className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow-sm transition-all duration-200 ${
                     form.is_gift ? "left-[22px]" : "left-0.5"
+                  }`}
+                />
+              </button>
+            </div>
+
+            {/* Computer Glasses toggle */}
+            <div className="flex items-center justify-between border-t border-white/[0.06] pt-4">
+              <div>
+                <p className="text-[13px] font-semibold text-white">
+                  Computer Glasses
+                </p>
+                <p className="text-[11px] text-white/40 mt-0.5">
+                  Displays in the Computer Glasses collection
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => set("is_computer_glasses", !form.is_computer_glasses)}
+                aria-label="Show this product in Computer Glasses"
+                aria-pressed={form.is_computer_glasses}
+                className={`relative w-11 h-6 rounded-full transition-colors duration-200 focus:outline-none cursor-pointer ${
+                  form.is_computer_glasses ? "bg-[#c8874a]" : "bg-[#252525]"
+                }`}
+              >
+                <span
+                  className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow-sm transition-all duration-200 ${
+                    form.is_computer_glasses ? "left-[22px]" : "left-0.5"
+                  }`}
+                />
+              </button>
+            </div>
+
+            {/* Accessories toggle */}
+            <div className="flex items-center justify-between border-t border-white/[0.06] pt-4">
+              <div>
+                <p className="text-[13px] font-semibold text-white">
+                  Accessories
+                </p>
+                <p className="text-[11px] text-white/40 mt-0.5">
+                  Displays in the Accessories collection
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => set("is_accessory", !form.is_accessory)}
+                aria-label="Show this product in Accessories"
+                aria-pressed={form.is_accessory}
+                className={`relative w-11 h-6 rounded-full transition-colors duration-200 focus:outline-none cursor-pointer ${
+                  form.is_accessory ? "bg-[#c8874a]" : "bg-[#252525]"
+                }`}
+              >
+                <span
+                  className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow-sm transition-all duration-200 ${
+                    form.is_accessory ? "left-[22px]" : "left-0.5"
                   }`}
                 />
               </button>

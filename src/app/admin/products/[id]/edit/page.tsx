@@ -3,7 +3,7 @@
 import React, { useState, useEffect, use } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Save, Loader2, CheckCircle2, Trash2 } from "lucide-react";
+import { ArrowLeft, Save, Loader2, CheckCircle2 } from "lucide-react";
 import MultiImageUpload from "@/components/admin/MultiImageUpload";
 import { createClient } from "@/lib/supabase/client";
 
@@ -39,6 +39,8 @@ export default function EditProductPage({ params }: EditProductPageProps) {
     is_new: true,
     is_polarized: false,
     is_gift: false,
+    is_computer_glasses: false,
+    is_accessory: false,
     status: "active" as "active" | "draft",
     image_url: null as string | null,
     gallery_images: [] as string[],
@@ -79,9 +81,10 @@ export default function EditProductPage({ params }: EditProductPageProps) {
           box = parts[1]?.trim() || DEFAULT_WHATS_IN_THE_BOX;
         }
 
-        // Also check if whats_in_the_box column exists on data
-        if ((data as any).whats_in_the_box) {
-          box = (data as any).whats_in_the_box;
+        // Also check if a legacy whats_in_the_box column exists on data.
+        const productWithBox = data as { whats_in_the_box?: string | null };
+        if (productWithBox.whats_in_the_box) {
+          box = productWithBox.whats_in_the_box;
         }
 
         const gallery = Array.isArray(data.images) ? data.images : [];
@@ -105,6 +108,8 @@ export default function EditProductPage({ params }: EditProductPageProps) {
           is_new: Boolean(data.is_new),
           is_polarized: Boolean(data.is_polarized),
           is_gift: Boolean(data.is_gift),
+          is_computer_glasses: Boolean(data.is_computer_glasses),
+          is_accessory: Boolean(data.is_accessory),
           status: (data.status as "active" | "draft") || "active",
           image_url: data.image_url || null,
           gallery_images: gallery,
@@ -150,6 +155,8 @@ export default function EditProductPage({ params }: EditProductPageProps) {
           is_new: form.is_new,
           is_polarized: form.is_polarized,
           is_gift: form.is_gift,
+          is_computer_glasses: form.is_computer_glasses,
+          is_accessory: form.is_accessory,
           status: form.status,
           image_url: form.image_url,
           images: form.gallery_images,
@@ -459,6 +466,60 @@ export default function EditProductPage({ params }: EditProductPageProps) {
                 <span
                   className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow-sm transition-all duration-200 ${
                     form.is_gift ? "left-[22px]" : "left-0.5"
+                  }`}
+                />
+              </button>
+            </div>
+
+            {/* Computer Glasses toggle */}
+            <div className="flex items-center justify-between border-t border-white/[0.06] pt-4">
+              <div>
+                <p className="text-[13px] font-semibold text-white">
+                  Computer Glasses
+                </p>
+                <p className="text-[11px] text-white/40 mt-0.5">
+                  Displays in the Computer Glasses collection
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => set("is_computer_glasses", !form.is_computer_glasses)}
+                aria-label="Show this product in Computer Glasses"
+                aria-pressed={form.is_computer_glasses}
+                className={`relative w-11 h-6 rounded-full transition-colors duration-200 focus:outline-none cursor-pointer ${
+                  form.is_computer_glasses ? "bg-[#c8874a]" : "bg-[#252525]"
+                }`}
+              >
+                <span
+                  className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow-sm transition-all duration-200 ${
+                    form.is_computer_glasses ? "left-[22px]" : "left-0.5"
+                  }`}
+                />
+              </button>
+            </div>
+
+            {/* Accessories toggle */}
+            <div className="flex items-center justify-between border-t border-white/[0.06] pt-4">
+              <div>
+                <p className="text-[13px] font-semibold text-white">
+                  Accessories
+                </p>
+                <p className="text-[11px] text-white/40 mt-0.5">
+                  Displays in the Accessories collection
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => set("is_accessory", !form.is_accessory)}
+                aria-label="Show this product in Accessories"
+                aria-pressed={form.is_accessory}
+                className={`relative w-11 h-6 rounded-full transition-colors duration-200 focus:outline-none cursor-pointer ${
+                  form.is_accessory ? "bg-[#c8874a]" : "bg-[#252525]"
+                }`}
+              >
+                <span
+                  className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow-sm transition-all duration-200 ${
+                    form.is_accessory ? "left-[22px]" : "left-0.5"
                   }`}
                 />
               </button>
