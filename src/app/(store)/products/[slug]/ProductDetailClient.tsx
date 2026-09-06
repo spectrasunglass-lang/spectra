@@ -21,7 +21,7 @@ import {
   ChevronRight,
   X,
   Star,
-  Share2,
+  Send,
   Copy,
   Check,
   Link as LinkIcon,
@@ -385,7 +385,7 @@ export default function ProductDetailClient({ product }: { product: ProductData 
                 aria-label="Share this product"
                 title="Share this product"
               >
-                <Share2 size={15} className="text-[#c8874a] group-hover:scale-110 transition-transform" />
+                <Send size={15} className="text-[#c8874a] group-hover:scale-110 transition-transform" />
               </button>
 
               {/* Share Dropdown from Top Button */}
@@ -437,9 +437,9 @@ export default function ProductDetailClient({ product }: { product: ProductData 
                       className="w-full flex items-center gap-3 px-4 py-3 text-[12px] font-semibold text-neutral-300 hover:bg-white/[0.05] hover:text-white transition-colors cursor-pointer"
                     >
                       <span className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center text-white">
-                        <Share2 size={15} />
+                        <Send size={15} />
                       </span>
-                      More Sharing Options...
+                      Instagram & More Options...
                     </button>
                   )}
                 </div>
@@ -536,7 +536,7 @@ export default function ProductDetailClient({ product }: { product: ProductData 
                 className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-white/[0.08] bg-[#141414] hover:bg-white/[0.06] text-neutral-300 hover:text-white text-[11px] font-semibold tracking-wider transition-all cursor-pointer group"
                 title="Share this product"
               >
-                <Share2 size={12} className="text-[#c8874a] group-hover:scale-110 transition-transform" />
+                <Send size={12} className="text-[#c8874a] group-hover:scale-110 transition-transform" />
                 <span>Share</span>
               </button>
             </div>
@@ -706,7 +706,7 @@ export default function ProductDetailClient({ product }: { product: ProductData 
               onClick={() => setShareOpen((prev) => !prev)}
               className="w-full flex items-center justify-center gap-2 py-3 rounded-xl border border-white/[0.08] bg-[#121212] text-[12px] font-bold uppercase tracking-[0.14em] text-neutral-300 hover:text-white hover:border-white/[0.18] transition-all cursor-pointer group"
             >
-              <Share2 size={15} className="text-[#c8874a] group-hover:scale-110 transition-transform" />
+              <Send size={15} className="text-[#c8874a] group-hover:scale-110 transition-transform" />
               Share This Product
             </button>
 
@@ -756,9 +756,9 @@ export default function ProductDetailClient({ product }: { product: ProductData 
                     className="w-full flex items-center gap-3 px-4 py-3 text-[12px] font-semibold text-neutral-300 hover:bg-white/[0.05] hover:text-white transition-colors cursor-pointer"
                   >
                     <span className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center text-white">
-                      <Share2 size={15} />
+                      <Send size={15} />
                     </span>
-                    More Sharing Options...
+                    Instagram & More Options...
                   </button>
                 )}
               </div>
