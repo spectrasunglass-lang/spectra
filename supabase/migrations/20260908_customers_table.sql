@@ -22,20 +22,37 @@ CREATE TABLE IF NOT EXISTS public.customers (
 -- 2. ENABLE ROW LEVEL SECURITY & POLICIES
 ALTER TABLE public.customers ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Allow public full access on customers"
-    ON public.customers FOR ALL
-    USING (true)
-    WITH CHECK (true);
+DO $$ 
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_policies 
+        WHERE tablename = 'customers' AND policyname = 'Allow full access on customers'
+    ) THEN
+        CREATE POLICY "Allow full access on customers"
+            ON public.customers FOR ALL
+            USING (true)
+            WITH CHECK (true);
+    END IF;
+END $$;
 
 -- 3. INDEXES FOR HIGH-SPEED SEARCH & QUERYING
 CREATE INDEX IF NOT EXISTS idx_customers_email ON public.customers (email);
 CREATE INDEX IF NOT EXISTS idx_customers_phone ON public.customers (phone);
 CREATE INDEX IF NOT EXISTS idx_customers_created_at ON public.customers (created_at DESC);
 
--- 4. AUTO-POPULATE INITIAL CUSTOMERS FROM EXISTING ORDERS
+-- 4. ADD TO REALTIME (Safe if already added)
+DO $$
+BEGIN
+    ALTER PUBLICATION supabase_realtime ADD TABLE public.customers;
+EXCEPTION
+    WHEN duplicate_object THEN NULL;
+    WHEN others THEN NULL;
+END $$;
+
+-- 5. AUTO-POPULATE INITIAL CUSTOMERS FROM EXISTING ORDERS
 INSERT INTO public.customers (name, email, phone, city, address, total_orders, total_spent, created_at, last_active_at)
 SELECT 
-    COALESCE(customer_name, split_part(customer_email, '@', 1)) AS name,
+    COALESCE(MAX(customer_name), split_part(LOWER(TRIM(customer_email)), '@', 1), 'Client') AS name,
     LOWER(TRIM(customer_email)) AS email,
     MAX(customer_phone) AS phone,
     MAX(city) AS city,
@@ -45,8 +62,8 @@ SELECT
     MIN(created_at) AS created_at,
     MAX(created_at) AS last_active_at
 FROM public.orders
-WHERE customer_email IS NOT NULL AND customer_email != ''
-GROUP BY customer_name, LOWER(TRIM(customer_email))
+WHERE customer_email IS NOT NULL AND TRIM(customer_email) != ''
+GROUP BY LOWER(TRIM(customer_email))
 ON CONFLICT (email) DO UPDATE SET
     total_orders = EXCLUDED.total_orders,
     total_spent = EXCLUDED.total_spent,
