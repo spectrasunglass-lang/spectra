@@ -625,3 +625,209 @@ export async function sendOrderEmails(details: OrderEmailDetails): Promise<{
     admin: adminResult,
   };
 }
+
+export interface OrderStatusEmailDetails {
+  orderId: string;
+  customerName: string;
+  customerEmail: string;
+  customerPhone?: string;
+  newStatus: "pending" | "processing" | "shipped" | "delivered" | "cancelled";
+  productName?: string;
+  amount?: number;
+  trackingNumber?: string;
+  city?: string;
+}
+
+/**
+ * Send order status update email to Customer via Brevo.
+ * Triggers whenever admin changes status to processing, shipped, delivered, or cancelled.
+ */
+export async function sendOrderStatusUpdateEmail(
+  details: OrderStatusEmailDetails
+): Promise<BrevoResponse> {
+  if (!isBrevoConfigured()) {
+    console.warn("[Brevo] Skipping status email because BREVO_API_KEY is not set.");
+    return { success: false, error: "BREVO_API_KEY missing" };
+  }
+
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.spectrasunglassess.in";
+  const logoUrl = `${siteUrl}/logo/logo.png`;
+  const orderId = details.orderId;
+  const trackUrl = `${siteUrl}/track-order?id=${encodeURIComponent(orderId)}`;
+  const formattedAmount = details.amount ? `₹${Number(details.amount).toLocaleString("en-IN")}` : "";
+
+  // Status-specific content
+  const statusConfig = {
+    pending: {
+      badge: "ORDER RECEIVED",
+      badgeBg: "#fef3c7",
+      badgeColor: "#b45309",
+      headline: "Order Confirmed & Pending Verification",
+      body: "We have received your order and are verifying the details. We will notify you once preparation begins.",
+      subject: `Order Update: #${orderId} Received — SPECTRA Eyewear`,
+      actionLabel: "View Order Status",
+    },
+    processing: {
+      badge: "PREPARING FOR DISPATCH",
+      badgeBg: "#ffedd5",
+      badgeColor: "#c2410c",
+      headline: "Your Order is Being Prepared",
+      body: "Our eyewear artisans are currently inspecting, cleaning, and hand-packaging your frames to ensure flawless luxury quality before dispatch.",
+      subject: `In Preparation: Your Order #${orderId} — SPECTRA Eyewear`,
+      actionLabel: "Track Progress",
+    },
+    shipped: {
+      badge: "DISPATCHED & IN TRANSIT",
+      badgeBg: "#e0e7ff",
+      badgeColor: "#3730a3",
+      headline: "Your Eyewear is On Its Way!",
+      body: `Great news! Your package has been securely dispatched from our facility${details.trackingNumber ? ` with tracking number ${details.trackingNumber}` : ""}. Our express delivery partner is on the way to you.`,
+      subject: `Dispatched: Your Order #${orderId} is On Its Way! — SPECTRA`,
+      actionLabel: "Track Shipment",
+    },
+    delivered: {
+      badge: "DELIVERED",
+      badgeBg: "#d1fae5",
+      badgeColor: "#047857",
+      headline: "Welcome to the World of SPECTRA",
+      body: "Your order has been safely delivered. We hope you enjoy absolute clarity, precision, and confidence with your new handcrafted frames.",
+      subject: `Delivered: Enjoy Your SPECTRA Eyewear ✨ [Order #${orderId}]`,
+      actionLabel: "Write a Review",
+    },
+    cancelled: {
+      badge: "ORDER CANCELLED",
+      badgeBg: "#fee2e2",
+      badgeColor: "#b91c1c",
+      headline: "Order Cancellation Confirmation",
+      body: `Your order #${orderId} has been cancelled. If any payment was captured, refund processing has been initiated to your original payment method.`,
+      subject: `Order Cancelled: #${orderId} — SPECTRA Eyewear`,
+      actionLabel: "Visit Store",
+    },
+  }[details.newStatus] || {
+    badge: details.newStatus.toUpperCase(),
+    badgeBg: "#f4f4f5",
+    badgeColor: "#3f3f46",
+    headline: `Order Status: ${details.newStatus}`,
+    body: `The status of your SPECTRA order #${orderId} has been updated to ${details.newStatus}.`,
+    subject: `Order #${orderId} Status Update — SPECTRA Eyewear`,
+    actionLabel: "View Order",
+  };
+
+  const html = `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>${statusConfig.subject}</title>
+    </head>
+    <body style="margin: 0; padding: 0; background-color: #0c0c0c; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased;">
+      <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #0c0c0c; padding: 30px 12px 50px;">
+        <tr>
+          <td align="center">
+            <table width="100%" cellpadding="0" cellspacing="0" style="max-width: 580px; background-color: #141414; border: 1px solid #27272a; border-radius: 12px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.8);">
+              
+              <!-- Header Brand Banner -->
+              <tr>
+                <td align="center" style="padding: 28px 24px 20px; background: linear-gradient(180deg, #1f1f1f 0%, #141414 100%); border-bottom: 1px solid #27272a;">
+                  <a href="${siteUrl}" target="_blank" style="text-decoration: none; display: inline-block;">
+                    <img src="${logoUrl}" alt="SPECTRA" width="150" style="display: block; border: 0; outline: none; margin: 0 auto; max-width: 150px; height: auto;" />
+                  </a>
+                  <p style="margin: 8px 0 0; font-size: 10px; font-weight: 700; letter-spacing: 0.25em; text-transform: uppercase; color: #c8874a;">
+                    Luxury Eyewear Maison
+                  </p>
+                </td>
+              </tr>
+
+              <!-- Status Badge & Headline -->
+              <tr>
+                <td style="padding: 32px 28px 12px; text-align: center;">
+                  <span style="display: inline-block; background-color: ${statusConfig.badgeBg}; color: ${statusConfig.badgeColor}; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.12em; padding: 6px 14px; border-radius: 20px;">
+                    ${statusConfig.badge}
+                  </span>
+                  <h1 style="margin: 16px 0 8px; font-size: 22px; font-weight: 700; color: #ffffff; letter-spacing: -0.01em;">
+                    ${statusConfig.headline}
+                  </h1>
+                  <p style="margin: 0; font-size: 14px; color: #a1a1aa; line-height: 1.55;">
+                    Dear ${details.customerName || "Valued Client"}, ${statusConfig.body}
+                  </p>
+                </td>
+              </tr>
+
+              <!-- Order Summary Card -->
+              <tr>
+                <td style="padding: 16px 28px 24px;">
+                  <div style="background-color: #1a1a1a; border: 1px solid #2e2e2e; border-radius: 8px; padding: 18px 20px;">
+                    <table width="100%" cellpadding="0" cellspacing="0" style="font-size: 13px;">
+                      <tr>
+                        <td style="color: #71717a; padding: 4px 0;">Order Reference:</td>
+                        <td align="right" style="color: #ffffff; font-weight: 700; font-family: monospace;">#${orderId}</td>
+                      </tr>
+                      ${details.productName ? `
+                      <tr>
+                        <td style="color: #71717a; padding: 4px 0;">Item:</td>
+                        <td align="right" style="color: #ffffff; font-weight: 600; max-width: 240px;">${details.productName}</td>
+                      </tr>` : ""}
+                      ${formattedAmount ? `
+                      <tr>
+                        <td style="color: #71717a; padding: 4px 0;">Order Value:</td>
+                        <td align="right" style="color: #c8874a; font-weight: 700;">${formattedAmount}</td>
+                      </tr>` : ""}
+                      ${details.city ? `
+                      <tr>
+                        <td style="color: #71717a; padding: 4px 0;">Destination:</td>
+                        <td align="right" style="color: #ffffff;">${details.city}</td>
+                      </tr>` : ""}
+                    </table>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Primary CTA Button -->
+              <tr>
+                <td align="center" style="padding: 0 28px 24px;">
+                  <a href="${trackUrl}" target="_blank" style="display: block; max-width: 320px; background-color: #c8874a; color: #ffffff; text-decoration: none; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; padding: 14px 24px; border-radius: 6px; text-align: center; box-shadow: 0 6px 16px rgba(200, 135, 74, 0.35);">
+                    ${statusConfig.actionLabel} &rarr;
+                  </a>
+                </td>
+              </tr>
+
+              <!-- Concierge WhatsApp Support Note -->
+              <tr>
+                <td style="padding: 16px 28px 24px; text-align: center; border-top: 1px solid #222222;">
+                  <p style="margin: 0; font-size: 12.5px; color: #a1a1aa;">
+                    Need assistance or wish to speak with our eyewear specialists?
+                    <br />
+                    <a href="https://wa.me/918129950341?text=${encodeURIComponent(`Hi SPECTRA, inquiring about my order #${orderId}`)}" target="_blank" style="color: #25D366; font-weight: 700; text-decoration: none; display: inline-block; margin-top: 6px;">
+                      💬 Chat with Concierge on WhatsApp &rarr;
+                    </a>
+                  </p>
+                </td>
+              </tr>
+
+              <!-- Footer -->
+              <tr>
+                <td style="padding: 18px 28px; background-color: #0d0d0d; text-align: center; font-size: 11px; color: #52525b; border-top: 1px solid #1f1f1f;">
+                  &copy; ${new Date().getFullYear()} SPECTRA Eyewear. Handcrafted with passion and precision.
+                  <br />
+                  <a href="${siteUrl}" target="_blank" style="color: #71717a; text-decoration: none; margin-top: 4px; display: inline-block;">
+                    www.spectrasunglassess.in
+                  </a>
+                </td>
+              </tr>
+
+            </table>
+          </td>
+        </tr>
+      </table>
+    </body>
+    </html>
+  `;
+
+  return sendBrevoEmail({
+    to: [{ email: details.customerEmail, name: details.customerName }],
+    subject: statusConfig.subject,
+    htmlContent: html,
+    tags: ["order_status_update", `status_${details.newStatus}`],
+  });
+}

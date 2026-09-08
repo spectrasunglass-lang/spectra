@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
-import { Search, Filter, ShoppingBag, Loader2, RefreshCw, ChevronDown, ChevronUp, Package } from "lucide-react";
+import { Search, Filter, ShoppingBag, Loader2, RefreshCw, ChevronDown, ChevronUp, Package, CheckCircle2 } from "lucide-react";
 import StatusBadge from "@/components/admin/StatusBadge";
 
 type OrderStatus = "pending" | "processing" | "shipped" | "delivered" | "cancelled";
@@ -47,6 +47,7 @@ export default function OrdersPage() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<OrderStatus | "all">("all");
   const [expanded, setExpanded] = useState<string | null>(null);
+  const [statusNotice, setStatusNotice] = useState<string | null>(null);
 
   const fetchOrders = useCallback(async () => {
     setLoading(true);
@@ -115,12 +116,30 @@ export default function OrdersPage() {
 
   const updateStatus = async (orderId: string, newStatus: OrderStatus) => {
     setUpdatingId(orderId);
-    const supabase = createClient();
-    await supabase.from("orders").update({ status: newStatus }).eq("id", orderId);
-    setUpdatingId(null);
-    setOrders((prev) =>
-      prev.map((o) => (o.id === orderId ? { ...o, status: newStatus } : o))
-    );
+    try {
+      const res = await fetch("/api/admin/orders/status", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ orderId, newStatus }),
+      });
+      const data = await res.json();
+      if (data?.emailSent) {
+        setStatusNotice(`Status updated to "${newStatus}". Notification email sent to client!`);
+      } else {
+        setStatusNotice(`Status updated to "${newStatus}".`);
+      }
+      setTimeout(() => setStatusNotice(null), 4000);
+    } catch {
+      const supabase = createClient();
+      await supabase.from("orders").update({ status: newStatus }).eq("id", orderId);
+      setStatusNotice(`Status updated to "${newStatus}".`);
+      setTimeout(() => setStatusNotice(null), 4000);
+    } finally {
+      setUpdatingId(null);
+      setOrders((prev) =>
+        prev.map((o) => (o.id === orderId ? { ...o, status: newStatus } : o))
+      );
+    }
   };
 
   const filtered = orders.filter((o) => {
@@ -136,6 +155,13 @@ export default function OrdersPage() {
 
   return (
     <div className="space-y-6">
+      {statusNotice && (
+        <div className="p-3 bg-emerald-500/10 border border-emerald-500/30 rounded-sm text-emerald-400 text-[12.5px] font-semibold flex items-center gap-2 animate-in fade-in duration-200">
+          <CheckCircle2 size={16} className="text-emerald-400 flex-shrink-0" />
+          <span>{statusNotice}</span>
+        </div>
+      )}
+
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
