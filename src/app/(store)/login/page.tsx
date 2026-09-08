@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { recordCustomer } from "@/lib/customers";
 import { Mail, Lock, User, ArrowRight, Loader2, Eye, EyeOff, ShieldCheck, CheckCircle2 } from "lucide-react";
 
 function LoginFormContent() {
@@ -50,12 +51,20 @@ function LoginFormContent() {
 
     try {
       if (tab === "login") {
-        const { error: authError } = await supabase.auth.signInWithPassword({
+        const { data: signInData, error: authError } = await supabase.auth.signInWithPassword({
           email: email.trim(),
           password,
         });
 
         if (authError) throw authError;
+
+        if (signInData?.user) {
+          recordCustomer({
+            name: signInData.user.user_metadata?.full_name || email.trim().split("@")[0],
+            email: email.trim(),
+            auth_id: signInData.user.id,
+          }).catch(() => {});
+        }
 
         router.push(redirectPath);
         router.refresh();
@@ -72,6 +81,12 @@ function LoginFormContent() {
         });
 
         if (signUpError) throw signUpError;
+
+        recordCustomer({
+          name: fullName.trim(),
+          email: email.trim(),
+          auth_id: data?.user?.id || null,
+        }).catch(() => {});
 
         if (data.session) {
           // Auto signed in

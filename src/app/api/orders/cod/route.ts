@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { sendOrderEmails } from "@/lib/brevo";
+import { recordCustomerServer } from "@/lib/customers.server";
 
 export async function POST(req: NextRequest) {
   try {
@@ -53,6 +54,16 @@ export async function POST(req: NextRequest) {
     }
 
     const confirmedOrderId = data?.id || `ORD-${Date.now().toString().slice(-6)}`;
+
+    // Record customer in customers table
+    recordCustomerServer({
+      name: address.fullName,
+      email: address.email,
+      phone: address.phone,
+      city: address.city,
+      address: fullAddress,
+      orderAmount: total,
+    }).catch((err) => console.warn("[COD] recordCustomerServer error:", err));
 
     // Send confirmation emails via Brevo
     try {

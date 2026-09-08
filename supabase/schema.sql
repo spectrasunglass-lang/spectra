@@ -165,10 +165,39 @@ CREATE POLICY "Allow full access on reviews"
     USING (true)
     WITH CHECK (true);
 
--- Enable Realtime for live updates on products, orders, settings, subscribers, reviews
+-- Enable Realtime for live updates on products, orders, settings, subscribers, reviews, customers
 ALTER PUBLICATION supabase_realtime ADD TABLE public.products;
 ALTER PUBLICATION supabase_realtime ADD TABLE public.orders;
 ALTER PUBLICATION supabase_realtime ADD TABLE public.settings;
 ALTER PUBLICATION supabase_realtime ADD TABLE public.subscribers;
 ALTER PUBLICATION supabase_realtime ADD TABLE public.reviews;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.customers;
+
+-- 7. CUSTOMERS TABLE
+CREATE TABLE IF NOT EXISTS public.customers (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    auth_id UUID,
+    name TEXT NOT NULL DEFAULT 'Client',
+    email TEXT UNIQUE NOT NULL,
+    phone TEXT,
+    city TEXT,
+    address TEXT,
+    total_orders INTEGER NOT NULL DEFAULT 0,
+    total_spent NUMERIC(10, 2) NOT NULL DEFAULT 0,
+    created_at TIMESTAMPTZ DEFAULT now(),
+    last_active_at TIMESTAMPTZ DEFAULT now(),
+    updated_at TIMESTAMPTZ DEFAULT now()
+);
+
+ALTER TABLE public.customers ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Allow full access on customers"
+    ON public.customers FOR ALL
+    USING (true)
+    WITH CHECK (true);
+
+CREATE INDEX IF NOT EXISTS idx_customers_email ON public.customers (email);
+CREATE INDEX IF NOT EXISTS idx_customers_phone ON public.customers (phone);
+CREATE INDEX IF NOT EXISTS idx_customers_created_at ON public.customers (created_at DESC);
+
 

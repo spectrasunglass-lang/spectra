@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { recordCustomer } from "@/lib/customers";
 import {
   User,
   Package,
@@ -58,6 +59,12 @@ export default function AccountPage() {
     });
 
     if (authUser.email) {
+      recordCustomer({
+        name: authUser.user_metadata?.full_name || authUser.email.split("@")[0],
+        email: authUser.email,
+        auth_id: authUser.id,
+      }).catch(() => {});
+
       // Fetch orders matching customer email
       const { data: orderData } = await supabase
         .from("orders")

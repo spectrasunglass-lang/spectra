@@ -4,6 +4,7 @@ import BenefitsBar from "@/components/BenefitsBar";
 import { CartProvider } from "@/components/CartContext";
 import CartDrawer from "@/components/CartDrawer";
 import PreIntro from "@/components/PreIntro";
+import WhatsAppChat from "@/components/WhatsAppChat";
 
 export default function StoreLayout({
   children,
@@ -24,6 +25,7 @@ export default function StoreLayout({
         <BenefitsBar />
         <Footer />
         <CartDrawer />
+        <WhatsAppChat />
       </div>
     </CartProvider>
   );

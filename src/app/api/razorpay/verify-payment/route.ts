@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { verifyRazorpaySignature } from "@/lib/razorpay";
 import { createClient } from "@/lib/supabase/server";
 import { sendOrderEmails } from "@/lib/brevo";
+import { recordCustomerServer } from "@/lib/customers.server";
 
 export async function POST(req: NextRequest) {
   try {
@@ -87,6 +88,16 @@ export async function POST(req: NextRequest) {
       .single();
 
     const confirmedOrderId = data?.id || `ORD-${Date.now().toString().slice(-6)}`;
+
+    // Record customer in customers table
+    recordCustomerServer({
+      name: address.fullName,
+      email: address.email,
+      phone: address.phone,
+      city: address.city,
+      address: fullAddress,
+      orderAmount: Number(totalAmount),
+    }).catch((err) => console.warn("[Razorpay] recordCustomerServer error:", err));
 
     // 5. Send order confirmation to Customer AND notification to Admin via Brevo
     try {
