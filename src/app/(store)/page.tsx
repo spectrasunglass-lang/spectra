@@ -54,6 +54,14 @@ export default async function Home() {
         "spotlight_stories",
         "spotlight_heading",
         "category_shapes",
+        "hero_label",
+        "hero_heading_line1",
+        "hero_heading_line2",
+        "hero_subtext",
+        "story_label",
+        "story_heading",
+        "story_body",
+        "story_link_text",
       ]),
   ]);
 
@@ -107,6 +115,22 @@ export default async function Home() {
 
   const storyImage = settingsMap.story_image || null;
 
+  // Hero text
+  const heroText = {
+    label: settingsMap.hero_label || "NEW COLLECTION 2026",
+    headingLine1: settingsMap.hero_heading_line1 || "SEE BEYOND",
+    headingLine2: settingsMap.hero_heading_line2 || "LIMITS",
+    subtext: settingsMap.hero_subtext || "Crafted for visionaries.\nDesigned to stand apart.",
+  };
+
+  // Our Story text
+  const storyText = {
+    label: settingsMap.story_label || "Our Story",
+    heading: settingsMap.story_heading || "BUILT TO BE SEEN",
+    body: settingsMap.story_body || "SPECTRA is more than eyewear. It\u2019s a mindset. Confidence in every detail. Clarity in every view.",
+    linkText: settingsMap.story_link_text || "DISCOVER OUR JOURNEY",
+  };
+
   let spotlightCards: SpotlightCard[] = [];
   if (settingsMap.spotlight_stories) {
     try {
@@ -136,7 +160,7 @@ export default async function Home() {
   return (
     <div className="bg-[#0a0a0a]">
       {/* 1. Hero Section */}
-      <HeroSection slides={heroSlides} />
+      <HeroSection slides={heroSlides} heroText={heroText} />
 
       {/* 2. Shop By Shape */}
       <ShopByShapeSection categories={shapeCategories} />
@@ -148,7 +172,7 @@ export default async function Home() {
       <NewArrivalsSection products={newArrivals} />
 
       {/* 5. Our Story (Built to be seen) */}
-      <OurStorySection storyImageUrl={storyImage} />
+      <OurStorySection storyImageUrl={storyImage} storyText={storyText} />
 
       {/* 6. All Products (Initial 8, scroll loads next 8) */}
       <AllProductsSection initialProducts={allProducts} />

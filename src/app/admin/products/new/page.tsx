@@ -25,6 +25,7 @@ export default function NewProductPage() {
     slug: "",
     price: "",
     compare_price: "",
+    cost_price: "",
     category: "Men",
     shape: "Rectangle",
     description: "",
@@ -44,11 +45,13 @@ export default function NewProductPage() {
     setForm((prev) => ({ ...prev, [k]: v }));
 
   const autoSlug = (name: string) =>
-    name
-      .toLowerCase()
-      .trim()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-|-$/g, "");
+    name.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+
+  // Live margin calculation
+  const sell = parseFloat(form.price) || 0;
+  const cost = parseFloat(form.cost_price) || 0;
+  const profit = sell - cost;
+  const margin = sell > 0 && cost > 0 ? ((profit / sell) * 100).toFixed(1) : null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,11 +59,11 @@ export default function NewProductPage() {
       setError("Name and price are required.");
       return;
     }
-    if (form.color_variants.some((variant) => !variant.name.trim() || !variant.image_url)) {
+    if (form.color_variants.some((v) => !v.name.trim() || !v.image_url)) {
       setError("Each colour needs a name and a photo before the product can be saved.");
       return;
     }
-    const colourNames = form.color_variants.map((variant) => variant.name.trim().toLowerCase());
+    const colourNames = form.color_variants.map((v) => v.name.trim().toLowerCase());
     if (new Set(colourNames).size !== colourNames.length) {
       setError("Each colour name must be unique for this product.");
       return;
@@ -82,6 +85,7 @@ export default function NewProductPage() {
           slug: form.slug || autoSlug(form.name),
           price: parseFloat(form.price),
           compare_price: form.compare_price ? parseFloat(form.compare_price) : null,
+          cost_price: form.cost_price ? parseFloat(form.cost_price) : null,
           category: form.category.toLowerCase(),
           shape: form.shape.toLowerCase(),
           description: combinedDescription,
@@ -120,18 +124,15 @@ export default function NewProductPage() {
           <ArrowLeft size={16} />
         </Link>
         <div>
-          <h1 className="text-[22px] font-bold text-white tracking-tight">
-            Add New Product
-          </h1>
-          <p className="text-[13px] text-white/40 mt-0.5">
-            Create and publish a new sunglass listing
-          </p>
+          <h1 className="text-[22px] font-bold text-white tracking-tight">Add New Product</h1>
+          <p className="text-[13px] text-white/40 mt-0.5">Create and publish a new sunglass listing</p>
         </div>
       </div>
 
       <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left: Main fields */}
         <div className="lg:col-span-2 space-y-5">
+
           {/* Basic Info Card */}
           <div className="bg-[#111111] rounded-sm border border-white/[0.07] p-6 space-y-5 shadow-xl shadow-black/40">
             <h2 className="text-[14px] font-bold text-white border-b border-white/[0.06] pb-4">
@@ -182,7 +183,7 @@ export default function NewProductPage() {
                 value={form.description}
                 onChange={(e) => set("description", e.target.value)}
                 rows={3}
-                placeholder="e.g. Masterfully designed with premium lightweight craftsmanship and scratch-resistant optical coating. Tailored for all-day comfort and glare-free clarity."
+                placeholder="e.g. Masterfully designed with premium lightweight craftsmanship..."
                 className={`${inputCls} resize-none`}
               />
             </FormField>
@@ -192,7 +193,7 @@ export default function NewProductPage() {
                 value={form.whats_in_the_box}
                 onChange={(e) => set("whats_in_the_box", e.target.value)}
                 rows={4}
-                placeholder={`• 1x SPECTRA Handcrafted Eyewear\n• 1x Signature Matte-Black Hardcase\n• 1x High-Density Microfiber Cleaning Cloth\n• 1x Authenticity & Warranty Card`}
+                placeholder={`• 1x SPECTRA Handcrafted Eyewear\n• 1x Signature Matte-Black Hardcase`}
                 className={`${inputCls} resize-none font-mono text-[12px]`}
               />
             </FormField>
@@ -203,12 +204,11 @@ export default function NewProductPage() {
             <h2 className="text-[14px] font-bold text-white border-b border-white/[0.06] pb-4">
               Pricing
             </h2>
+
             <div className="grid grid-cols-2 gap-4">
               <FormField label="Selling Price (₹)" required>
                 <div className="flex items-center rounded-sm border border-white/[0.08] bg-[#161616] focus-within:border-[#c8874a] overflow-hidden transition-colors">
-                  <span className="px-3.5 py-2.5 text-[13px] text-[#c8874a] bg-[#121212] border-r border-white/[0.08] font-bold">
-                    ₹
-                  </span>
+                  <span className="px-3.5 py-2.5 text-[13px] text-[#c8874a] bg-[#121212] border-r border-white/[0.08] font-bold">₹</span>
                   <input
                     type="number"
                     value={form.price}
@@ -221,11 +221,10 @@ export default function NewProductPage() {
                   />
                 </div>
               </FormField>
-              <FormField label="Compare Price (₹)">
+
+              <FormField label="Compare / MRP Price (₹)">
                 <div className="flex items-center rounded-sm border border-white/[0.08] bg-[#161616] focus-within:border-[#c8874a] overflow-hidden transition-colors">
-                  <span className="px-3.5 py-2.5 text-[13px] text-white/40 bg-[#121212] border-r border-white/[0.08]">
-                    ₹
-                  </span>
+                  <span className="px-3.5 py-2.5 text-[13px] text-white/40 bg-[#121212] border-r border-white/[0.08]">₹</span>
                   <input
                     type="number"
                     value={form.compare_price}
@@ -237,6 +236,40 @@ export default function NewProductPage() {
                   />
                 </div>
               </FormField>
+            </div>
+
+            {/* Cost Price + Auto Margin Row */}
+            <div className="grid grid-cols-2 gap-4 pt-1 border-t border-white/[0.05]">
+              <FormField label="Cost Price (₹) — Internal Only">
+                <div className="flex items-center rounded-sm border border-white/[0.08] bg-[#161616] focus-within:border-[#c8874a] overflow-hidden transition-colors">
+                  <span className="px-3.5 py-2.5 text-[13px] text-white/40 bg-[#121212] border-r border-white/[0.08]">₹</span>
+                  <input
+                    type="number"
+                    value={form.cost_price}
+                    onChange={(e) => set("cost_price", e.target.value)}
+                    placeholder="499"
+                    className="flex-1 px-3.5 py-2.5 text-[13px] outline-none text-white bg-transparent placeholder-white/30"
+                    min="0"
+                    step="1"
+                  />
+                </div>
+              </FormField>
+
+              <div className="space-y-1.5">
+                <label className="block text-[12px] font-bold text-white/80 tracking-wide">
+                  Profit Margin <span className="text-white/30 font-normal">(auto)</span>
+                </label>
+                <div className="h-[42px] flex items-center px-3.5 rounded-sm border border-white/[0.06] bg-[#0d0d0d]">
+                  {margin !== null ? (
+                    <span className={`text-[13px] font-bold ${profit >= 0 ? "text-emerald-400" : "text-red-400"}`}>
+                      {profit >= 0 ? "+" : ""}₹{profit.toFixed(0)}&nbsp;
+                      <span className="text-[11px] font-semibold opacity-80">({margin}% margin)</span>
+                    </span>
+                  ) : (
+                    <span className="text-[12px] text-white/25">Enter cost price above</span>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
 
@@ -253,9 +286,7 @@ export default function NewProductPage() {
                   className={selectCls}
                 >
                   {categories.map((c) => (
-                    <option key={c} value={c} className="bg-[#181818] text-white">
-                      {c}
-                    </option>
+                    <option key={c} value={c} className="bg-[#181818] text-white">{c}</option>
                   ))}
                 </select>
               </FormField>
@@ -266,9 +297,7 @@ export default function NewProductPage() {
                   className={selectCls}
                 >
                   {shapes.map((s) => (
-                    <option key={s} value={s} className="bg-[#181818] text-white">
-                      {s}
-                    </option>
+                    <option key={s} value={s} className="bg-[#181818] text-white">{s}</option>
                   ))}
                 </select>
               </FormField>
@@ -283,12 +312,10 @@ export default function NewProductPage() {
 
         {/* Right: Image + Status */}
         <div className="space-y-5">
-          {/* Product Media & Angles Showcase */}
+          {/* Product Media */}
           <div className="bg-[#111111] rounded-sm border border-white/[0.07] p-6 space-y-4 shadow-xl shadow-black/40">
             <div>
-              <h2 className="text-[14px] font-bold text-white">
-                Product Gallery & Angles
-              </h2>
+              <h2 className="text-[14px] font-bold text-white">Product Gallery & Angles</h2>
               <p className="text-[11px] text-white/40 mt-0.5">
                 Drop multiple image files at once. First image is the Main Cover; remaining images become gallery angles & card hover.
               </p>
@@ -304,9 +331,7 @@ export default function NewProductPage() {
 
           {/* Status & Flags */}
           <div className="bg-[#111111] rounded-sm border border-white/[0.07] p-6 space-y-5 shadow-xl shadow-black/40">
-            <h2 className="text-[14px] font-bold text-white border-b border-white/[0.06] pb-4">
-              Status & Flags
-            </h2>
+            <h2 className="text-[14px] font-bold text-white border-b border-white/[0.06] pb-4">Status & Flags</h2>
 
             <FormField label="Visibility">
               <div className="flex items-center gap-1 bg-[#161616] p-1 rounded-sm border border-white/[0.06]">
@@ -316,9 +341,7 @@ export default function NewProductPage() {
                     type="button"
                     onClick={() => set("status", s)}
                     className={`flex-1 py-2 text-[11px] font-bold rounded-sm capitalize transition-all ${
-                      form.status === s
-                        ? "bg-[#c8874a] text-white shadow-sm"
-                        : "text-white/40 hover:text-white"
+                      form.status === s ? "bg-[#c8874a] text-white shadow-sm" : "text-white/40 hover:text-white"
                     }`}
                   >
                     {s}
@@ -327,134 +350,33 @@ export default function NewProductPage() {
               </div>
             </FormField>
 
-            {/* New badge toggle */}
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-[13px] font-semibold text-white">
-                  Mark as New
-                </p>
-                <p className="text-[11px] text-white/40 mt-0.5">
-                  Shows &quot;NEW&quot; badge on card
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => set("is_new", !form.is_new)}
-                className={`relative w-11 h-6 rounded-full transition-colors duration-200 focus:outline-none cursor-pointer ${
-                  form.is_new ? "bg-[#c8874a]" : "bg-[#252525]"
-                }`}
-              >
-                <span
-                  className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow-sm transition-all duration-200 ${
-                    form.is_new ? "left-[22px]" : "left-0.5"
+            {[
+              { key: "is_new", label: "Mark as New", desc: 'Shows "NEW" badge on card' },
+              { key: "is_polarized", label: "Polarized Lens", desc: "Displays in Polarized Optics collection" },
+              { key: "is_gift", label: "Featured for Gifting", desc: "Displays in Luxury Gifts collection" },
+              { key: "is_computer_glasses", label: "Computer Glasses", desc: "Displays in the Computer Glasses collection" },
+              { key: "is_accessory", label: "Accessories", desc: "Displays in the Accessories collection" },
+            ].map(({ key, label, desc }, i) => (
+              <div key={key} className={`flex items-center justify-between ${i > 0 ? "border-t border-white/[0.06] pt-4" : ""}`}>
+                <div>
+                  <p className="text-[13px] font-semibold text-white">{label}</p>
+                  <p className="text-[11px] text-white/40 mt-0.5">{desc}</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => set(key as keyof typeof form, !form[key as keyof typeof form])}
+                  className={`relative w-11 h-6 rounded-full transition-colors duration-200 focus:outline-none cursor-pointer ${
+                    form[key as keyof typeof form] ? "bg-[#c8874a]" : "bg-[#252525]"
                   }`}
-                />
-              </button>
-            </div>
-
-            {/* Polarized toggle */}
-            <div className="flex items-center justify-between border-t border-white/[0.06] pt-4">
-              <div>
-                <p className="text-[13px] font-semibold text-white">
-                  Polarized Lens
-                </p>
-                <p className="text-[11px] text-white/40 mt-0.5">
-                  Displays in Polarized Optics collection
-                </p>
+                >
+                  <span
+                    className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow-sm transition-all duration-200 ${
+                      form[key as keyof typeof form] ? "left-[22px]" : "left-0.5"
+                    }`}
+                  />
+                </button>
               </div>
-              <button
-                type="button"
-                onClick={() => set("is_polarized", !form.is_polarized)}
-                className={`relative w-11 h-6 rounded-full transition-colors duration-200 focus:outline-none cursor-pointer ${
-                  form.is_polarized ? "bg-[#c8874a]" : "bg-[#252525]"
-                }`}
-              >
-                <span
-                  className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow-sm transition-all duration-200 ${
-                    form.is_polarized ? "left-[22px]" : "left-0.5"
-                  }`}
-                />
-              </button>
-            </div>
-
-            {/* Gift Recommended toggle */}
-            <div className="flex items-center justify-between border-t border-white/[0.06] pt-4">
-              <div>
-                <p className="text-[13px] font-semibold text-white">
-                  Featured for Gifting
-                </p>
-                <p className="text-[11px] text-white/40 mt-0.5">
-                  Displays in Luxury Gifts collection
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => set("is_gift", !form.is_gift)}
-                className={`relative w-11 h-6 rounded-full transition-colors duration-200 focus:outline-none cursor-pointer ${
-                  form.is_gift ? "bg-[#c8874a]" : "bg-[#252525]"
-                }`}
-              >
-                <span
-                  className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow-sm transition-all duration-200 ${
-                    form.is_gift ? "left-[22px]" : "left-0.5"
-                  }`}
-                />
-              </button>
-            </div>
-
-            {/* Computer Glasses toggle */}
-            <div className="flex items-center justify-between border-t border-white/[0.06] pt-4">
-              <div>
-                <p className="text-[13px] font-semibold text-white">
-                  Computer Glasses
-                </p>
-                <p className="text-[11px] text-white/40 mt-0.5">
-                  Displays in the Computer Glasses collection
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => set("is_computer_glasses", !form.is_computer_glasses)}
-                aria-label="Show this product in Computer Glasses"
-                aria-pressed={form.is_computer_glasses}
-                className={`relative w-11 h-6 rounded-full transition-colors duration-200 focus:outline-none cursor-pointer ${
-                  form.is_computer_glasses ? "bg-[#c8874a]" : "bg-[#252525]"
-                }`}
-              >
-                <span
-                  className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow-sm transition-all duration-200 ${
-                    form.is_computer_glasses ? "left-[22px]" : "left-0.5"
-                  }`}
-                />
-              </button>
-            </div>
-
-            {/* Accessories toggle */}
-            <div className="flex items-center justify-between border-t border-white/[0.06] pt-4">
-              <div>
-                <p className="text-[13px] font-semibold text-white">
-                  Accessories
-                </p>
-                <p className="text-[11px] text-white/40 mt-0.5">
-                  Displays in the Accessories collection
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => set("is_accessory", !form.is_accessory)}
-                aria-label="Show this product in Accessories"
-                aria-pressed={form.is_accessory}
-                className={`relative w-11 h-6 rounded-full transition-colors duration-200 focus:outline-none cursor-pointer ${
-                  form.is_accessory ? "bg-[#c8874a]" : "bg-[#252525]"
-                }`}
-              >
-                <span
-                  className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow-sm transition-all duration-200 ${
-                    form.is_accessory ? "left-[22px]" : "left-0.5"
-                  }`}
-                />
-              </button>
-            </div>
+            ))}
           </div>
 
           {/* Error */}
@@ -475,20 +397,11 @@ export default function NewProductPage() {
             } disabled:opacity-70`}
           >
             {saving ? (
-              <>
-                <Loader2 size={15} className="animate-spin" />
-                Saving Product...
-              </>
+              <><Loader2 size={15} className="animate-spin" />Saving Product...</>
             ) : saved ? (
-              <>
-                <CheckCircle2 size={15} />
-                Product Saved!
-              </>
+              <><CheckCircle2 size={15} />Product Saved!</>
             ) : (
-              <>
-                <Save size={15} />
-                Save & Publish
-              </>
+              <><Save size={15} />Save & Publish</>
             )}
           </button>
 
@@ -504,16 +417,8 @@ export default function NewProductPage() {
   );
 }
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
-function FormField({
-  label,
-  required,
-  children,
-}: {
-  label: string;
-  required?: boolean;
-  children: React.ReactNode;
-}) {
+// ── Helpers ────────────────────────────────────────────────────────────────────
+function FormField({ label, required, children }: { label: string; required?: boolean; children: React.ReactNode }) {
   return (
     <div className="space-y-1.5">
       <label className="block text-[12px] font-bold text-white/80 tracking-wide">

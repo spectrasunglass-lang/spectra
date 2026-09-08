@@ -34,6 +34,7 @@ export default function EditProductPage({ params }: EditProductPageProps) {
     slug: "",
     price: "",
     compare_price: "",
+    cost_price: "",
     category: "Men",
     shape: "Rectangle",
     description: "",
@@ -98,6 +99,7 @@ export default function EditProductPage({ params }: EditProductPageProps) {
           slug: data.slug || "",
           price: data.price ? String(data.price) : "",
           compare_price: data.compare_price ? String(data.compare_price) : "",
+          cost_price: data.cost_price ? String(data.cost_price) : "",
           category:
             categories.find(
               (c) => c.toLowerCase() === (data.category || "").toLowerCase()
@@ -162,6 +164,7 @@ export default function EditProductPage({ params }: EditProductPageProps) {
           slug: form.slug || autoSlug(form.name),
           price: parseFloat(form.price),
           compare_price: form.compare_price ? parseFloat(form.compare_price) : null,
+          cost_price: form.cost_price ? parseFloat(form.cost_price) : null,
           category: form.category.toLowerCase(),
           shape: form.shape.toLowerCase(),
           description: combinedDescription,
@@ -312,7 +315,7 @@ export default function EditProductPage({ params }: EditProductPageProps) {
                   />
                 </div>
               </FormField>
-              <FormField label="Compare Price (₹)">
+              <FormField label="Compare / MRP Price (₹)">
                 <div className="flex items-center rounded-sm border border-white/[0.08] bg-[#161616] focus-within:border-[#c8874a] overflow-hidden transition-colors">
                   <span className="px-3.5 py-2.5 text-[13px] text-white/40 bg-[#121212] border-r border-white/[0.08]">
                     ₹
@@ -329,6 +332,47 @@ export default function EditProductPage({ params }: EditProductPageProps) {
                 </div>
               </FormField>
             </div>
+
+            {/* Cost Price + Auto Margin */}
+            {(() => {
+              const sell = parseFloat(form.price) || 0;
+              const cost = parseFloat(form.cost_price) || 0;
+              const profit = sell - cost;
+              const margin = sell > 0 && cost > 0 ? ((profit / sell) * 100).toFixed(1) : null;
+              return (
+                <div className="grid grid-cols-2 gap-4 pt-1 border-t border-white/[0.05]">
+                  <FormField label="Cost Price (₹) — Internal Only">
+                    <div className="flex items-center rounded-sm border border-white/[0.08] bg-[#161616] focus-within:border-[#c8874a] overflow-hidden transition-colors">
+                      <span className="px-3.5 py-2.5 text-[13px] text-white/40 bg-[#121212] border-r border-white/[0.08]">₹</span>
+                      <input
+                        type="number"
+                        value={form.cost_price}
+                        onChange={(e) => set("cost_price", e.target.value)}
+                        placeholder="499"
+                        className="flex-1 px-3.5 py-2.5 text-[13px] outline-none text-white bg-transparent placeholder-white/30"
+                        min="0"
+                        step="1"
+                      />
+                    </div>
+                  </FormField>
+                  <div className="space-y-1.5">
+                    <label className="block text-[12px] font-bold text-white/80 tracking-wide">
+                      Profit Margin <span className="text-white/30 font-normal">(auto)</span>
+                    </label>
+                    <div className="h-[42px] flex items-center px-3.5 rounded-sm border border-white/[0.06] bg-[#0d0d0d]">
+                      {margin !== null ? (
+                        <span className={`text-[13px] font-bold ${profit >= 0 ? "text-emerald-400" : "text-red-400"}`}>
+                          {profit >= 0 ? "+" : ""}₹{profit.toFixed(0)}&nbsp;
+                          <span className="text-[11px] font-semibold opacity-80">({margin}% margin)</span>
+                        </span>
+                      ) : (
+                        <span className="text-[12px] text-white/25">Enter cost price above</span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
           </div>
 
           {/* Organisation Card */}

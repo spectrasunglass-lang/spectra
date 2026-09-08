@@ -10,14 +10,23 @@ export interface HeroSlideData {
   mobile?: string | null;
 }
 
+export interface HeroTextData {
+  label?: string;
+  headingLine1?: string;
+  headingLine2?: string;
+  subtext?: string;
+}
+
 interface HeroSectionProps {
   slides?: HeroSlideData[];
   autoSlideInterval?: number;
+  heroText?: HeroTextData;
 }
 
 export default function HeroSection({
   slides = [],
   autoSlideInterval = 5000,
+  heroText = {},
 }: HeroSectionProps) {
   const [activeSlide, setActiveSlide] = useState(0);
   const touchStartX = useRef<number>(0);
@@ -155,24 +164,22 @@ export default function HeroSection({
         <div className="w-full max-w-md sm:max-w-lg md:max-w-md lg:max-w-xl flex flex-col items-start text-left">
           {/* Label */}
           <p className="text-[11px] sm:text-[12px] font-bold tracking-[0.3em] uppercase text-[#c8874a] mb-2 sm:mb-4">
-            NEW COLLECTION 2026
+            {heroText.label || "NEW COLLECTION 2026"}
           </p>
 
-          {/* Headline with Clean Luxury Editorial Typography */}
+          {/* Headline */}
           <h1 className="font-hero uppercase font-black leading-[0.98] tracking-[0.04em] sm:tracking-[0.06em] mb-3 sm:mb-5">
             <span className="block text-white text-[32px] sm:text-5xl md:text-6xl lg:text-[72px] font-black drop-shadow-md">
-              SEE BEYOND{" "}
+              {heroText.headingLine1 || "SEE BEYOND"}{" "}
             </span>
             <span className="block text-[#c8874a] text-[32px] sm:text-5xl md:text-6xl lg:text-[72px] font-black mt-1 drop-shadow-md">
-              LIMITS
+              {heroText.headingLine2 || "LIMITS"}
             </span>
           </h1>
 
           {/* Subtext */}
-          <p className="text-neutral-300 text-[13px] sm:text-sm md:text-[15px] leading-relaxed mb-5 sm:mb-8 font-medium">
-            Crafted for visionaries.
-            <br />
-            Designed to stand apart.
+          <p className="text-neutral-300 text-[13px] sm:text-sm md:text-[15px] leading-relaxed mb-5 sm:mb-8 font-medium whitespace-pre-line">
+            {heroText.subtext || "Crafted for visionaries.\nDesigned to stand apart."}
           </p>
 
           {/* CTA Buttons */}

@@ -3,11 +3,24 @@ import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 
-interface OurStorySectionProps {
-  storyImageUrl?: string | null;
+export interface StoryTextData {
+  label?: string;
+  heading?: string;
+  body?: string;
+  linkText?: string;
 }
 
-export default function OurStorySection({ storyImageUrl }: OurStorySectionProps) {
+interface OurStorySectionProps {
+  storyImageUrl?: string | null;
+  storyText?: StoryTextData;
+}
+
+export default function OurStorySection({ storyImageUrl, storyText = {} }: OurStorySectionProps) {
+  const label = storyText.label || "Our Story";
+  const heading = storyText.heading || "BUILT TO BE SEEN";
+  const body = storyText.body || "SPECTRA is more than eyewear. It\u2019s a mindset. Confidence in every detail. Clarity in every view.";
+  const linkText = storyText.linkText || "DISCOVER OUR JOURNEY";
+
   return (
     <section className="bg-[#0a0a0a]">
       <div className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 py-5 md:py-0">
@@ -15,29 +28,23 @@ export default function OurStorySection({ storyImageUrl }: OurStorySectionProps)
           {/* Text content */}
           <div className="w-full max-w-xl lg:max-w-2xl">
             <p className="section-label mb-4 text-[#c8874a] text-[11px] font-bold tracking-[0.3em] uppercase">
-              Our Story
+              {label}
             </p>
             <h2 className="text-white text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold uppercase leading-[1.05] mb-5 tracking-tight">
-                BUILT TO
-                BE SEEN
-             
+              {heading}
             </h2>
-            <p className="text-neutral-300 text-sm md:text-[16px] leading-relaxed mb-7 ">
-              SPECTRA is more than eyewear.
-           
-              It&apos;s a mindset.
-                Confidence in every detail.
-           
-              Clarity in every view.
+            <p className="text-neutral-300 text-sm md:text-[16px] leading-relaxed mb-7">
+              {body}
             </p>
             <Link
               href="/about"
               className="inline-flex items-center gap-2 text-[11px] font-bold tracking-[0.2em] uppercase text-[#c8874a] hover:text-[#d4956a] transition-colors group"
             >
-              DISCOVER OUR JOURNEY
+              {linkText}
               <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
+
 
           {/* Story image — empty slot for admin upload */}
           <div className="relative w-full aspect-[3/4] max-h-[240px] md:max-h-[480px] bg-[#141414] overflow-hidden">
