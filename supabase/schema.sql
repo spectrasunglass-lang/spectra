@@ -172,6 +172,7 @@ ALTER PUBLICATION supabase_realtime ADD TABLE public.settings;
 ALTER PUBLICATION supabase_realtime ADD TABLE public.subscribers;
 ALTER PUBLICATION supabase_realtime ADD TABLE public.reviews;
 ALTER PUBLICATION supabase_realtime ADD TABLE public.customers;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.coupons;
 
 -- 7. CUSTOMERS TABLE
 CREATE TABLE IF NOT EXISTS public.customers (
@@ -199,5 +200,38 @@ CREATE POLICY "Allow full access on customers"
 CREATE INDEX IF NOT EXISTS idx_customers_email ON public.customers (email);
 CREATE INDEX IF NOT EXISTS idx_customers_phone ON public.customers (phone);
 CREATE INDEX IF NOT EXISTS idx_customers_created_at ON public.customers (created_at DESC);
+
+-- 8. COUPONS TABLE
+CREATE TABLE IF NOT EXISTS public.coupons (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    code TEXT UNIQUE NOT NULL,
+    description TEXT,
+    discount_type TEXT NOT NULL CHECK (discount_type IN ('percentage', 'fixed')),
+    discount_value NUMERIC(10, 2) NOT NULL,
+    min_order_value NUMERIC(10, 2) NOT NULL DEFAULT 0,
+    max_discount_amount NUMERIC(10, 2) DEFAULT NULL,
+    valid_from TIMESTAMPTZ DEFAULT now(),
+    expires_at TIMESTAMPTZ DEFAULT NULL,
+    usage_limit INTEGER DEFAULT NULL,
+    used_count INTEGER NOT NULL DEFAULT 0,
+    is_active BOOLEAN NOT NULL DEFAULT true,
+    created_at TIMESTAMPTZ DEFAULT now(),
+    updated_at TIMESTAMPTZ DEFAULT now()
+);
+
+ALTER TABLE public.coupons ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Allow full access on coupons"
+    ON public.coupons FOR ALL
+    USING (true)
+    WITH CHECK (true);
+
+CREATE INDEX IF NOT EXISTS idx_coupons_code ON public.coupons (UPPER(code));
+CREATE INDEX IF NOT EXISTS idx_coupons_active ON public.coupons (is_active);
+
+-- Update orders with coupon columns
+ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS coupon_code TEXT DEFAULT NULL;
+ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS discount_amount NUMERIC(10, 2) NOT NULL DEFAULT 0;
+
 
 

@@ -2,11 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { sendOrderEmails } from "@/lib/brevo";
 import { recordCustomerServer } from "@/lib/customers.server";
+import { incrementCouponUsedServer } from "@/lib/coupons.server";
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { address, items, totalAmount } = body;
+    const { address, items, totalAmount, couponCode, discountAmount } = body;
 
     if (!items || !Array.isArray(items) || items.length === 0) {
       return NextResponse.json({ success: false, error: "Cart is empty" }, { status: 400 });
@@ -29,7 +30,8 @@ export async function POST(req: NextRequest) {
       })
       .join(", ");
 
-    const paymentNote = `[CASH ON DELIVERY - FULL AMOUNT ₹${total} TO BE COLLECTED AT DOORSTEP]`;
+    const couponNote = couponCode ? ` [Coupon: ${couponCode} (-₹${discountAmount || 0})]` : "";
+    const paymentNote = `[CASH ON DELIVERY - FULL AMOUNT ₹${total} TO BE COLLECTED AT DOORSTEP]${couponNote}`;
     const fullAddress = `${address.street}, ${address.city}, ${address.state} - ${address.pincode} ${paymentNote}`;
 
     const supabase = await createClient();
@@ -44,6 +46,8 @@ export async function POST(req: NextRequest) {
         status: "pending",
         city: address.city,
         address: fullAddress,
+        coupon_code: couponCode ? String(couponCode).toUpperCase().trim() : null,
+        discount_amount: Number(discountAmount || 0),
       })
       .select("id")
       .single();
@@ -65,6 +69,13 @@ export async function POST(req: NextRequest) {
       orderAmount: total,
     }).catch((err) => console.warn("[COD] recordCustomerServer error:", err));
 
+    // Increment coupon used count if coupon was applied
+    if (couponCode) {
+      incrementCouponUsedServer(couponCode).catch((err) =>
+        console.warn("[COD] incrementCouponUsedServer error:", err)
+      );
+    }
+
     // Send confirmation emails via Brevo
     try {
       await sendOrderEmails({
@@ -78,6 +89,8 @@ export async function POST(req: NextRequest) {
         chargeAmount: 0,
         balanceDue: total,
         paymentMethod: "cod",
+        couponCode: couponCode || undefined,
+        discountAmount: discountAmount ? Number(discountAmount) : undefined,
         address,
       });
     } catch (emailErr) {

@@ -21,6 +21,7 @@ import {
   X,
   Star,
   Users,
+  Tag,
 } from "lucide-react";
 import { useAdminNav } from "./AdminNavContext";
 
@@ -29,6 +30,7 @@ const navItems = [
   { label: "Products",        href: "/admin/products",      icon: Package,         exact: false },
   { label: "Orders",          href: "/admin/orders",        icon: ShoppingBag,     exact: false },
   { label: "Customers",       href: "/admin/customers",     icon: Users,           exact: false },
+  { label: "Coupons",         href: "/admin/coupons",       icon: Tag,             exact: false },
   { label: "Reviews",         href: "/admin/reviews",       icon: Star,            exact: false },
   { label: "Gift Packaging",  href: "/admin/gift-packages", icon: Gift,            exact: false },
   { label: "Subscribers",     href: "/admin/subscribers",   icon: Mail,            exact: false },

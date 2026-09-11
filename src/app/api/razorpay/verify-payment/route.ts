@@ -3,6 +3,7 @@ import { verifyRazorpaySignature } from "@/lib/razorpay";
 import { createClient } from "@/lib/supabase/server";
 import { sendOrderEmails } from "@/lib/brevo";
 import { recordCustomerServer } from "@/lib/customers.server";
+import { incrementCouponUsedServer } from "@/lib/coupons.server";
 
 export async function POST(req: NextRequest) {
   try {
@@ -17,6 +18,8 @@ export async function POST(req: NextRequest) {
       chargeAmount,
       balanceDue,
       paymentMethod,
+      couponCode,
+      discountAmount,
     } = body;
 
     // 1. Validate required fields
@@ -83,6 +86,8 @@ export async function POST(req: NextRequest) {
         status: "pending",
         city: address.city,
         address: fullAddress,
+        coupon_code: couponCode ? String(couponCode).toUpperCase().trim() : null,
+        discount_amount: Number(discountAmount || 0),
       })
       .select("id")
       .single();
@@ -99,6 +104,13 @@ export async function POST(req: NextRequest) {
       orderAmount: Number(totalAmount),
     }).catch((err) => console.warn("[Razorpay] recordCustomerServer error:", err));
 
+    // Increment coupon used count if coupon was applied
+    if (couponCode) {
+      incrementCouponUsedServer(couponCode).catch((err) =>
+        console.warn("[Razorpay] incrementCouponUsedServer error:", err)
+      );
+    }
+
     // 5. Send order confirmation to Customer AND notification to Admin via Brevo
     try {
       await sendOrderEmails({
@@ -113,6 +125,8 @@ export async function POST(req: NextRequest) {
         balanceDue: Number(balanceDue),
         paymentMethod,
         paymentId: razorpay_payment_id,
+        couponCode: couponCode || undefined,
+        discountAmount: discountAmount ? Number(discountAmount) : undefined,
         address,
       });
     } catch (emailErr) {

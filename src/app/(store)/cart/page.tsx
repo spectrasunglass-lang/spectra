@@ -4,11 +4,12 @@ import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useCart } from "@/components/CartContext";
-import { Plus, Minus, Trash2, ShoppingBag, ArrowRight, ArrowLeft, Loader2, AlertCircle } from "lucide-react";
+import { Plus, Minus, Trash2, ShoppingBag, ArrowRight, ArrowLeft, Loader2, AlertCircle, Tag, Check, X } from "lucide-react";
 import CartAddressForm, { AddressData } from "@/components/CartAddressForm";
 import CartPaymentMethod, { PaymentOption } from "@/components/CartPaymentMethod";
 import { createClient } from "@/lib/supabase/client";
 import { loadRazorpayScript } from "@/lib/razorpay";
+import { calculateCouponDiscount } from "@/lib/coupons";
 
 export default function CartPage() {
   const { items, count, total, removeItem, updateQty, clearCart } = useCart();
@@ -32,6 +33,8 @@ export default function CartPage() {
     isCodAdvance: boolean;
     paymentMethod: PaymentOption;
     address: AddressData;
+    couponCode?: string;
+    discountAmount?: number;
   }
 
   const [paymentMethod, setPaymentMethod] = useState<PaymentOption>("online");
@@ -43,6 +46,21 @@ export default function CartPage() {
     enabled: false,
     amount: "199",
   });
+
+  // Coupon state
+  const [couponInput, setCouponInput] = useState("");
+  const [appliedCoupon, setAppliedCoupon] = useState<{
+    id?: string;
+    code: string;
+    description?: string | null;
+    discount_type: "percentage" | "fixed";
+    discount_value: number;
+    min_order_value?: number;
+    max_discount_amount?: number | null;
+  } | null>(null);
+  const [couponDiscount, setCouponDiscount] = useState<number>(0);
+  const [couponLoading, setCouponLoading] = useState(false);
+  const [couponError, setCouponError] = useState<string | null>(null);
 
   React.useEffect(() => {
     if (orderPlaced && typeof window !== "undefined") {
@@ -74,9 +92,58 @@ export default function CartPage() {
     fetchSettings();
   }, []);
 
+  // Recalculate coupon discount whenever cart total changes
+  React.useEffect(() => {
+    if (appliedCoupon) {
+      if (appliedCoupon.min_order_value && total < appliedCoupon.min_order_value) {
+        setCouponError(`Coupon ${appliedCoupon.code} removed (minimum order ₹${appliedCoupon.min_order_value.toLocaleString("en-IN")} required).`);
+        setAppliedCoupon(null);
+        setCouponDiscount(0);
+      } else {
+        const disc = calculateCouponDiscount(total, appliedCoupon);
+        setCouponDiscount(disc);
+      }
+    }
+  }, [total, appliedCoupon]);
+
+  const handleApplyCoupon = async () => {
+    if (!couponInput.trim()) {
+      setCouponError("Please enter a coupon code.");
+      return;
+    }
+    setCouponLoading(true);
+    setCouponError(null);
+    try {
+      const res = await fetch("/api/coupons/validate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code: couponInput.trim(), orderAmount: total }),
+      });
+      const data = await res.json();
+      if (res.ok && data.valid) {
+        setAppliedCoupon(data.coupon);
+        setCouponDiscount(data.discountAmount);
+        setCouponInput("");
+      } else {
+        setCouponError(data.error || "Invalid coupon code.");
+      }
+    } catch {
+      setCouponError("Failed to validate coupon. Please try again.");
+    } finally {
+      setCouponLoading(false);
+    }
+  };
+
+  const handleRemoveCoupon = () => {
+    setAppliedCoupon(null);
+    setCouponDiscount(0);
+    setCouponError(null);
+  };
+
+  const finalTotal = Math.max(0, total - couponDiscount);
   const isCodAdvance = paymentMethod === "cod" && codSettings.enabled;
-  const advanceAmount = isCodAdvance ? Math.min(Number(codSettings.amount) || 199, total) : 0;
-  const balanceDue = Math.max(0, total - advanceAmount);
+  const advanceAmount = isCodAdvance ? Math.min(Number(codSettings.amount) || 199, finalTotal) : 0;
+  const balanceDue = Math.max(0, finalTotal - advanceAmount);
 
   const handleAddressChange = (field: keyof AddressData, value: string) => {
     setAddress((prev) => ({ ...prev, [field]: value }));
@@ -112,7 +179,9 @@ export default function CartPage() {
 
     try {
       // Snapshot values for order confirmation before cart is cleared
-      const currentTotal = total;
+      const currentTotal = finalTotal;
+      const currentCouponCode = appliedCoupon?.code || null;
+      const currentDiscountAmount = couponDiscount;
       const currentAddress = { ...address };
       const currentPaymentMethod = paymentMethod;
 
@@ -125,6 +194,8 @@ export default function CartPage() {
             address: currentAddress,
             items,
             totalAmount: currentTotal,
+            couponCode: currentCouponCode,
+            discountAmount: currentDiscountAmount,
           }),
         });
 
@@ -139,6 +210,8 @@ export default function CartPage() {
             isCodAdvance: false,
             paymentMethod: "cod",
             address: currentAddress,
+            couponCode: currentCouponCode || undefined,
+            discountAmount: currentDiscountAmount || undefined,
           });
           if (typeof window !== "undefined") {
             window.scrollTo({ top: 0, behavior: "smooth" });
@@ -171,6 +244,8 @@ export default function CartPage() {
             email: currentAddress.email,
             phone: currentAddress.phone,
           },
+          couponCode: currentCouponCode,
+          discountAmount: currentDiscountAmount,
         }),
       });
 
@@ -236,6 +311,8 @@ export default function CartPage() {
                 chargeAmount: orderData.chargeAmount,
                 balanceDue: orderData.balanceDue,
                 paymentMethod: currentPaymentMethod,
+                couponCode: currentCouponCode,
+                discountAmount: currentDiscountAmount,
               }),
             });
 
@@ -250,6 +327,8 @@ export default function CartPage() {
                 isCodAdvance,
                 paymentMethod: currentPaymentMethod,
                 address: currentAddress,
+                couponCode: currentCouponCode || undefined,
+                discountAmount: currentDiscountAmount || undefined,
               });
               if (typeof window !== "undefined") {
                 window.scrollTo({ top: 0, behavior: "smooth" });
@@ -292,6 +371,11 @@ export default function CartPage() {
             <p><span className="text-white/40">Recipient:</span> {orderPlaced.address.fullName}</p>
             <p><span className="text-white/40">Delivery to:</span> {orderPlaced.address.street}, {orderPlaced.address.city}, {orderPlaced.address.pincode}</p>
             <p><span className="text-white/40">Total Order:</span> ₹{orderPlaced.total.toLocaleString("en-IN")}</p>
+            {orderPlaced.couponCode && orderPlaced.discountAmount ? (
+              <p className="text-emerald-400 font-semibold">
+                <span className="text-white/40">Coupon Savings:</span> {orderPlaced.couponCode} (-₹{orderPlaced.discountAmount.toLocaleString("en-IN")})
+              </p>
+            ) : null}
             {orderPlaced.isCodAdvance ? (
               <>
                 <p className="text-emerald-400 font-semibold">
@@ -483,11 +567,96 @@ export default function CartPage() {
               Order Summary
             </h2>
 
-            <div className="space-y-2.5 text-[13px]">
+            {/* Coupon Code Section */}
+            {appliedCoupon ? (
+              <div className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-between">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-7 h-7 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400 flex-shrink-0">
+                    <Tag size={13} />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-mono font-bold text-emerald-400 text-[13px] tracking-wider uppercase">
+                        {appliedCoupon.code}
+                      </span>
+                      <span className="text-[10px] bg-emerald-500/20 text-emerald-300 font-semibold px-1.5 py-0.5 rounded">
+                        {appliedCoupon.discount_type === "percentage" ? `${appliedCoupon.discount_value}% OFF` : `₹${appliedCoupon.discount_value} OFF`}
+                      </span>
+                    </div>
+                    {appliedCoupon.description && (
+                      <p className="text-[11px] text-white/50">{appliedCoupon.description}</p>
+                    )}
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleRemoveCoupon}
+                  className="text-white/40 hover:text-red-400 transition-colors p-1.5 rounded hover:bg-white/[0.04] cursor-pointer"
+                  title="Remove coupon"
+                  aria-label="Remove coupon"
+                >
+                  <X size={15} />
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-1.5">
+                <label className="text-[11px] font-medium uppercase tracking-wider text-white/50">
+                  Have a Coupon?
+                </label>
+                <div className="flex items-center gap-2">
+                  <div className="relative flex-1">
+                    <Tag size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/30" />
+                    <input
+                      type="text"
+                      value={couponInput}
+                      onChange={(e) => {
+                        setCouponInput(e.target.value.toUpperCase());
+                        if (couponError) setCouponError(null);
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          handleApplyCoupon();
+                        }
+                      }}
+                      placeholder="ENTER CODE (e.g. SPECTRA10)"
+                      className="w-full bg-white/[0.04] border border-white/[0.08] focus:border-[#c8874a] text-white text-[12px] font-mono pl-8 pr-3 py-2 rounded-sm outline-none uppercase placeholder:normal-case placeholder:font-sans placeholder:text-white/25 transition-colors"
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleApplyCoupon}
+                    disabled={couponLoading || !couponInput.trim()}
+                    className="bg-white/[0.08] hover:bg-[#c8874a] hover:text-white disabled:opacity-40 text-white/80 text-[11px] font-bold px-3.5 py-2 rounded-sm transition-colors uppercase tracking-wider flex items-center gap-1.5 cursor-pointer disabled:cursor-not-allowed"
+                  >
+                    {couponLoading ? <Loader2 size={12} className="animate-spin" /> : "Apply"}
+                  </button>
+                </div>
+                {couponError && (
+                  <p className="text-[11px] text-red-400 flex items-center gap-1 pt-0.5">
+                    <AlertCircle size={12} className="flex-shrink-0" />
+                    <span>{couponError}</span>
+                  </p>
+                )}
+              </div>
+            )}
+
+            <div className="space-y-2.5 text-[13px] pt-1 border-t border-white/[0.06]">
               <div className="flex justify-between text-white/60">
                 <span>Subtotal ({count} items)</span>
                 <span>&#8377;{total.toLocaleString("en-IN")}</span>
               </div>
+
+              {couponDiscount > 0 && (
+                <div className="flex justify-between text-emerald-400 font-medium">
+                  <span className="flex items-center gap-1.5">
+                    <Tag size={12} />
+                    <span>Coupon ({appliedCoupon?.code})</span>
+                  </span>
+                  <span>-&#8377;{couponDiscount.toLocaleString("en-IN")}</span>
+                </div>
+              )}
+
               <div className="flex justify-between text-white/60">
                 <span>Shipping</span>
                 <span className="text-emerald-400 font-semibold">Free</span>
@@ -513,7 +682,16 @@ export default function CartPage() {
               <div className="h-px bg-white/[0.07] my-1" />
               <div className="flex justify-between font-bold text-white text-[15px]">
                 <span>Total Order Value</span>
-                <span>&#8377;{total.toLocaleString("en-IN")}</span>
+                <div className="text-right">
+                  {couponDiscount > 0 && (
+                    <span className="line-through text-white/40 text-[12px] font-normal mr-2">
+                      &#8377;{total.toLocaleString("en-IN")}
+                    </span>
+                  )}
+                  <span className={couponDiscount > 0 ? "text-emerald-400" : ""}>
+                    &#8377;{finalTotal.toLocaleString("en-IN")}
+                  </span>
+                </div>
               </div>
             </div>
 
@@ -536,7 +714,7 @@ export default function CartPage() {
               ) : isCodAdvance ? (
                 <>Pay &#8377;{advanceAmount.toLocaleString("en-IN")} Advance & Place Order<ArrowRight size={15} /></>
               ) : (
-                <>Pay &#8377;{total.toLocaleString("en-IN")} & Place Order<ArrowRight size={15} /></>
+                <>Pay &#8377;{finalTotal.toLocaleString("en-IN")} & Place Order<ArrowRight size={15} /></>
               )}
             </button>
 
@@ -563,7 +741,7 @@ export default function CartPage() {
       {/* Mobile Sticky Checkout Bar */}
       <div className="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#0d0d0d] border-t border-white/[0.07] px-4 py-3">
         <button onClick={handleCheckout} disabled={submitting} className="w-full flex items-center justify-center gap-2 bg-[#c8874a] disabled:opacity-50 text-white text-[13px] font-bold py-3.5 rounded-sm uppercase tracking-wider">
-          {submitting ? <><Loader2 size={14} className="animate-spin" />Processing...</> : isCodAdvance ? <>Pay &#8377;{advanceAmount.toLocaleString("en-IN")} Advance<ArrowRight size={14} /></> : <>Pay &#8377;{total.toLocaleString("en-IN")} & Place Order<ArrowRight size={14} /></>}
+          {submitting ? <><Loader2 size={14} className="animate-spin" />Processing...</> : isCodAdvance ? <>Pay &#8377;{advanceAmount.toLocaleString("en-IN")} Advance<ArrowRight size={14} /></> : <>Pay &#8377;{finalTotal.toLocaleString("en-IN")} & Place Order<ArrowRight size={14} /></>}
         </button>
       </div>
 

@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
-import { Search, Filter, ShoppingBag, Loader2, RefreshCw, ChevronDown, ChevronUp, Package, CheckCircle2 } from "lucide-react";
+import { Search, Filter, ShoppingBag, Loader2, RefreshCw, ChevronDown, ChevronUp, Package, CheckCircle2, Tag } from "lucide-react";
 import StatusBadge from "@/components/admin/StatusBadge";
 
 type OrderStatus = "pending" | "processing" | "shipped" | "delivered" | "cancelled";
@@ -19,6 +19,8 @@ interface Order {
   created_at: string;
   city?: string;
   address?: string;
+  coupon_code?: string | null;
+  discount_amount?: number | null;
 }
 
 const statusOptions: { value: OrderStatus | "all"; label: string }[] = [
@@ -302,7 +304,16 @@ export default function OrdersPage() {
                         </div>
                       </td>
                       <td className="px-5 py-4 text-[13px] font-bold text-white">
-                        ₹{(order.amount ?? 0).toLocaleString("en-IN")}
+                        <div>₹{(order.amount ?? 0).toLocaleString("en-IN")}</div>
+                        {order.coupon_code && (
+                          <div className="flex items-center gap-1 text-[10.5px] text-emerald-400 font-mono mt-0.5">
+                            <Tag size={10} className="flex-shrink-0" />
+                            <span>{order.coupon_code}</span>
+                            {Number(order.discount_amount || 0) > 0 && (
+                              <span className="text-emerald-400/80">(-₹{Number(order.discount_amount).toLocaleString("en-IN")})</span>
+                            )}
+                          </div>
+                        )}
                       </td>
                       <td className="px-5 py-4 text-[11.5px] text-white/40 whitespace-nowrap">
                         {new Date(order.created_at).toLocaleDateString("en-IN", {
@@ -352,6 +363,15 @@ export default function OrdersPage() {
                             <div>
                               <p className="text-[9px] font-bold text-white/30 uppercase tracking-widest mb-1.5">Order Total</p>
                               <p className="text-[22px] font-bold text-[#c8874a]">₹{(order.amount ?? 0).toLocaleString("en-IN")}</p>
+                              {order.coupon_code && (
+                                <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[11px] font-mono mt-1">
+                                  <Tag size={11} />
+                                  <span>{order.coupon_code}</span>
+                                  {Number(order.discount_amount || 0) > 0 && (
+                                    <span>(-₹{Number(order.discount_amount).toLocaleString("en-IN")})</span>
+                                  )}
+                                </div>
+                              )}
                             </div>
                             <div className="ml-auto">
                               <p className="text-[9px] font-bold text-white/30 uppercase tracking-widest mb-2.5">Update Status</p>

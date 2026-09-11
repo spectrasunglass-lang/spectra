@@ -69,6 +69,8 @@ export interface OrderEmailDetails {
   balanceDue?: number;
   paymentMethod?: string;
   paymentId?: string;
+  couponCode?: string;
+  discountAmount?: number;
   address?: {
     fullName: string;
     phone: string;
@@ -418,6 +420,12 @@ export async function sendOrderEmails(details: OrderEmailDetails): Promise<{
                               <td>Shipping:</td>
                               <td align="right" style="color: #16a34a; font-weight: 700;">FREE (Express)</td>
                             </tr>
+                            ${details.couponCode ? `
+                              <tr>
+                                <td style="color: #16a34a;">Coupon (${details.couponCode}):</td>
+                                <td align="right" style="font-weight: 700; color: #16a34a;">-₹${details.discountAmount || 0}</td>
+                              </tr>
+                            ` : ""}
                             <tr>
                               <td>Payment Mode:</td>
                               <td align="right" style="font-weight: 600; color: #0f172a;">

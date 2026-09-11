@@ -4,7 +4,7 @@ import { getRazorpayClient } from "@/lib/razorpay";
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { items, totalAmount, paymentMethod, advanceAmount, customer } = body;
+    const { items, totalAmount, paymentMethod, advanceAmount, customer, couponCode, discountAmount } = body;
 
     if (!items || !Array.isArray(items) || items.length === 0) {
       return NextResponse.json(
@@ -55,6 +55,8 @@ export async function POST(req: NextRequest) {
         total_order_amount: String(total),
         advance_paid: String(chargeAmount),
         balance_due_on_delivery: String(Math.max(0, total - chargeAmount)),
+        coupon_code: couponCode ? String(couponCode) : "",
+        discount_amount: String(discountAmount || 0),
       },
     });
 
