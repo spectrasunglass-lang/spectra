@@ -24,6 +24,7 @@ const footerSections = [
     title: "Client Concierge",
     links: [
       { name: "Track Your Order", href: "/track-order" },
+      { name: "Returns & Exchanges", href: "/returns" },
       { name: "Shipping Policy", href: "/shipping" },
       { name: "Authenticity Guarantee", href: "/authenticity" },
       { name: "Privacy Policy", href: "/privacy-policy" },

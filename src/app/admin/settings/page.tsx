@@ -15,6 +15,11 @@ interface SettingsForm {
   currency: string;
   free_shipping_threshold: string;
   return_window_days: string;
+  return_policy_enabled: string;
+  return_policy_type: string;
+  return_shipping_type: string;
+  return_policy_tagline: string;
+  return_policy_conditions: string;
   tax_included: string;
   cod_advance_enabled: string;
   cod_advance_amount: string;
@@ -31,6 +36,11 @@ const defaults: SettingsForm = {
   currency: "INR",
   free_shipping_threshold: "0",
   return_window_days: "14",
+  return_policy_enabled: "true",
+  return_policy_type: "exchange_and_refund",
+  return_shipping_type: "complimentary_pickup",
+  return_policy_tagline: "Effortless home exchange & returns",
+  return_policy_conditions: "Items must be in unworn, brand-new condition with all tags, luxury hard case, warranty card, and microfiber cloth included. Reverse pickup is arranged from your doorstep.",
   tax_included: "true",
   cod_advance_enabled: "false",
   cod_advance_amount: "199",
@@ -167,7 +177,7 @@ export default function SettingsPage() {
 
         {/* Commerce */}
         <Section title="Commerce Settings" icon={<Globe size={16} />}>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <Field label="Currency">
               <select value={form.currency} onChange={(e) => set("currency", e.target.value)} className={selectCls}>
                 <option value="INR" className="bg-[#181818] text-white">INR — Indian Rupee (₹)</option>
@@ -177,9 +187,6 @@ export default function SettingsPage() {
             </Field>
             <Field label="Free Shipping Above (₹)">
               <input type="number" min="0" value={form.free_shipping_threshold} onChange={(e) => set("free_shipping_threshold", e.target.value)} className={inputCls} placeholder="0 = always free" />
-            </Field>
-            <Field label="Return Window (days)">
-              <input type="number" min="1" max="365" value={form.return_window_days} onChange={(e) => set("return_window_days", e.target.value)} className={inputCls} placeholder="14" />
             </Field>
           </div>
 
@@ -226,6 +233,116 @@ export default function SettingsPage() {
                     placeholder="199"
                   />
                 </Field>
+              </div>
+            )}
+          </div>
+        </Section>
+
+        {/* Return & Exchange Policy */}
+        <Section title="Return & Exchange Policy" icon={<RefreshCw size={16} />}>
+          <div className="space-y-5">
+            {/* Returns Enabled Toggle */}
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-[13px] font-semibold text-white">Enable Returns & Exchanges</p>
+                <p className="text-[11px] text-white/40 mt-0.5">Show return guarantee badges across the store, product pages, and footer</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => set("return_policy_enabled", form.return_policy_enabled === "true" ? "false" : "true")}
+                className={`relative w-11 h-6 rounded-full transition-colors duration-200 ${form.return_policy_enabled === "true" ? "bg-[#c8874a]" : "bg-[#252525]"}`}
+              >
+                <span className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow-sm transition-all duration-200 ${form.return_policy_enabled === "true" ? "left-[22px]" : "left-0.5"}`} />
+              </button>
+            </div>
+
+            {form.return_policy_enabled === "true" ? (
+              <>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 pt-3 border-t border-white/[0.06]">
+                  <Field label="Return Window (Days)">
+                    <input
+                      type="number"
+                      min="1"
+                      max="90"
+                      value={form.return_window_days}
+                      onChange={(e) => set("return_window_days", e.target.value)}
+                      className={inputCls}
+                      placeholder="14"
+                    />
+                    <p className="text-[10.5px] text-white/30 mt-1">Days from delivery allowed for exchange or return</p>
+                  </Field>
+
+                  <Field label="Resolution Type">
+                    <select
+                      value={form.return_policy_type}
+                      onChange={(e) => set("return_policy_type", e.target.value)}
+                      className={selectCls}
+                    >
+                      <option value="exchange_and_refund" className="bg-[#181818] text-white">Exchange & Full Refund</option>
+                      <option value="exchange_or_credit" className="bg-[#181818] text-white">Exchange or Store Credit</option>
+                      <option value="exchange_only" className="bg-[#181818] text-white">Exchange Only (No Cash Refund)</option>
+                      <option value="replacement_only" className="bg-[#181818] text-white">Defective Replacement Only</option>
+                    </select>
+                    <p className="text-[10.5px] text-white/30 mt-1">Resolution offered to customers</p>
+                  </Field>
+
+                  <Field label="Reverse Courier Pickup">
+                    <select
+                      value={form.return_shipping_type}
+                      onChange={(e) => set("return_shipping_type", e.target.value)}
+                      className={selectCls}
+                    >
+                      <option value="complimentary_pickup" className="bg-[#181818] text-white">Complimentary Doorstep Pickup</option>
+                      <option value="customer_borne" className="bg-[#181818] text-white">Customer Borne / Self-Ship</option>
+                    </select>
+                    <p className="text-[10.5px] text-white/30 mt-1">Shipping cost responsibility</p>
+                  </Field>
+                </div>
+
+                <div className="pt-2">
+                  <Field label="Storefront Tagline / Headline">
+                    <input
+                      type="text"
+                      value={form.return_policy_tagline}
+                      onChange={(e) => set("return_policy_tagline", e.target.value)}
+                      className={inputCls}
+                      placeholder="Effortless home exchange & returns"
+                    />
+                    <p className="text-[10.5px] text-white/30 mt-1">Appears on product detail page badge and the returns policy header</p>
+                  </Field>
+                </div>
+
+                <div className="pt-2">
+                  <Field label="Eligibility Conditions & Guidelines">
+                    <textarea
+                      rows={3}
+                      value={form.return_policy_conditions}
+                      onChange={(e) => set("return_policy_conditions", e.target.value)}
+                      className="w-full bg-[#161616] border border-white/[0.08] rounded-sm px-3.5 py-2.5 text-[13px] text-white placeholder-white/30 outline-none focus:border-[#c8874a] transition-colors resize-none"
+                      placeholder="List conditions required (tags attached, box intact, etc.)"
+                    />
+                    <p className="text-[10.5px] text-white/30 mt-1">Shown prominently on the customer-facing /returns page</p>
+                  </Field>
+                </div>
+
+                {/* Live Storefront Preview */}
+                <div className="p-4 rounded-sm bg-[#161616]/80 border border-white/[0.06] space-y-2">
+                  <p className="text-[10.5px] font-bold uppercase tracking-wider text-[#c8874a]">Live Storefront Display Preview</p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-[12px] text-neutral-300">
+                    <div className="bg-[#111111] p-3 rounded-sm border border-white/[0.04]">
+                      <span className="text-white/40 block text-[10.5px] uppercase tracking-wider mb-1">Store Benefits Bar</span>
+                      <span className="font-semibold text-white">EASY RETURNS — {form.return_window_days || "14"} days return</span>
+                    </div>
+                    <div className="bg-[#111111] p-3 rounded-sm border border-white/[0.04]">
+                      <span className="text-white/40 block text-[10.5px] uppercase tracking-wider mb-1">Product Detail Badge</span>
+                      <span className="font-semibold text-white">{form.return_window_days || "14"}-day {form.return_policy_tagline || "effortless home exchange & returns"}</span>
+                    </div>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <div className="p-4 rounded-sm bg-amber-500/10 border border-amber-500/20 text-amber-300 text-[12px]">
+                Returns & exchanges are disabled. Storefront will display &quot;Quality Inspected / Replacement Guarantee&quot;.
               </div>
             )}
           </div>

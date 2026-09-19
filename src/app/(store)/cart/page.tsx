@@ -720,9 +720,11 @@ export default function CartPage() {
 
             {/* Trust badges */}
             <div className="flex items-center justify-center gap-4 pt-1">
-              {["Free Returns", "Secure Payment", "30-Day Warranty"].map((t) => (
-                <span key={t} className="text-[10px] text-white/25 text-center">{t}</span>
-              ))}
+              <Link href="/returns" className="text-[10px] text-white/40 hover:text-[#c8874a] transition-colors text-center underline decoration-white/10 hover:decoration-[#c8874a]">
+                Free Returns
+              </Link>
+              <span className="text-[10px] text-white/25 text-center">Secure Payment</span>
+              <span className="text-[10px] text-white/25 text-center">UV400 Certified</span>
             </div>
           </div>
         </div>

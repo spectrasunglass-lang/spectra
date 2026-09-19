@@ -51,7 +51,19 @@ interface ProductData {
   whats_in_the_box?: string | string[] | null;
 }
 
-export default function ProductDetailClient({ product }: { product: ProductData }) {
+export interface ReturnSettingsProp {
+  windowDays?: string;
+  enabled?: boolean;
+  tagline?: string;
+}
+
+export default function ProductDetailClient({
+  product,
+  returnSettings,
+}: {
+  product: ProductData;
+  returnSettings?: ReturnSettingsProp;
+}) {
   const { addItem } = useCart();
   const colorVariants = useMemo(
     () => normalizeProductColorVariants(product.color_variants),
@@ -689,10 +701,17 @@ export default function ProductDetailClient({ product }: { product: ProductData 
               <Truck size={16} className="text-[#c8874a]" />
               <span>Complimentary express delivery across India</span>
             </div>
-            <div className="flex items-center gap-3">
-              <RefreshCw size={16} className="text-[#c8874a]" />
-              <span>14-day effortless home exchange & returns</span>
-            </div>
+            <Link
+              href="/returns"
+              className="flex items-center gap-3 hover:text-white transition-colors group/ret cursor-pointer"
+            >
+              <RefreshCw size={16} className="text-[#c8874a] group-hover/ret:rotate-180 transition-transform duration-500" />
+              <span>
+                {returnSettings?.enabled === false
+                  ? "100% Inspected quality & replacement guarantee"
+                  : `${returnSettings?.windowDays || "14"}-day ${returnSettings?.tagline || "effortless home exchange & returns"}`}
+              </span>
+            </Link>
             <div className="flex items-center gap-3">
               <ShieldCheck size={16} className="text-[#c8874a]" />
               <span>100% Certified UV400 optical protection</span>

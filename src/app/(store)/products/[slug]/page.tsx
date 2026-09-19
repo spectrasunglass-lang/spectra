@@ -171,13 +171,33 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
     },
   };
 
-  // Fetch related products in the same category
-  const { data: relatedData } = await supabase
-    .from("products")
-    .select("id, name, subtitle, price, compare_price, image_url, images, slug, is_new, shape, category")
-    .eq("status", "active")
-    .neq("id", product.id)
-    .limit(4);
+  // Fetch related products and store return policy in parallel
+  const [{ data: relatedData }, { data: settingsData }] = await Promise.all([
+    supabase
+      .from("products")
+      .select("id, name, subtitle, price, compare_price, image_url, images, slug, is_new, shape, category")
+      .eq("status", "active")
+      .neq("id", product.id)
+      .limit(4),
+    supabase
+      .from("settings")
+      .select("key, value")
+      .in("key", ["return_window_days", "return_policy_enabled", "return_policy_tagline"]),
+  ]);
+
+  const returnSettings = {
+    windowDays: "14",
+    enabled: true,
+    tagline: "effortless home exchange & returns",
+  };
+
+  if (settingsData && settingsData.length > 0) {
+    settingsData.forEach((row) => {
+      if (row.key === "return_window_days" && row.value) returnSettings.windowDays = row.value;
+      if (row.key === "return_policy_enabled") returnSettings.enabled = row.value !== "false";
+      if (row.key === "return_policy_tagline" && row.value) returnSettings.tagline = row.value;
+    });
+  }
 
   const relatedProducts: Product[] = (relatedData || []).map((p) => ({
     id: p.id,
@@ -199,7 +219,7 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }}
       />
 
-      <ProductDetailClient key={product.id} product={product} />
+      <ProductDetailClient key={product.id} product={product} returnSettings={returnSettings} />
 
       {/* Related Products */}
       {relatedProducts.length > 0 && (
