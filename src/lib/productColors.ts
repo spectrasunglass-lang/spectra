@@ -2,6 +2,7 @@ export interface ProductColorVariant {
   id: string;
   name: string;
   image_url: string;
+  images?: string[];
 }
 
 type UnknownRecord = Record<string, unknown>;
@@ -10,7 +11,7 @@ function isRecord(value: unknown): value is UnknownRecord {
   return typeof value === "object" && value !== null;
 }
 
-/** Safely reads colour variants returned from Supabase JSONB data. */
+/** Safely reads colour variants returned from Supabase JSONB data with multi-image support. */
 export function normalizeProductColorVariants(value: unknown): ProductColorVariant[] {
   let rawValue = value;
 
@@ -33,8 +34,24 @@ export function normalizeProductColorVariants(value: unknown): ProductColorVaria
     const imageUrl = typeof item.image_url === "string" ? item.image_url.trim() : "";
     const requestedId = typeof item.id === "string" ? item.id.trim() : "";
 
-    // A customer-facing variant must always identify a colour and its image.
-    if (!name || !imageUrl) return variants;
+    // Parse multi-image array if present
+    let images: string[] = [];
+    if (Array.isArray(item.images)) {
+      images = item.images.filter((img): img is string => typeof img === "string" && img.trim() !== "");
+    }
+
+    // Determine the primary cover image
+    const primaryImage = imageUrl || images[0] || "";
+
+    // A customer-facing variant must always identify a colour and at least one image.
+    if (!name || !primaryImage) return variants;
+
+    // Ensure primary image is present in the images array
+    if (images.length === 0) {
+      images = [primaryImage];
+    } else if (!images.includes(primaryImage)) {
+      images = [primaryImage, ...images];
+    }
 
     const idBase = requestedId || `color-${index + 1}`;
     let id = idBase;
@@ -45,12 +62,17 @@ export function normalizeProductColorVariants(value: unknown): ProductColorVaria
     }
     usedIds.add(id);
 
-    variants.push({ id, name, image_url: imageUrl });
+    variants.push({
+      id,
+      name,
+      image_url: primaryImage,
+      images,
+    });
     return variants;
   }, []);
 }
 
 export function createProductColorVariant(): ProductColorVariant {
   const id = globalThis.crypto?.randomUUID?.() || `color-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-  return { id, name: "", image_url: "" };
+  return { id, name: "", image_url: "", images: [] };
 }

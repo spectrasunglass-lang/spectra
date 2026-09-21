@@ -72,7 +72,7 @@ export default function ProductDetailClient({
   const [selectedColorId, setSelectedColorId] = useState<string | null>(colorVariants[0]?.id || null);
   const selectedColor = colorVariants.find((variant) => variant.id === selectedColorId) || null;
   const [selectedImage, setSelectedImage] = useState(
-    colorVariants[0]?.image_url || product.image_url
+    colorVariants[0]?.images?.[0] || colorVariants[0]?.image_url || product.image_url
   );
   const [added, setAdded] = useState(false);
   const [activeTab, setActiveTab] = useState<string | null>("details");
@@ -176,15 +176,27 @@ export default function ProductDetailClient({
   ];
 
   const images = useMemo(() => {
+    // 1. If a colour variant is selected and has multiple angle photos:
+    if (selectedColor?.images && selectedColor.images.length > 0) {
+      return selectedColor.images;
+    }
+
+    // 2. If a colour variant is selected with single image_url:
+    if (selectedColor?.image_url) {
+      const angles = Array.isArray(product.images) ? product.images : [];
+      return Array.from(new Set([selectedColor.image_url, ...angles]));
+    }
+
+    // 3. Fallback to main product gallery:
     const rawImages = [
       product.image_url,
       ...(Array.isArray(product.images) ? product.images : []),
       ...(Array.isArray(product.gallery_urls) ? product.gallery_urls : []),
-      ...colorVariants.map((variant) => variant.image_url),
+      ...colorVariants.map((variant) => variant.images?.[0] || variant.image_url),
     ].filter(Boolean) as string[];
 
     return Array.from(new Set(rawImages));
-  }, [product.image_url, product.images, product.gallery_urls, colorVariants]);
+  }, [product.image_url, product.images, product.gallery_urls, colorVariants, selectedColor]);
 
   const discountPercent =
     product.compare_price && product.compare_price > product.price
@@ -197,7 +209,7 @@ export default function ProductDetailClient({
       name: product.name,
       slug: product.slug || product.id,
       price: Number(product.price),
-      image_url: selectedColor?.image_url || product.image_url,
+      image_url: selectedColor?.images?.[0] || selectedColor?.image_url || product.image_url,
       subtitle: product.subtitle || "",
       color: selectedColor ? { id: selectedColor.id, name: selectedColor.name } : null,
       gift_package: selectedGiftPackage
@@ -215,7 +227,8 @@ export default function ProductDetailClient({
 
   const selectColor = (variant: ProductColorVariant) => {
     setSelectedColorId(variant.id);
-    setSelectedImage(variant.image_url);
+    const coverImage = variant.images?.[0] || variant.image_url;
+    setSelectedImage(coverImage);
   };
 
   const toggleTab = (tab: string) => {
@@ -641,7 +654,7 @@ export default function ProductDetailClient({
                     >
                       <span className="relative h-8 w-8 overflow-hidden rounded-md bg-[#f5f0eb]">
                         <Image
-                          src={variant.image_url}
+                          src={variant.images?.[0] || variant.image_url}
                           alt={`${variant.name} ${product.name}`}
                           fill
                           className="object-contain p-0.5"
