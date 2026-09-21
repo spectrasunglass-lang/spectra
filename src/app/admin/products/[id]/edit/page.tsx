@@ -179,6 +179,7 @@ export default function EditProductPage({ params }: EditProductPageProps) {
           color_variants: form.color_variants.map((variant) => ({
             ...variant,
             name: variant.name.trim(),
+            product_name: variant.product_name?.trim() || undefined,
           })),
           updated_at: new Date().toISOString(),
         })

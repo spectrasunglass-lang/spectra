@@ -1,6 +1,7 @@
 export interface ProductColorVariant {
   id: string;
   name: string;
+  product_name?: string;
   image_url: string;
   images?: string[];
 }
@@ -11,7 +12,7 @@ function isRecord(value: unknown): value is UnknownRecord {
   return typeof value === "object" && value !== null;
 }
 
-/** Safely reads colour variants returned from Supabase JSONB data with multi-image support. */
+/** Safely reads colour variants returned from Supabase JSONB data with multi-image & custom product name support. */
 export function normalizeProductColorVariants(value: unknown): ProductColorVariant[] {
   let rawValue = value;
 
@@ -31,6 +32,7 @@ export function normalizeProductColorVariants(value: unknown): ProductColorVaria
     if (!isRecord(item)) return variants;
 
     const name = typeof item.name === "string" ? item.name.trim() : "";
+    const productName = typeof item.product_name === "string" ? item.product_name.trim() : "";
     const imageUrl = typeof item.image_url === "string" ? item.image_url.trim() : "";
     const requestedId = typeof item.id === "string" ? item.id.trim() : "";
 
@@ -65,6 +67,7 @@ export function normalizeProductColorVariants(value: unknown): ProductColorVaria
     variants.push({
       id,
       name,
+      product_name: productName || undefined,
       image_url: primaryImage,
       images,
     });
@@ -74,5 +77,5 @@ export function normalizeProductColorVariants(value: unknown): ProductColorVaria
 
 export function createProductColorVariant(): ProductColorVariant {
   const id = globalThis.crypto?.randomUUID?.() || `color-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-  return { id, name: "", image_url: "", images: [] };
+  return { id, name: "", product_name: "", image_url: "", images: [] };
 }

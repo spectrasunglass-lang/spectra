@@ -107,7 +107,8 @@ export default function ProductDetailClient({
     ? `${window.location.origin}/products/${product.slug || product.id}`
     : `/products/${product.slug || product.id}`;
 
-  const shareText = `Check out ${product.name} on SPECTRA Eyewear`;
+  const currentTitle = selectedColor?.product_name || product.name;
+  const shareText = `Check out ${currentTitle} on SPECTRA Eyewear`;
 
   const handleCopyLink = async () => {
     try {
@@ -131,7 +132,7 @@ export default function ProductDetailClient({
     if (typeof navigator !== "undefined" && typeof (navigator as unknown as { share?: (data: ShareData) => Promise<void> }).share === "function") {
       try {
         await navigator.share({
-          title: product.name,
+          title: currentTitle,
           text: shareText,
           url: productUrl,
         });
@@ -206,7 +207,7 @@ export default function ProductDetailClient({
   const handleAddToCart = () => {
     addItem({
       id: product.id,
-      name: product.name,
+      name: selectedColor?.product_name || product.name,
       slug: product.slug || product.id,
       price: Number(product.price),
       image_url: selectedColor?.images?.[0] || selectedColor?.image_url || product.image_url,
@@ -567,7 +568,7 @@ export default function ProductDetailClient({
             </div>
 
             <h1 className="text-3xl sm:text-4xl text-white tracking-wider uppercase">
-              {product.name}
+              {selectedColor?.product_name || product.name}
             </h1>
 
             {product.subtitle && (

@@ -151,34 +151,58 @@ export default function ProductColorVariantsField({
                 key={variant.id}
                 className="rounded-sm border border-white/[0.08] bg-[#161616] p-4 sm:p-5 space-y-4"
               >
-                {/* Variant Header & Name */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-white/[0.05]">
-                  <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#c8874a] bg-[#c8874a]/10 px-2 py-0.5 rounded">
-                      Colour {index + 1}
-                    </span>
-                    <span className="text-[11px] text-white/40">
-                      {variantImages.length} {variantImages.length === 1 ? "angle" : "angles"} uploaded
-                    </span>
-                  </div>
+                {/* Variant Header & Names */}
+                <div className="space-y-3 pb-3 border-b border-white/[0.05]">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-[#c8874a] bg-[#c8874a]/10 px-2 py-0.5 rounded">
+                        Colour {index + 1}
+                      </span>
+                      <span className="text-[11px] text-white/40">
+                        {variantImages.length} {variantImages.length === 1 ? "angle" : "angles"} uploaded
+                      </span>
+                    </div>
 
-                  <div className="flex items-center gap-2 w-full sm:w-auto">
-                    <input
-                      type="text"
-                      value={variant.name}
-                      onChange={(e) => updateVariant(variant.id, { name: e.target.value })}
-                      placeholder="Colour Name (e.g. Crystal Brown, Matte Black)"
-                      className="flex-1 sm:w-64 rounded-sm border border-white/[0.08] bg-[#111111] px-3 py-1.5 text-[12px] text-white outline-none transition-colors placeholder:text-white/25 focus:border-[#c8874a]"
-                    />
                     <button
                       type="button"
                       onClick={() => onChange(variants.filter((item) => item.id !== variant.id))}
-                      className="rounded p-1.5 text-white/35 hover:bg-red-500/10 hover:text-red-400 transition-colors flex-shrink-0 cursor-pointer"
+                      className="rounded p-1 text-white/35 hover:bg-red-500/10 hover:text-red-400 transition-colors cursor-pointer flex items-center gap-1 text-[11px]"
                       title="Remove this colour variant"
                       aria-label={`Remove colour ${variant.name || index + 1}`}
                     >
-                      <Trash2 size={15} />
+                      <Trash2 size={13} />
+                      <span className="hidden sm:inline">Delete</span>
                     </button>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="text-[10px] font-bold uppercase tracking-wider text-white/50 block mb-1">
+                        Colour Swatch Name *
+                      </label>
+                      <input
+                        type="text"
+                        value={variant.name}
+                        onChange={(e) => updateVariant(variant.id, { name: e.target.value })}
+                        placeholder="e.g. Crystal Brown, Matte Black, Blue"
+                        className="w-full rounded-sm border border-white/[0.08] bg-[#111111] px-3 py-2 text-[12px] text-white outline-none transition-colors placeholder:text-white/25 focus:border-[#c8874a]"
+                      />
+                      <p className="text-[10px] text-white/30 mt-1">Short label shown on the colour selector button</p>
+                    </div>
+
+                    <div>
+                      <label className="text-[10px] font-bold uppercase tracking-wider text-[#c8874a] block mb-1">
+                        Product Name on Colour Click (H1 Title)
+                      </label>
+                      <input
+                        type="text"
+                        value={variant.product_name || ""}
+                        onChange={(e) => updateVariant(variant.id, { product_name: e.target.value })}
+                        placeholder="e.g. Classic - Crystal Brown Transparent"
+                        className="w-full rounded-sm border border-white/[0.08] bg-[#111111] px-3 py-2 text-[12px] text-white outline-none transition-colors placeholder:text-white/25 focus:border-[#c8874a]"
+                      />
+                      <p className="text-[10px] text-white/30 mt-1">Changes product title when customer clicks this colour</p>
+                    </div>
                   </div>
                 </div>
 
