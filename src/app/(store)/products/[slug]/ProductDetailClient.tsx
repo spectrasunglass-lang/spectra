@@ -610,6 +610,42 @@ export default function ProductDetailClient({
             )}
           </div>
 
+          {/* Real Stock Inventory Status */}
+          {(() => {
+            const stockQty = (() => {
+              if (typeof product.stock_quantity === "number") return product.stock_quantity;
+              if (Array.isArray(product.color_variants) && product.color_variants.length > 0) {
+                const first = product.color_variants[0] as { stock_quantity?: number };
+                if (typeof first?.stock_quantity === "number") return first.stock_quantity;
+              }
+              return null;
+            })();
+
+            if (stockQty === null) return null;
+            if (stockQty <= 0) {
+              return (
+                <div className="flex items-center gap-2 px-3.5 py-2.5 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-[12px] font-bold">
+                  <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+                  Currently Out of Stock — Check back soon
+                </div>
+              );
+            }
+            if (stockQty <= 5) {
+              return (
+                <div className="flex items-center gap-2 px-3.5 py-2.5 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-400 text-[12px] font-semibold">
+                  <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+                  ⚡ Only {stockQty} {stockQty === 1 ? "unit" : "units"} left in stock — order soon!
+                </div>
+              );
+            }
+            return (
+              <div className="flex items-center gap-2 text-[11.5px] font-semibold text-emerald-400">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                In Stock • Ready to dispatch across India
+              </div>
+            );
+          })()}
+
           {/* Quick Specs Pills */}
           <div className="grid grid-cols-2 gap-2 text-[11.5px] text-neutral-300">
             {product.material && (
@@ -680,33 +716,60 @@ export default function ProductDetailClient({
 
           {/* Add to Cart / Buy Now CTAs */}
           <div className="space-y-3 pt-1">
-            <button
-              type="button"
-              onClick={handleAddToCart}
-              className={`w-full py-4 rounded-sm font-bold text-[12px] uppercase tracking-[0.18em] flex items-center justify-center gap-2 transition-all shadow-xl cursor-pointer ${
-                added
-                  ? "bg-emerald-600 text-white shadow-emerald-900/30"
-                  : "bg-[#c8874a] hover:bg-[#b87840] text-white shadow-[#c8874a]/25 hover:shadow-[#c8874a]/40"
-              }`}
-            >
-              {added ? (
-                <>
-                  <Bookmark size={16} className="fill-white" /> Saved to List
-                </>
-              ) : (
-                <>
-                  <Bookmark size={16} /> Save to List
-                </>
-              )}
-            </button>
+            {(() => {
+              const isOutOfStock = (() => {
+                const qty = typeof product.stock_quantity === "number"
+                  ? product.stock_quantity
+                  : Array.isArray(product.color_variants) && product.color_variants[0]?.stock_quantity !== undefined
+                  ? Number((product.color_variants[0] as { stock_quantity?: number }).stock_quantity)
+                  : null;
+                return qty !== null && qty <= 0;
+              })();
 
-            <Link
-              href="/cart"
-              onClick={handleAddToCart}
-              className="w-full py-4 rounded-sm font-bold text-[12px] uppercase tracking-[0.18em] flex items-center justify-center gap-2 bg-white text-black hover:bg-neutral-200 transition-colors shadow-lg cursor-pointer"
-            >
-              <Zap size={16} /> Buy Now
-            </Link>
+              if (isOutOfStock) {
+                return (
+                  <button
+                    type="button"
+                    disabled
+                    className="w-full py-4 rounded-sm font-bold text-[12px] uppercase tracking-[0.18em] flex items-center justify-center gap-2 bg-neutral-800 text-neutral-400 cursor-not-allowed border border-white/[0.06]"
+                  >
+                    Currently Out of Stock
+                  </button>
+                );
+              }
+
+              return (
+                <>
+                  <button
+                    type="button"
+                    onClick={handleAddToCart}
+                    className={`w-full py-4 rounded-sm font-bold text-[12px] uppercase tracking-[0.18em] flex items-center justify-center gap-2 transition-all shadow-xl cursor-pointer ${
+                      added
+                        ? "bg-emerald-600 text-white shadow-emerald-900/30"
+                        : "bg-[#c8874a] hover:bg-[#b87840] text-white shadow-[#c8874a]/25 hover:shadow-[#c8874a]/40"
+                    }`}
+                  >
+                    {added ? (
+                      <>
+                        <Bookmark size={16} className="fill-white" /> Saved to List
+                      </>
+                    ) : (
+                      <>
+                        <Bookmark size={16} /> Save to List
+                      </>
+                    )}
+                  </button>
+
+                  <Link
+                    href="/cart"
+                    onClick={handleAddToCart}
+                    className="w-full py-4 rounded-sm font-bold text-[12px] uppercase tracking-[0.18em] flex items-center justify-center gap-2 bg-white text-black hover:bg-neutral-200 transition-colors shadow-lg cursor-pointer"
+                  >
+                    <Zap size={16} /> Buy Now
+                  </Link>
+                </>
+              );
+            })()}
           </div>
 
           {/* Guarantee Badges */}

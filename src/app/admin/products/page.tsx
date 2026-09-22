@@ -18,10 +18,21 @@ interface Product {
   category: string;
   shape: string;
   is_new: boolean;
+  stock_quantity?: number | null;
+  color_variants?: unknown;
   status: "active" | "draft";
   slug: string;
   created_at: string;
 }
+
+const getProductStock = (p: Product): number | null => {
+  if (typeof p.stock_quantity === "number") return p.stock_quantity;
+  if (Array.isArray(p.color_variants) && p.color_variants.length > 0) {
+    const first = p.color_variants[0] as { stock_quantity?: number };
+    if (typeof first?.stock_quantity === "number") return first.stock_quantity;
+  }
+  return null;
+};
 
 export default function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -219,7 +230,20 @@ export default function ProductsPage() {
                 <p className="text-[11px] text-white/40 mt-0.5 truncate">{product.subtitle}</p>
                 <div className="flex items-center justify-between mt-2.5">
                   <p className="text-[13px] font-bold text-[#c8874a]">₹{product.price.toLocaleString("en-IN")}</p>
-                  <StatusBadge status={product.status} />
+                  <div className="flex items-center gap-1.5">
+                    {(() => {
+                      const stock = getProductStock(product);
+                      if (stock === null) return null;
+                      if (stock <= 0) {
+                        return <span className="text-[9px] font-bold text-red-400 bg-red-500/15 px-1.5 py-0.5 rounded border border-red-500/20">Out</span>;
+                      }
+                      if (stock <= 5) {
+                        return <span className="text-[9px] font-bold text-amber-400 bg-amber-500/15 px-1.5 py-0.5 rounded border border-amber-500/20">{stock} left</span>;
+                      }
+                      return <span className="text-[9px] text-white/40">{stock} qty</span>;
+                    })()}
+                    <StatusBadge status={product.status} />
+                  </div>
                 </div>
               </div>
             </div>
@@ -228,10 +252,10 @@ export default function ProductsPage() {
       ) : (
         <div className="bg-[#111111] rounded-sm border border-white/[0.07] overflow-hidden">
           <div className="overflow-x-auto no-scrollbar">
-            <table className="w-full text-left min-w-[620px]">
+            <table className="w-full text-left min-w-[680px]">
               <thead>
                 <tr className="border-b border-white/[0.06] bg-[#0d0d0d]">
-                  {["Product", "Category", "Shape", "Price", "Status", ""].map((h) => (
+                  {["Product", "Category", "Shape", "Price", "Stock", "Status", ""].map((h) => (
                     <th key={h} className="px-6 py-3.5 text-[10px] font-bold text-white/30 uppercase tracking-widest">{h}</th>
                   ))}
                 </tr>
@@ -257,6 +281,31 @@ export default function ProductsPage() {
                     <td className="px-6 py-4 text-[12px] text-white/70 capitalize">{product.category}</td>
                     <td className="px-6 py-4 text-[12px] text-white/70 capitalize">{product.shape}</td>
                     <td className="px-6 py-4 text-[13px] font-bold text-[#c8874a]">₹{product.price.toLocaleString("en-IN")}</td>
+                    <td className="px-6 py-4">
+                      {(() => {
+                        const stock = getProductStock(product);
+                        if (stock === null) return <span className="text-white/30 text-[11px]">—</span>;
+                        if (stock <= 0) {
+                          return (
+                            <span className="inline-flex items-center px-2 py-0.5 rounded text-[10.5px] font-bold bg-red-500/15 text-red-400 border border-red-500/20">
+                              0 (Out)
+                            </span>
+                          );
+                        }
+                        if (stock <= 5) {
+                          return (
+                            <span className="inline-flex items-center px-2 py-0.5 rounded text-[10.5px] font-bold bg-amber-500/15 text-amber-400 border border-amber-500/20">
+                              {stock} left
+                            </span>
+                          );
+                        }
+                        return (
+                          <span className="text-[12px] font-medium text-emerald-400">
+                            {stock} in stock
+                          </span>
+                        );
+                      })()}
+                    </td>
                     <td className="px-6 py-4"><StatusBadge status={product.status} /></td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-1">

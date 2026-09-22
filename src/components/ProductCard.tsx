@@ -18,6 +18,8 @@ export interface Product {
   is_new?: boolean;
   shape?: string;
   category?: string;
+  stock_quantity?: number | null;
+  color_variants?: unknown;
 }
 
 export interface ProductCardProps {
@@ -32,6 +34,8 @@ export interface ProductCardProps {
   is_new?: boolean;
   shape?: string;
   category?: string;
+  stock_quantity?: number | null;
+  color_variants?: unknown;
   product?: Product;
   variant?: "default" | "classic";
 }
@@ -49,6 +53,8 @@ export function ProductCard(props: ProductCardProps) {
     is_new: props.is_new,
     shape: props.shape,
     category: props.category,
+    stock_quantity: props.stock_quantity ?? null,
+    color_variants: props.color_variants ?? [],
   };
 
   const variant = props.variant || "default";
@@ -95,6 +101,21 @@ export function ProductCard(props: ProductCardProps) {
       ? Math.round(((p.compare_price - p.price) / p.compare_price) * 100)
       : null;
 
+  // ── Real Stock & Urgency Logic ──
+  const stock: number | null = (() => {
+    if (typeof p.stock_quantity === "number") return p.stock_quantity;
+    if (Array.isArray(p.color_variants) && p.color_variants.length > 0) {
+      const first = p.color_variants[0] as { stock_quantity?: number };
+      if (typeof first?.stock_quantity === "number") return first.stock_quantity;
+    }
+    return null;
+  })();
+
+  const isOutOfStock = stock !== null && stock <= 0;
+  const isLowStock = stock !== null && stock > 0 && stock <= 5;
+  const isNew = Boolean(p.is_new);
+  const isSale = !isNew && !isLowStock && !isOutOfStock && Boolean(p.compare_price && p.compare_price > p.price);
+
   // ── CLASSIC / OLD STYLE (Used in New Arrivals) ──
   if (variant === "classic") {
     return (
@@ -133,38 +154,59 @@ export function ProductCard(props: ProductCardProps) {
 
             {/* Badges */}
             <div className="absolute top-3 left-3 flex items-center gap-1.5 z-10">
-              {p.is_new && (
-                <span className="text-[9px] font-bold tracking-[0.15em] px-2 py-0.5 bg-[#c8874a] text-white rounded-sm uppercase ">
-                  NEW
+              {isOutOfStock ? (
+                <span className="text-[9px] font-bold px-2 py-0.5 bg-neutral-900 text-white rounded-sm uppercase tracking-wider">
+                  OUT OF STOCK
                 </span>
-              )}
-              {discount && (
-                <span className="text-[9px] font-bold px-2 py-0.5 bg-red-600 text-white rounded-sm shadow-sm">
-                  -{discount}%
+              ) : isLowStock ? (
+                <span className="text-[9px] font-bold px-2 py-0.5 bg-[#b93828] text-white rounded-sm uppercase tracking-wider">
+                  {stock === 1 ? "ONLY 1 LEFT" : `ONLY ${stock} LEFT`}
                 </span>
+              ) : (
+                <>
+                  {p.is_new && (
+                    <span className="text-[9px] font-bold tracking-[0.15em] px-2 py-0.5 bg-[#c8874a] text-white rounded-sm uppercase ">
+                      NEW
+                    </span>
+                  )}
+                  {discount && (
+                    <span className="text-[9px] font-bold px-2 py-0.5 bg-red-600 text-white rounded-sm shadow-sm">
+                      -{discount}%
+                    </span>
+                  )}
+                </>
               )}
             </div>
 
             {/* Add to Cart slide-up button on hover */}
             <div className="absolute inset-x-0 bottom-0 translate-y-full group-hover:translate-y-0 transition-transform duration-300 z-20">
-              <button
-                onClick={handleAddToCart}
-                className={`w-full py-3 flex items-center justify-center gap-2 text-[11px] font-bold tracking-wider uppercase transition-all duration-200 shadow-md ${
-                  added
-                    ? "bg-emerald-600 text-white"
-                    : "bg-[#0a0a0a] text-white hover:bg-[#c8874a]"
-                }`}
-              >
-                {added ? (
-                  <>
-                    <Bookmark size={14} className="fill-white" /> Saved to List!
-                  </>
-                ) : (
-                  <>
-                    <Bookmark size={14} /> Save to List
-                  </>
-                )}
-              </button>
+              {isOutOfStock ? (
+                <button
+                  disabled
+                  className="w-full py-3 flex items-center justify-center gap-2 text-[11px] font-bold tracking-wider uppercase bg-neutral-800 text-neutral-400 cursor-not-allowed"
+                >
+                  Out of Stock
+                </button>
+              ) : (
+                <button
+                  onClick={handleAddToCart}
+                  className={`w-full py-3 flex items-center justify-center gap-2 text-[11px] font-bold tracking-wider uppercase transition-all duration-200 shadow-md ${
+                    added
+                      ? "bg-emerald-600 text-white"
+                      : "bg-[#0a0a0a] text-white hover:bg-[#c8874a]"
+                  }`}
+                >
+                  {added ? (
+                    <>
+                      <Bookmark size={14} className="fill-white" /> Saved to List!
+                    </>
+                  ) : (
+                    <>
+                      <Bookmark size={14} /> Save to List
+                    </>
+                  )}
+                </button>
+              )}
             </div>
           </div>
 
@@ -179,15 +221,20 @@ export function ProductCard(props: ProductCardProps) {
               </h3>
             </div>
 
-            <div className="mt-3 flex items-baseline gap-2">
-              <span className="text-base font-bold text-neutral-900">
-                &#8377;{p.price.toLocaleString("en-IN")}
-              </span>
-              {p.compare_price && p.compare_price > p.price && (
-                <span className="text-xs text-neutral-400 line-through">
-                  &#8377;{p.compare_price.toLocaleString("en-IN")}
+            <div className="mt-3 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="font-bold text-neutral-900 text-sm">
+                  Rs. {p.price.toLocaleString("en-IN")}
                 </span>
-              )}
+                {p.compare_price && p.compare_price > p.price && (
+                  <span className="text-xs text-neutral-400 line-through">
+                    Rs. {p.compare_price.toLocaleString("en-IN")}
+                  </span>
+                )}
+              </div>
+              <span className="text-[10px] uppercase tracking-widest font-semibold text-neutral-400">
+                Spectra
+              </span>
             </div>
           </div>
         </div>
@@ -196,9 +243,6 @@ export function ProductCard(props: ProductCardProps) {
   }
 
   // ── DEFAULT NEW MODERN MINIMAL STYLE ──
-  const isLowStock = !p.is_new && p.compare_price && p.compare_price > p.price;
-  const isNew = Boolean(p.is_new);
-
   const tagLabel = p.shape
     ? `${p.shape.toUpperCase()} / M`
     : p.category
@@ -240,41 +284,62 @@ export function ProductCard(props: ProductCardProps) {
             </div>
           )}
 
-          {/* Top Left Badge: LOW STOCK / NEW */}
-          {isNew ? (
+          {/* Top Left Badge: OUT OF STOCK / ONLY X LEFT / NEW / SALE */}
+          {isOutOfStock ? (
             <div className="absolute top-2.5 left-2.5 z-10">
-              <span className="text-[8px] sm:text-[8.5px] font-extrabold px-1.5 py-0.5 bg-black text-white rounded-[2px] uppercase tracking-wider">
-                NEW
+              <span className="text-[8px] sm:text-[8.5px] font-extrabold px-1.5 py-0.5 bg-neutral-900 text-white rounded-[2px] uppercase tracking-wider">
+                OUT OF STOCK
               </span>
             </div>
           ) : isLowStock ? (
             <div className="absolute top-2.5 left-2.5 z-10">
               <span className="text-[8px] sm:text-[8.5px] font-extrabold px-1.5 py-0.5 bg-[#b93828] text-white rounded-[2px] uppercase tracking-wider">
-                LOW STOCK
+                {stock === 1 ? "ONLY 1 LEFT" : `ONLY ${stock} LEFT`}
+              </span>
+            </div>
+          ) : isNew ? (
+            <div className="absolute top-2.5 left-2.5 z-10">
+              <span className="text-[8px] sm:text-[8.5px] font-extrabold px-1.5 py-0.5 bg-black text-white rounded-[2px] uppercase tracking-wider">
+                NEW
+              </span>
+            </div>
+          ) : isSale ? (
+            <div className="absolute top-2.5 left-2.5 z-10">
+              <span className="text-[8px] sm:text-[8.5px] font-extrabold px-1.5 py-0.5 bg-[#c8874a] text-white rounded-[2px] uppercase tracking-wider">
+                {discount ? `-${discount}%` : "SALE"}
               </span>
             </div>
           ) : null}
 
           {/* Add to Cart slide-up button on hover */}
           <div className="absolute inset-x-0 bottom-0 translate-y-full group-hover:translate-y-0 transition-transform duration-300 z-20">
-            <button
-              onClick={handleAddToCart}
-              className={`w-full py-2.5 sm:py-3 flex items-center justify-center gap-2 text-[10.5px] sm:text-[11px] font-bold tracking-wider uppercase transition-all duration-200 shadow-md rounded-none ${
-                added
-                  ? "bg-emerald-600 text-white"
-                  : "bg-[#0a0a0a] text-white hover:bg-[#c8874a]"
-              }`}
-            >
-              {added ? (
-                <>
-                  <Bookmark size={14} className="fill-white" /> Saved to List!
-                </>
-              ) : (
-                <>
-                  <Bookmark size={14} /> Save to List
-                </>
-              )}
-            </button>
+            {isOutOfStock ? (
+              <button
+                disabled
+                className="w-full py-2.5 sm:py-3 flex items-center justify-center gap-2 text-[10.5px] sm:text-[11px] font-bold tracking-wider uppercase bg-neutral-800 text-neutral-400 cursor-not-allowed rounded-none"
+              >
+                Out of Stock
+              </button>
+            ) : (
+              <button
+                onClick={handleAddToCart}
+                className={`w-full py-2.5 sm:py-3 flex items-center justify-center gap-2 text-[10.5px] sm:text-[11px] font-bold tracking-wider uppercase transition-all duration-200 shadow-md rounded-none ${
+                  added
+                    ? "bg-emerald-600 text-white"
+                    : "bg-[#0a0a0a] text-white hover:bg-[#c8874a]"
+                }`}
+              >
+                {added ? (
+                  <>
+                    <Bookmark size={14} className="fill-white" /> Saved to List!
+                  </>
+                ) : (
+                  <>
+                    <Bookmark size={14} /> Save to List
+                  </>
+                )}
+              </button>
+            )}
           </div>
         </div>
 

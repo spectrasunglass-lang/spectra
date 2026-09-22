@@ -17,6 +17,7 @@ CREATE TABLE IF NOT EXISTS public.products (
     image_url TEXT,
     images TEXT[] DEFAULT ARRAY[]::TEXT[],
     color_variants JSONB NOT NULL DEFAULT '[]'::JSONB,
+    stock_quantity INTEGER DEFAULT 20,
     is_new BOOLEAN DEFAULT true,
     is_polarized BOOLEAN DEFAULT false,
     is_gift BOOLEAN DEFAULT false,
@@ -28,6 +29,7 @@ CREATE TABLE IF NOT EXISTS public.products (
 );
 
 -- Migration helpers if table already exists
+ALTER TABLE public.products ADD COLUMN IF NOT EXISTS stock_quantity INTEGER DEFAULT 20;
 ALTER TABLE public.products ADD COLUMN IF NOT EXISTS is_polarized BOOLEAN DEFAULT false;
 ALTER TABLE public.products ADD COLUMN IF NOT EXISTS is_gift BOOLEAN DEFAULT false;
 ALTER TABLE public.products ADD COLUMN IF NOT EXISTS is_computer_glasses BOOLEAN DEFAULT false;

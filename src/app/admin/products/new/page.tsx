@@ -39,6 +39,7 @@ export default function NewProductPage() {
     image_url: null as string | null,
     gallery_images: [] as string[],
     color_variants: [] as ProductColorVariant[],
+    stock_quantity: "20",
   });
 
   const set = (k: keyof typeof form, v: unknown) =>
@@ -78,32 +79,46 @@ export default function NewProductPage() {
         ? `${form.description.trim()}\n\n---WHATS_IN_THE_BOX---\n${form.whats_in_the_box.trim()}`
         : form.description.trim();
 
-      const { error: dbError } = await supabase.from("products").insert([
-        {
-          name: form.name,
-          subtitle: form.subtitle,
-          slug: form.slug || autoSlug(form.name),
-          price: parseFloat(form.price),
-          compare_price: form.compare_price ? parseFloat(form.compare_price) : null,
-          cost_price: form.cost_price ? parseFloat(form.cost_price) : null,
-          category: form.category.toLowerCase(),
-          shape: form.shape.toLowerCase(),
-          description: combinedDescription,
-          is_new: form.is_new,
-          is_polarized: form.is_polarized,
-          is_gift: form.is_gift,
-          is_computer_glasses: form.is_computer_glasses,
-          is_accessory: form.is_accessory,
-          status: form.status,
-          image_url: form.image_url,
-          images: form.gallery_images,
-          color_variants: form.color_variants.map((variant) => ({
-            ...variant,
-            name: variant.name.trim(),
-            product_name: variant.product_name?.trim() || undefined,
-          })),
-        },
-      ]);
+      const stockQtyNum = form.stock_quantity.trim() !== "" && !isNaN(Number(form.stock_quantity))
+        ? Math.max(0, parseInt(form.stock_quantity, 10))
+        : null;
+
+      const productPayload: Record<string, unknown> = {
+        name: form.name,
+        subtitle: form.subtitle,
+        slug: form.slug || autoSlug(form.name),
+        price: parseFloat(form.price),
+        compare_price: form.compare_price ? parseFloat(form.compare_price) : null,
+        cost_price: form.cost_price ? parseFloat(form.cost_price) : null,
+        category: form.category.toLowerCase(),
+        shape: form.shape.toLowerCase(),
+        description: combinedDescription,
+        is_new: form.is_new,
+        is_polarized: form.is_polarized,
+        is_gift: form.is_gift,
+        is_computer_glasses: form.is_computer_glasses,
+        is_accessory: form.is_accessory,
+        status: form.status,
+        image_url: form.image_url,
+        images: form.gallery_images,
+        color_variants: form.color_variants.map((variant) => ({
+          ...variant,
+          name: variant.name.trim(),
+          product_name: variant.product_name?.trim() || undefined,
+          stock_quantity: stockQtyNum !== null ? stockQtyNum : undefined,
+        })),
+        ...(stockQtyNum !== null ? { stock_quantity: stockQtyNum } : {}),
+      };
+
+      let { error: dbError } = await supabase.from("products").insert([productPayload]);
+
+      // If stock_quantity column doesn't exist yet in Supabase schema, retry safely without it
+      if (dbError && dbError.message && dbError.message.includes("stock_quantity")) {
+        delete productPayload.stock_quantity;
+        const retry = await supabase.from("products").insert([productPayload]);
+        dbError = retry.error;
+      }
+
       if (dbError) throw new Error(dbError.message);
       setSaved(true);
       setTimeout(() => router.push("/admin/products"), 1200);
@@ -271,6 +286,27 @@ export default function NewProductPage() {
                   )}
                 </div>
               </div>
+            </div>
+
+            {/* Stock Quantity / Inventory Row */}
+            <div className="pt-4 border-t border-white/[0.05]">
+              <FormField label="Available Stock Quantity (Inventory Units)">
+                <div className="flex items-center rounded-sm border border-white/[0.08] bg-[#161616] focus-within:border-[#c8874a] overflow-hidden transition-colors">
+                  <span className="px-3.5 py-2.5 text-[12px] font-bold text-white/40 bg-[#121212] border-r border-white/[0.08]">QTY</span>
+                  <input
+                    type="number"
+                    value={form.stock_quantity}
+                    onChange={(e) => set("stock_quantity", e.target.value)}
+                    placeholder="20"
+                    className="flex-1 px-3.5 py-2.5 text-[13px] outline-none text-white bg-transparent placeholder-white/30"
+                    min="0"
+                    step="1"
+                  />
+                </div>
+                <p className="text-[11px] text-white/35 mt-1.5 leading-relaxed">
+                  💡 When stock is 5 or below, storefront automatically displays the red <strong className="text-[#c8874a]">LOW STOCK</strong> urgency badge. Set to 0 to mark as <strong className="text-white/60">OUT OF STOCK</strong>.
+                </p>
+              </FormField>
             </div>
           </div>
 
