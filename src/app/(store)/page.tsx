@@ -29,12 +29,14 @@ export default async function Home() {
       .from("products")
       .select("id, name, subtitle, price, compare_price, image_url, images, slug, is_new, shape, category")
       .eq("status", "active")
+      .neq("is_accessory", true)
       .order("created_at", { ascending: false })
       .limit(4),
     supabase
       .from("products")
       .select("id, name, subtitle, price, compare_price, image_url, images, slug, is_new, shape, category")
       .eq("status", "active")
+      .neq("is_accessory", true)
       .order("created_at", { ascending: false })
       .range(0, 7),
     supabase

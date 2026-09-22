@@ -39,6 +39,8 @@ export default function EditProductPage({ params }: EditProductPageProps) {
     shape: "Rectangle",
     description: "",
     whats_in_the_box: DEFAULT_WHATS_IN_THE_BOX,
+    show_description: true,
+    show_whats_in_box: true,
     is_new: true,
     is_polarized: false,
     is_gift: false,
@@ -111,6 +113,8 @@ export default function EditProductPage({ params }: EditProductPageProps) {
             ) || "Rectangle",
           description: desc,
           whats_in_the_box: box,
+          show_description: desc.trim().length > 0,
+          show_whats_in_box: box.trim().length > 0,
           is_new: Boolean(data.is_new),
           is_polarized: Boolean(data.is_polarized),
           is_gift: Boolean(data.is_gift),
@@ -161,9 +165,13 @@ export default function EditProductPage({ params }: EditProductPageProps) {
     try {
       const supabase = createClient();
 
-      const combinedDescription = form.whats_in_the_box?.trim()
-        ? `${form.description.trim()}\n\n---WHATS_IN_THE_BOX---\n${form.whats_in_the_box.trim()}`
-        : form.description.trim();
+      const descPart = form.show_description ? form.description.trim() : "";
+      const boxPart = form.show_whats_in_box && form.whats_in_the_box?.trim()
+        ? form.whats_in_the_box.trim()
+        : "";
+      const combinedDescription = boxPart
+        ? `${descPart}\n\n---WHATS_IN_THE_BOX---\n${boxPart}`
+        : descPart;
 
       const stockQtyNum = form.stock_quantity.trim() !== "" && !isNaN(Number(form.stock_quantity))
         ? Math.max(0, parseInt(form.stock_quantity, 10))
@@ -299,25 +307,67 @@ export default function EditProductPage({ params }: EditProductPageProps) {
               </div>
             </FormField>
 
-            <FormField label="Frame Description & Optics">
-              <textarea
-                value={form.description}
-                onChange={(e) => set("description", e.target.value)}
-                rows={3}
-                placeholder="e.g. Masterfully designed with premium lightweight craftsmanship and scratch-resistant optical coating. Tailored for all-day comfort and glare-free clarity."
-                className={`${inputCls} resize-none`}
-              />
-            </FormField>
+            {/* Description toggle */}
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <label className="text-[12px] font-bold text-white/80 tracking-wide">Frame Description &amp; Optics</label>
+                <button
+                  type="button"
+                  onClick={() => set("show_description", !form.show_description)}
+                  className={`relative w-10 h-5 rounded-full transition-colors duration-200 focus:outline-none cursor-pointer ${
+                    form.show_description ? "bg-[#c8874a]" : "bg-[#252525]"
+                  }`}
+                >
+                  <span className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transition-all duration-200 ${
+                    form.show_description ? "left-[22px]" : "left-0.5"
+                  }`} />
+                </button>
+              </div>
+              {form.show_description ? (
+                <textarea
+                  value={form.description}
+                  onChange={(e) => set("description", e.target.value)}
+                  rows={3}
+                  placeholder="e.g. Masterfully designed with premium lightweight craftsmanship and scratch-resistant optical coating. Tailored for all-day comfort and glare-free clarity."
+                  className={`${inputCls} resize-none`}
+                />
+              ) : (
+                <div className="w-full px-3.5 py-3 rounded-sm border border-white/[0.05] bg-[#0d0d0d] text-[12px] text-white/25 italic">
+                  Description hidden — toggle on to show/edit
+                </div>
+              )}
+            </div>
 
-            <FormField label="What's In The Box (Items listed one per line)">
-              <textarea
-                value={form.whats_in_the_box}
-                onChange={(e) => set("whats_in_the_box", e.target.value)}
-                rows={4}
-                placeholder={`• 1x SPECTRA Handcrafted Eyewear\n• 1x Signature Matte-Black Hardcase\n• 1x High-Density Microfiber Cleaning Cloth\n• 1x Authenticity & Warranty Card`}
-                className={`${inputCls} resize-none font-mono text-[12px]`}
-              />
-            </FormField>
+            {/* What's In The Box toggle */}
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <label className="text-[12px] font-bold text-white/80 tracking-wide">What&apos;s In The Box</label>
+                <button
+                  type="button"
+                  onClick={() => set("show_whats_in_box", !form.show_whats_in_box)}
+                  className={`relative w-10 h-5 rounded-full transition-colors duration-200 focus:outline-none cursor-pointer ${
+                    form.show_whats_in_box ? "bg-[#c8874a]" : "bg-[#252525]"
+                  }`}
+                >
+                  <span className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transition-all duration-200 ${
+                    form.show_whats_in_box ? "left-[22px]" : "left-0.5"
+                  }`} />
+                </button>
+              </div>
+              {form.show_whats_in_box ? (
+                <textarea
+                  value={form.whats_in_the_box}
+                  onChange={(e) => set("whats_in_the_box", e.target.value)}
+                  rows={4}
+                  placeholder={`• 1x SPECTRA Handcrafted Eyewear\n• 1x Signature Matte-Black Hardcase\n• 1x High-Density Microfiber Cleaning Cloth\n• 1x Authenticity & Warranty Card`}
+                  className={`${inputCls} resize-none font-mono text-[12px]`}
+                />
+              ) : (
+                <div className="w-full px-3.5 py-3 rounded-sm border border-white/[0.05] bg-[#0d0d0d] text-[12px] text-white/25 italic">
+                  What&apos;s In The Box hidden — toggle on to show/edit
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Pricing Card */}
