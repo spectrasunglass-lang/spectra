@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { cldUrl, isCloudinaryUrl } from "@/lib/cldUrl";
 import { useCart } from "@/components/CartContext";
 import GiftPackageSelector from "@/components/GiftPackageSelector";
 import { GiftPackage } from "@/lib/giftPackages";
@@ -363,7 +364,14 @@ export default function ProductDetailClient({
                     selectedImage === img ? "border-[#c8874a] shadow-md shadow-[#c8874a]/20 scale-95" : "border-transparent opacity-60 hover:opacity-100"
                   }`}
                 >
-                  <Image src={img} alt={`${product.name} thumbnail ${idx + 1}`} fill className="object-contain p-2" sizes="80px" />
+                  <Image
+                    src={cldUrl(img, 200)}
+                    alt={`${product.name} thumbnail ${idx + 1}`}
+                    fill
+                    unoptimized={isCloudinaryUrl(img)}
+                    className="object-contain p-2"
+                    sizes="80px"
+                  />
                 </button>
               ))}
             </div>
@@ -482,10 +490,11 @@ export default function ProductDetailClient({
               }}
             >
               <Image
-                src={selectedImage}
+                src={cldUrl(selectedImage, 1400)}
                 alt={product.name}
                 fill
                 priority
+                unoptimized={isCloudinaryUrl(selectedImage)}
                 className="object-contain p-4 sm:p-8"
                 sizes="(max-width: 1024px) 100vw, 60vw"
               />
@@ -691,9 +700,10 @@ export default function ProductDetailClient({
                     >
                       <span className="relative h-8 w-8 overflow-hidden rounded-md bg-[#f5f0eb]">
                         <Image
-                          src={variant.images?.[0] || variant.image_url}
+                          src={cldUrl(variant.images?.[0] || variant.image_url, 120)}
                           alt={`${variant.name} ${product.name}`}
                           fill
+                          unoptimized={isCloudinaryUrl(variant.images?.[0] || variant.image_url)}
                           className="object-contain p-0.5"
                           sizes="32px"
                         />
@@ -970,10 +980,11 @@ export default function ProductDetailClient({
               }`}
             >
               <Image
-                src={selectedImage}
+                src={cldUrl(selectedImage, 1800)}
                 alt={product.name}
                 fill
                 priority
+                unoptimized={isCloudinaryUrl(selectedImage)}
                 className="object-contain p-2 sm:p-4 select-none"
                 sizes="100vw"
               />
@@ -1021,7 +1032,14 @@ export default function ProductDetailClient({
                       : "border-white/20 opacity-50 hover:opacity-100"
                   }`}
                 >
-                  <Image src={img} alt="" fill className="object-contain p-1" sizes="60px" />
+                  <Image
+                    src={cldUrl(img, 150)}
+                    alt=""
+                    fill
+                    unoptimized={isCloudinaryUrl(img)}
+                    className="object-contain p-1"
+                    sizes="60px"
+                  />
                 </button>
               ))}
             </div>

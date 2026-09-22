@@ -3,6 +3,7 @@
 import React, { useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { cldUrl, isCloudinaryUrl } from "@/lib/cldUrl";
 import { SpotlightCard, SpotlightHeading } from "@/types/campaign";
 
 interface SpotlightSectionProps {
@@ -64,9 +65,10 @@ export default function SpotlightSection({
                 {/* Background Image */}
                 <div className="absolute inset-0 w-full h-full bg-neutral-900 overflow-hidden">
                   <Image
-                    src={card.image_url}
+                    src={cldUrl(card.image_url, 600)}
                     alt={card.title || "Campaign"}
                     fill
+                    unoptimized={isCloudinaryUrl(card.image_url)}
                     sizes="(max-width: 640px) 260px, (max-width: 1024px) 290px, 320px"
                     className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                     priority={false}

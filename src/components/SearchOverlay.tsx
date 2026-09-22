@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { cldUrl, isCloudinaryUrl } from "@/lib/cldUrl";
 import { Search, X, Loader2, ArrowRight } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
@@ -169,9 +170,10 @@ export default function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                     <div className="w-12 h-12 flex-shrink-0 overflow-hidden relative">
                       {product.image_url ? (
                         <Image
-                          src={product.image_url}
+                          src={cldUrl(product.image_url, 150)}
                           alt={product.name}
                           fill
+                          unoptimized={isCloudinaryUrl(product.image_url)}
                           className="object-contain p-1 group-hover:scale-105 transition-transform duration-300"
                         />
                       ) : (

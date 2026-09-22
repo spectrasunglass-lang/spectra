@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { cldUrl, isCloudinaryUrl } from "@/lib/cldUrl";
 import { createClient } from "@/lib/supabase/client";
 import {
   Plus, Search, LayoutGrid, List, Edit2, Trash2, Package, Loader2, RefreshCw,
@@ -197,7 +198,7 @@ export default function ProductsPage() {
             >
               <div className="relative aspect-square bg-[#f5f0eb]">
                 {product.image_url ? (
-                  <Image src={product.image_url} alt={product.name} fill className="object-contain p-3 transition-transform duration-300 group-hover:scale-105" />
+                  <Image src={cldUrl(product.image_url, 400)} unoptimized={isCloudinaryUrl(product.image_url)} alt={product.name} fill className="object-contain p-3 transition-transform duration-300 group-hover:scale-105" />
                 ) : (
                   <div className="absolute inset-0 flex items-center justify-center">
                     <Package size={24} className="text-gray-400" />
@@ -267,7 +268,7 @@ export default function ProductsPage() {
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-sm bg-[#161616] border border-white/[0.06] flex-shrink-0 overflow-hidden relative">
                           {product.image_url ? (
-                            <Image src={product.image_url} alt={product.name} fill className="object-contain p-1" />
+                            <Image src={cldUrl(product.image_url, 150)} unoptimized={isCloudinaryUrl(product.image_url)} alt={product.name} fill className="object-contain p-1" />
                           ) : (
                             <Package size={16} className="text-white/30 absolute inset-0 m-auto" />
                           )}

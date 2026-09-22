@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
+import { cldUrl, isCloudinaryUrl } from "@/lib/cldUrl";
 import { ImagePlus, Loader2, Plus, Trash2, X, Star, UploadCloud } from "lucide-react";
 import { createProductColorVariant, ProductColorVariant } from "@/lib/productColors";
 
@@ -229,7 +230,8 @@ export default function ProductColorVariantsField({
                           className="group relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-sm border border-white/[0.1] bg-[#f5f0eb] shadow-md"
                         >
                           <Image
-                            src={imgUrl}
+                            src={cldUrl(imgUrl, 200)}
+                            unoptimized={isCloudinaryUrl(imgUrl)}
                             alt={`${variant.name} angle ${imgIdx + 1}`}
                             fill
                             className="object-contain p-1"

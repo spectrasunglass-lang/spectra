@@ -1,6 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { cldUrl, isCloudinaryUrl } from "@/lib/cldUrl";
 import { ArrowRight } from "lucide-react";
 
 export interface StoryTextData {
@@ -50,9 +51,10 @@ export default function OurStorySection({ storyImageUrl, storyText = {} }: OurSt
           <div className="relative w-full aspect-[3/4] max-h-[240px] md:max-h-[480px] bg-[#141414] overflow-hidden">
             {storyImageUrl ? (
               <Image
-                src={storyImageUrl}
+                src={cldUrl(storyImageUrl, 1000)}
                 alt="SPECTRA Story"
                 fill
+                unoptimized={isCloudinaryUrl(storyImageUrl)}
                 className="object-cover"
                 sizes="(max-width: 768px) 100vw, 50vw"
               />

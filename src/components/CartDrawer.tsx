@@ -3,6 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { cldUrl, isCloudinaryUrl } from "@/lib/cldUrl";
 import { X, Plus, Minus, Bookmark, Trash2, ArrowRight, Gift } from "lucide-react";
 import { useCart } from "./CartContext";
 
@@ -78,7 +79,8 @@ export default function CartDrawer() {
                     <div className="w-20 h-20 rounded-xl bg-[#f5f0eb] flex-shrink-0 overflow-hidden relative">
                       {item.image_url ? (
                         <Image
-                          src={item.image_url}
+                          src={cldUrl(item.image_url, 200)}
+                          unoptimized={isCloudinaryUrl(item.image_url)}
                           alt={item.name}
                           fill
                           className="object-contain p-2"

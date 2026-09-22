@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { cldUrl, isCloudinaryUrl } from "@/lib/cldUrl";
 import { ChevronLeft, ChevronRight, ArrowUpRight } from "lucide-react";
 
 export interface HeroSlideData {
@@ -105,10 +106,11 @@ export default function HeroSection({
               {desktopImg && (
                 <div className="hidden md:block absolute inset-0">
                   <Image
-                    src={desktopImg}
+                    src={cldUrl(desktopImg, 1920)}
                     alt={`Hero Slide ${i + 1} Desktop`}
                     fill
-                    priority
+                    priority={i === 0}
+                    unoptimized={isCloudinaryUrl(desktopImg)}
                     sizes="100vw"
                     className="object-cover object-right lg:object-center"
                   />
@@ -119,10 +121,11 @@ export default function HeroSection({
               {mobileImg && (
                 <div className="block md:hidden absolute inset-0">
                   <Image
-                    src={mobileImg}
+                    src={cldUrl(mobileImg, 1080)}
                     alt={`Hero Slide ${i + 1} Mobile`}
                     fill
-                    priority
+                    priority={i === 0}
+                    unoptimized={isCloudinaryUrl(mobileImg)}
                     sizes="100vw"
                     className="object-cover object-top"
                   />

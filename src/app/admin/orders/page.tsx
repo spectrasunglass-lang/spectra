@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
+import { cldUrl, isCloudinaryUrl } from "@/lib/cldUrl";
 import { createClient } from "@/lib/supabase/client";
 import { Search, Filter, ShoppingBag, Loader2, RefreshCw, ChevronDown, ChevronUp, Package, CheckCircle2, Tag } from "lucide-react";
 import StatusBadge from "@/components/admin/StatusBadge";
@@ -285,7 +286,8 @@ export default function OrdersPage() {
                           <div className="relative w-11 h-11 rounded-sm bg-[#f5f0eb] border border-white/[0.08] overflow-hidden flex-shrink-0 flex items-center justify-center shadow-sm">
                             {resolveProductImage(order.product_name) ? (
                               <Image
-                                src={resolveProductImage(order.product_name)!}
+                                src={cldUrl(resolveProductImage(order.product_name), 150)}
+                                unoptimized={isCloudinaryUrl(resolveProductImage(order.product_name))}
                                 alt={order.product_name}
                                 fill
                                 className="object-contain p-1"
@@ -336,7 +338,8 @@ export default function OrdersPage() {
                               <div className="relative w-14 h-14 rounded-sm bg-[#f5f0eb] border border-white/[0.08] overflow-hidden flex-shrink-0 flex items-center justify-center shadow-inner">
                                 {resolveProductImage(order.product_name) ? (
                                   <Image
-                                    src={resolveProductImage(order.product_name)!}
+                                    src={cldUrl(resolveProductImage(order.product_name), 150)}
+                                    unoptimized={isCloudinaryUrl(resolveProductImage(order.product_name))}
                                     alt={order.product_name}
                                     fill
                                     className="object-contain p-1.5"

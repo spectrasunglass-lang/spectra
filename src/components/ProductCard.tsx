@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { ShoppingBag, Check, Bookmark } from "lucide-react";
 import { useCart } from "./CartContext";
+import { cldUrl, isCloudinaryUrl } from "@/lib/cldUrl";
 
 export interface Product {
   id: string;
@@ -126,9 +127,10 @@ export function ProductCard(props: ProductCardProps) {
             {p.image_url ? (
               <>
                 <Image
-                  src={p.image_url}
+                  src={cldUrl(p.image_url, 800)}
                   alt={p.name}
                   fill
+                  unoptimized={isCloudinaryUrl(p.image_url)}
                   sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                   className={`object-contain p-4 transition-all duration-500 ease-out ${
                     secondaryImage
@@ -138,9 +140,10 @@ export function ProductCard(props: ProductCardProps) {
                 />
                 {secondaryImage && (
                   <Image
-                    src={secondaryImage}
+                    src={cldUrl(secondaryImage, 800)}
                     alt={`${p.name} alternate view`}
                     fill
+                    unoptimized={isCloudinaryUrl(secondaryImage)}
                     sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                     className="object-contain p-4 absolute inset-0 opacity-0 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500 ease-out"
                   />
@@ -258,9 +261,10 @@ export function ProductCard(props: ProductCardProps) {
           {p.image_url ? (
             <>
               <Image
-                src={p.image_url}
+                src={cldUrl(p.image_url, 800)}
                 alt={p.name}
                 fill
+                unoptimized={isCloudinaryUrl(p.image_url)}
                 sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                 className={`object-contain p-2 sm:p-4 transition-all duration-500 ease-out ${
                   secondaryImage
@@ -270,9 +274,10 @@ export function ProductCard(props: ProductCardProps) {
               />
               {secondaryImage && (
                 <Image
-                  src={secondaryImage}
+                  src={cldUrl(secondaryImage, 800)}
                   alt={`${p.name} alternate view`}
                   fill
+                  unoptimized={isCloudinaryUrl(secondaryImage)}
                   sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                   className="object-contain p-2 sm:p-4 absolute inset-0 opacity-0 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500 ease-out"
                 />

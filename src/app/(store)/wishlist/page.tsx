@@ -3,6 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { cldUrl, isCloudinaryUrl } from "@/lib/cldUrl";
 import { Bookmark, ArrowRight, Trash2, ShoppingBag } from "lucide-react";
 import { useCart } from "@/components/CartContext";
 
@@ -60,7 +61,8 @@ export default function WishlistPage() {
                   >
                     {item.image_url ? (
                       <Image
-                        src={item.image_url}
+                        src={cldUrl(item.image_url, 200)}
+                        unoptimized={isCloudinaryUrl(item.image_url)}
                         alt={item.name}
                         fill
                         className="object-contain p-1"

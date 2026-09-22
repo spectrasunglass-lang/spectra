@@ -1,6 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { cldUrl, isCloudinaryUrl } from "@/lib/cldUrl";
 import { ArrowRight } from "lucide-react";
 
 export interface ShapeCategory {
@@ -76,9 +77,10 @@ export default function ShopByShapeSection({
                 <div className="w-24 h-24 sm:w-44 sm:h-44 md:w-56 md:h-56 flex items-center justify-center relative mb-2.5 bg-gradient-to-b from-[#fafafc] via-[#f2f3f7] to-[#e6e7ec] border border-gray-200 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] group-hover:-translate-y-1.5 transition-all duration-300 ease-out rounded-sm">
                   {imageUrl ? (
                     <Image
-                      src={imageUrl}
+                      src={cldUrl(imageUrl, 450)}
                       alt={shape.name}
                       fill
+                      unoptimized={isCloudinaryUrl(imageUrl)}
                       className="object-contain p-2 sm:p-5 group-hover:scale-105 transition-transform duration-500 ease-out"
                       sizes="(max-width: 640px) 96px, (max-width: 768px) 176px, 224px"
                     />

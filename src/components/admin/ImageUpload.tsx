@@ -75,6 +75,7 @@ export default function ImageUpload({
             src={value}
             alt="Uploaded"
             fill
+            unoptimized
             className="object-contain p-3"
           />
         </div>
