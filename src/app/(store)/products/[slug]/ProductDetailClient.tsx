@@ -387,7 +387,7 @@ export default function ProductDetailClient({
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
             onClick={() => setIsLightboxOpen(true)}
-            className="relative flex-1 aspect-square sm:aspect-[4/4.5] max-h-[580px] bg-white rounded-sm overflow-hidden border border-white/[0.08] shadow-2xl flex items-center justify-center p-6 sm:p-10 group cursor-zoom-in select-none"
+            className="relative flex-1 aspect-square max-h-[580px] bg-white rounded-sm overflow-hidden border border-white/[0.08] shadow-2xl flex items-center justify-center p-0 group cursor-zoom-in select-none"
           >
             {/* Top Left Badges */}
             <div className="absolute top-4 left-4 z-10 flex flex-wrap items-center gap-2 pointer-events-none">
@@ -495,7 +495,7 @@ export default function ProductDetailClient({
                 fill
                 priority
                 unoptimized={isCloudinaryUrl(selectedImage)}
-                className="object-contain p-4 sm:p-8"
+                className="object-contain p-0"
                 sizes="(max-width: 1024px) 100vw, 60vw"
               />
             </div>
