@@ -151,7 +151,7 @@ export default function AllProductsSection({
         {products.length > 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 md:gap-3">
             {products.map((product) => (
-              <ProductCard key={product.id} product={product} />
+              <ProductCard key={product.id} product={product} theme="light" />
             ))}
           </div>
         ) : !loading ? (

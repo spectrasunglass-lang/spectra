@@ -34,7 +34,7 @@ export default function NewArrivalsSection({ products }: NewArrivalsSectionProps
         {products.length > 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-3 gap-y-7 sm:gap-x-4 sm:gap-y-8 md:gap-x-5">
             {products.map((product) => (
-              <ProductCard key={product.id} product={product} variant="classic" />
+              <ProductCard key={product.id} product={product} variant="classic" theme="light" />
             ))}
           </div>
         ) : (

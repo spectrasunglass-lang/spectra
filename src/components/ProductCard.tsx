@@ -39,6 +39,7 @@ export interface ProductCardProps {
   color_variants?: unknown;
   product?: Product;
   variant?: "default" | "classic";
+  theme?: "dark" | "light";
 }
 
 const formatCurrency = (amount: number) =>
@@ -120,6 +121,8 @@ export function ProductCard(props: ProductCardProps) {
   const isOutOfStock = stock !== null && stock <= 0;
   const isLowStock = stock !== null && stock > 0 && stock <= 5;
   const isNew = Boolean(p.is_new);
+
+  const isLight = props.theme === "light";
 
   return (
     <Link href={`/products/${safeSlug}`} scroll={true} className="group block h-full select-none">
@@ -217,7 +220,13 @@ export function ProductCard(props: ProductCardProps) {
 
         {/* Product Details Section Below Image — Free and borderless on the page */}
         <div className="pt-3 pb-1 flex flex-col">
-          <h3 className="text-[12.5px] sm:text-[13.5px] font-bold text-neutral-900 uppercase tracking-tight leading-snug line-clamp-1 group-hover:text-[#c8874a] transition-colors">
+          <h3
+            className={`text-[12.5px] sm:text-[13.5px] font-bold uppercase tracking-tight leading-snug line-clamp-1 transition-colors ${
+              isLight
+                ? "text-neutral-900 group-hover:text-[#c8874a]"
+                : "text-white group-hover:text-[#c8874a]"
+            }`}
+          >
             {p.name}
           </h3>
 
@@ -228,12 +237,20 @@ export function ProductCard(props: ProductCardProps) {
                 <span className="text-[11.5px] sm:text-[12.5px] text-neutral-400 line-through font-normal">
                   {formatCurrency(p.compare_price)}
                 </span>
-                <span className="text-[12.5px] sm:text-[13.5px] font-bold text-[#c92a2a]">
+                <span
+                  className={`text-[12.5px] sm:text-[13.5px] font-bold ${
+                    isLight ? "text-[#c92a2a]" : "text-[#ff4d4d]"
+                  }`}
+                >
                   {formatCurrency(p.price)}
                 </span>
               </>
             ) : (
-              <span className="text-[12.5px] sm:text-[13.5px] font-bold text-neutral-900">
+              <span
+                className={`text-[12.5px] sm:text-[13.5px] font-bold ${
+                  isLight ? "text-neutral-900" : "text-white"
+                }`}
+              >
                 {formatCurrency(p.price)}
               </span>
             )}
