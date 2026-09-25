@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ShoppingBag, Check, Bookmark } from "lucide-react";
+import { ShoppingBag, Bookmark } from "lucide-react";
 import { useCart } from "./CartContext";
 import { cldUrl, isCloudinaryUrl } from "@/lib/cldUrl";
 
@@ -41,6 +41,12 @@ export interface ProductCardProps {
   variant?: "default" | "classic";
 }
 
+const formatCurrency = (amount: number) =>
+  `₹${amount.toLocaleString("en-IN", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })}`;
+
 export function ProductCard(props: ProductCardProps) {
   const p: Product = props.product || {
     id: props.id || "",
@@ -58,7 +64,6 @@ export function ProductCard(props: ProductCardProps) {
     color_variants: props.color_variants ?? [],
   };
 
-  const variant = props.variant || "default";
   const { addItem } = useCart();
   const [added, setAdded] = useState(false);
 
@@ -115,149 +120,12 @@ export function ProductCard(props: ProductCardProps) {
   const isOutOfStock = stock !== null && stock <= 0;
   const isLowStock = stock !== null && stock > 0 && stock <= 5;
   const isNew = Boolean(p.is_new);
-  const isSale = !isNew && !isLowStock && !isOutOfStock && Boolean(p.compare_price && p.compare_price > p.price);
-
-  // ── CLASSIC / OLD STYLE (Used in New Arrivals) ──
-  if (variant === "classic") {
-    return (
-      <Link href={`/products/${safeSlug}`} scroll={true} className="group block h-full border">
-        <div className="relative flex flex-col border border-gray-200 h-full overflow-hidden rounded-md bg-white ">
-          {/* Product Image Area */}
-          <div className="relative aspect-square w-full bg-white overflow-hidden flex items-center justify-center p-6">
-            {p.image_url ? (
-              <>
-                <Image
-                  src={cldUrl(p.image_url, 800)}
-                  alt={p.name}
-                  fill
-                  unoptimized={isCloudinaryUrl(p.image_url)}
-                  sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                  className={`object-contain p-4 transition-all duration-500 ease-out ${
-                    secondaryImage
-                      ? "group-hover:opacity-0 group-hover:scale-105"
-                      : "group-hover:scale-105"
-                  }`}
-                />
-                {secondaryImage && (
-                  <Image
-                    src={cldUrl(secondaryImage, 800)}
-                    alt={`${p.name} alternate view`}
-                    fill
-                    unoptimized={isCloudinaryUrl(secondaryImage)}
-                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                    className="object-contain p-4 absolute inset-0 opacity-0 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500 ease-out"
-                  />
-                )}
-              </>
-            ) : (
-              <div className="flex items-center justify-center w-full h-full bg-neutral-50 text-neutral-300">
-                <ShoppingBag size={36} />
-              </div>
-            )}
-
-            {/* Badges */}
-            <div className="absolute top-3 left-3 flex items-center gap-1.5 z-10">
-              {isOutOfStock ? (
-                <span className="text-[9px] font-bold px-2 py-0.5 bg-neutral-900 text-white rounded-sm uppercase tracking-wider">
-                  OUT OF STOCK
-                </span>
-              ) : isLowStock ? (
-                <span className="text-[9px] font-bold px-2 py-0.5 bg-[#b93828] text-white rounded-sm uppercase tracking-wider">
-                  {stock === 1 ? "ONLY 1 LEFT" : `ONLY ${stock} LEFT`}
-                </span>
-              ) : (
-                <>
-                  {p.is_new && (
-                    <span className="text-[9px] font-bold tracking-[0.15em] px-2 py-0.5 bg-[#c8874a] text-white rounded-sm uppercase ">
-                      NEW
-                    </span>
-                  )}
-                  {discount && (
-                    <span className="text-[9px] font-bold px-2 py-0.5 bg-red-600 text-white rounded-sm shadow-sm">
-                      -{discount}%
-                    </span>
-                  )}
-                </>
-              )}
-            </div>
-
-            {/* Add to Cart slide-up button on hover */}
-            <div className="absolute inset-x-0 bottom-0 translate-y-full group-hover:translate-y-0 transition-transform duration-300 z-20">
-              {isOutOfStock ? (
-                <button
-                  disabled
-                  className="w-full py-3 flex items-center justify-center gap-2 text-[11px] font-bold tracking-wider uppercase bg-neutral-800 text-neutral-400 cursor-not-allowed"
-                >
-                  Out of Stock
-                </button>
-              ) : (
-                <button
-                  onClick={handleAddToCart}
-                  className={`w-full py-3 flex items-center justify-center gap-2 text-[11px] font-bold tracking-wider uppercase transition-all duration-200 shadow-md ${
-                    added
-                      ? "bg-emerald-600 text-white"
-                      : "bg-[#0a0a0a] text-white hover:bg-[#c8874a]"
-                  }`}
-                >
-                  {added ? (
-                    <>
-                      <Bookmark size={14} className="fill-white" /> Saved to List!
-                    </>
-                  ) : (
-                    <>
-                      <Bookmark size={14} /> Save to List
-                    </>
-                  )}
-                </button>
-              )}
-            </div>
-          </div>
-
-          {/* Product Info */}
-          <div className="p-4 flex flex-col flex-grow justify-between bg-white">
-            <div>
-              <p className="text-[10px] uppercase tracking-wider text-neutral-400 font-semibold mb-1">
-                {p.subtitle || "Spectra Eyewear"}
-              </p>
-              <h3 className="font-semibold text-neutral-900 text-sm tracking-tight leading-snug line-clamp-1 group-hover:text-[#c8874a] transition-colors">
-                {p.name}
-              </h3>
-            </div>
-
-            <div className="mt-3 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span className="font-bold text-neutral-900 text-sm">
-                  Rs. {p.price.toLocaleString("en-IN")}
-                </span>
-                {p.compare_price && p.compare_price > p.price && (
-                  <span className="text-xs text-neutral-400 line-through">
-                    Rs. {p.compare_price.toLocaleString("en-IN")}
-                  </span>
-                )}
-              </div>
-              <span className="text-[10px] uppercase tracking-widest font-semibold text-neutral-400">
-                Spectra
-              </span>
-            </div>
-          </div>
-        </div>
-      </Link>
-    );
-  }
-
-  // ── DEFAULT NEW MODERN MINIMAL STYLE ──
-  const tagLabel = p.shape
-    ? `${p.shape.toUpperCase()} / M`
-    : p.category
-    ? `${p.category.toUpperCase()} / M`
-    : null;
 
   return (
     <Link href={`/products/${safeSlug}`} scroll={true} className="group block h-full select-none">
-      <div className="relative flex flex-col h-full bg-white transition-all duration-200">
-        
-        {/* Product Image Box */}
-        <div className="relative aspect-square w-full bg-white overflow-hidden flex items-center justify-center p-4 sm:p-6 rounded-none border border-b-0 border-gray-200">
+      <div className="relative flex flex-col h-full bg-transparent transition-all duration-200">
+        {/* Product Image Area with clean border box */}
+        <div className="relative aspect-square w-full bg-white border border-gray-200 rounded-sm overflow-hidden flex items-center justify-center p-3 sm:p-5 group-hover:border-[#c8874a]/50 group-hover:shadow-sm transition-all duration-200">
           {p.image_url ? (
             <>
               <Image
@@ -266,7 +134,7 @@ export function ProductCard(props: ProductCardProps) {
                 fill
                 unoptimized={isCloudinaryUrl(p.image_url)}
                 sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                className={`object-contain p-2 sm:p-4 transition-all duration-500 ease-out ${
+                className={`object-contain p-2 sm:p-3 transition-all duration-500 ease-out ${
                   secondaryImage
                     ? "group-hover:opacity-0 group-hover:scale-105"
                     : "group-hover:scale-105"
@@ -279,7 +147,7 @@ export function ProductCard(props: ProductCardProps) {
                   fill
                   unoptimized={isCloudinaryUrl(secondaryImage)}
                   sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                  className="object-contain p-2 sm:p-4 absolute inset-0 opacity-0 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500 ease-out"
+                  className="object-contain p-2 sm:p-3 absolute inset-0 opacity-0 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500 ease-out"
                 />
               )}
             </>
@@ -289,34 +157,33 @@ export function ProductCard(props: ProductCardProps) {
             </div>
           )}
 
-          {/* Top Left Badge: OUT OF STOCK / ONLY X LEFT / NEW / SALE */}
-          {isOutOfStock ? (
-            <div className="absolute top-2.5 left-2.5 z-10">
-              <span className="text-[8px] sm:text-[8.5px] font-extrabold px-1.5 py-0.5 bg-neutral-900 text-white rounded-[2px] uppercase tracking-wider">
+          {/* Badges ("badges needed bro") */}
+          <div className="absolute top-2.5 left-2.5 z-10 flex items-center gap-1.5 flex-wrap">
+            {isOutOfStock ? (
+              <span className="text-[8.5px] sm:text-[9px] font-extrabold px-1.5 py-0.5 bg-neutral-900 text-white rounded-[2px] uppercase tracking-wider">
                 OUT OF STOCK
               </span>
-            </div>
-          ) : isLowStock ? (
-            <div className="absolute top-2.5 left-2.5 z-10">
-              <span className="text-[8px] sm:text-[8.5px] font-extrabold px-1.5 py-0.5 bg-[#b93828] text-white rounded-[2px] uppercase tracking-wider">
+            ) : isLowStock ? (
+              <span className="text-[8.5px] sm:text-[9px] font-extrabold px-1.5 py-0.5 bg-[#b93828] text-white rounded-[2px] uppercase tracking-wider">
                 {stock === 1 ? "ONLY 1 LEFT" : `ONLY ${stock} LEFT`}
               </span>
-            </div>
-          ) : isNew ? (
-            <div className="absolute top-2.5 left-2.5 z-10">
-              <span className="text-[8px] sm:text-[8.5px] font-extrabold px-1.5 py-0.5 bg-black text-white rounded-[2px] uppercase tracking-wider">
-                NEW
-              </span>
-            </div>
-          ) : isSale ? (
-            <div className="absolute top-2.5 left-2.5 z-10">
-              <span className="text-[8px] sm:text-[8.5px] font-extrabold px-1.5 py-0.5 bg-[#c8874a] text-white rounded-[2px] uppercase tracking-wider">
-                {discount ? `-${discount}%` : "SALE"}
-              </span>
-            </div>
-          ) : null}
+            ) : (
+              <>
+                {isNew && (
+                  <span className="text-[8.5px] sm:text-[9px] font-bold tracking-[0.15em] px-1.5 py-0.5 bg-[#c8874a] text-white rounded-[2px] uppercase">
+                    NEW
+                  </span>
+                )}
+                {discount ? (
+                  <span className="text-[8.5px] sm:text-[9px] font-bold px-1.5 py-0.5 bg-red-600 text-white rounded-[2px] shadow-sm">
+                    -{discount}%
+                  </span>
+                ) : null}
+              </>
+            )}
+          </div>
 
-          {/* Add to Cart slide-up button on hover */}
+          {/* Add to Cart / Save to List slide-up button on hover */}
           <div className="absolute inset-x-0 bottom-0 translate-y-full group-hover:translate-y-0 transition-transform duration-300 z-20">
             {isOutOfStock ? (
               <button
@@ -348,27 +215,26 @@ export function ProductCard(props: ProductCardProps) {
           </div>
         </div>
 
-        {/* Product Details Section Below Image */}
-        <div className="pt-2.5 pb-2.5 px-2 flex flex-col flex-1 justify-between border border-t-0 border-gray-200">
-          <div>
-            {tagLabel && (
-              <p className="text-[9px] sm:text-[9.5px] font-semibold tracking-wider text-neutral-400 uppercase mb-0.5">
-                {tagLabel}
-              </p>
-            )}
-            <h3 className="text-[11.5px] sm:text-[12px] font-bold text-neutral-900 leading-snug line-clamp-1 group-hover:text-[#c8874a] transition-colors">
-              {p.name}
-            </h3>
-          </div>
+        {/* Product Details Section Below Image — Free and borderless on the page */}
+        <div className="pt-3 pb-1 flex flex-col">
+          <h3 className="text-[12.5px] sm:text-[13.5px] font-bold text-neutral-900 uppercase tracking-tight leading-snug line-clamp-1 group-hover:text-[#c8874a] transition-colors">
+            {p.name}
+          </h3>
 
-          {/* Price */}
-          <div className="flex items-baseline mt-1">
-            <span className="text-[12.5px] sm:text-[13px] font-extrabold text-neutral-950">
-              Rs. {p.price.toLocaleString("en-IN")}
-            </span>
-            {p.compare_price && p.compare_price > p.price && (
-              <span className="text-[11px] text-neutral-400 line-through ml-2 font-normal">
-                Rs. {p.compare_price.toLocaleString("en-IN")}
+          {/* Price: Strikethrough compare price + Bold Red Sale Price */}
+          <div className="flex items-center gap-2 sm:gap-2.5 mt-1.5 flex-wrap">
+            {p.compare_price && p.compare_price > p.price ? (
+              <>
+                <span className="text-[11.5px] sm:text-[12.5px] text-neutral-400 line-through font-normal">
+                  {formatCurrency(p.compare_price)}
+                </span>
+                <span className="text-[12.5px] sm:text-[13.5px] font-bold text-[#c92a2a]">
+                  {formatCurrency(p.price)}
+                </span>
+              </>
+            ) : (
+              <span className="text-[12.5px] sm:text-[13.5px] font-bold text-neutral-900">
+                {formatCurrency(p.price)}
               </span>
             )}
           </div>
