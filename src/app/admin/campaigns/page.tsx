@@ -174,6 +174,16 @@ export default function CampaignsAdminPage() {
       return;
     }
 
+    const currentSlug = editingCard.link_url?.startsWith("/products/")
+      ? editingCard.link_url.replace("/products/", "")
+      : "";
+    const isMissingProduct = Boolean(currentSlug && !products.some((p) => p.slug === currentSlug));
+
+    if (isMissingProduct) {
+      setError("The previously linked product was removed or renamed. Please select an active product from the dropdown before saving.");
+      return;
+    }
+
     const index = cards.findIndex((c) => c.id === editingCard.id);
     let updated: SpotlightCard[];
     if (index >= 0) {
@@ -808,6 +818,22 @@ export default function CampaignsAdminPage() {
                           )}
                         </div>
                       )}
+                      {/* Warning if previously linked product no longer exists */}
+                      {(() => {
+                        const slug = editingCard.link_url?.startsWith("/products/")
+                          ? editingCard.link_url.replace("/products/", "")
+                          : "";
+                        const isMissing = Boolean(slug && !products.some((p) => p.slug === slug));
+                        if (isMissing) {
+                          return (
+                            <div className="mt-2 text-[11px] text-amber-400 bg-amber-500/10 border border-amber-500/20 rounded-sm p-2 flex items-start gap-1.5">
+                              <span className="flex-shrink-0">⚠️</span>
+                              <span>Previously linked product was deleted or renamed. Please select an active product above.</span>
+                            </div>
+                          );
+                        }
+                        return null;
+                      })()}
                     </div>
                   </div>
 

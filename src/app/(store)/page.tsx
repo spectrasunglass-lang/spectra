@@ -24,6 +24,7 @@ export default async function Home() {
     { data: newArrivalsData },
     { data: allProductsData },
     { data: settingsData },
+    { data: allSlugsData },
   ] = await Promise.all([
     supabase
       .from("products")
@@ -65,6 +66,10 @@ export default async function Home() {
         "story_body",
         "story_link_text",
       ]),
+    supabase
+      .from("products")
+      .select("slug")
+      .eq("status", "active"),
   ]);
 
   const newArrivals = (newArrivalsData || []).map((p) => ({
@@ -137,7 +142,18 @@ export default async function Home() {
   if (settingsMap.spotlight_stories) {
     try {
       const parsed = JSON.parse(settingsMap.spotlight_stories);
-      if (Array.isArray(parsed)) spotlightCards = parsed;
+      if (Array.isArray(parsed)) {
+        const activeSlugs = new Set((allSlugsData || []).map((p) => p.slug));
+        spotlightCards = parsed.map((card) => {
+          if (card.link_url?.startsWith("/products/")) {
+            const slug = card.link_url.replace("/products/", "");
+            if (!activeSlugs.has(slug)) {
+              return { ...card, link_url: "/sunglasses" };
+            }
+          }
+          return card;
+        });
+      }
     } catch { }
   }
 
