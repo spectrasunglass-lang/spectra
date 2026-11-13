@@ -6,7 +6,7 @@ import ProductDetailClient from "./ProductDetailClient";
 import type { Metadata } from "next";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 export const dynamicParams = true;
 
 interface ProductPageProps {
