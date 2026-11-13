@@ -4,7 +4,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { cldUrl, isCloudinaryUrl } from "@/lib/cldUrl";
 import { createClient } from "@/lib/supabase/client";
-import { Search, Filter, ShoppingBag, Loader2, RefreshCw, ChevronDown, ChevronUp, Package, CheckCircle2, Tag } from "lucide-react";
+import { Search, Filter, ShoppingBag, Loader2, RefreshCw, ChevronDown, ChevronUp, Package, CheckCircle2, Tag, Clock } from "lucide-react";
 import StatusBadge from "@/components/admin/StatusBadge";
 
 type OrderStatus = "pending" | "processing" | "shipped" | "delivered" | "cancelled";
@@ -254,7 +254,7 @@ export default function OrdersPage() {
             <table className="w-full text-left min-w-[700px]">
               <thead>
                 <tr className="border-b border-white/[0.06] bg-[#0d0d0d]">
-                  {["", "Order ID", "Customer", "Product", "Amount", "Date", "Status"].map((h) => (
+                  {["", "Order ID", "Customer", "Product", "Amount", "Date & Time", "Status"].map((h) => (
                     <th key={h} className="px-5 py-3.5 text-[10px] font-bold text-white/30 uppercase tracking-widest">
                       {h}
                     </th>
@@ -317,11 +317,24 @@ export default function OrdersPage() {
                           </div>
                         )}
                       </td>
-                      <td className="px-5 py-4 text-[11.5px] text-white/40 whitespace-nowrap">
-                        {new Date(order.created_at).toLocaleDateString("en-IN", {
-                          day: "numeric",
-                          month: "short",
-                        })}
+                      <td className="px-5 py-4 text-[11.5px] whitespace-nowrap">
+                        <div className="font-semibold text-white/80">
+                          {new Date(order.created_at).toLocaleDateString("en-IN", {
+                            day: "numeric",
+                            month: "short",
+                            year: "numeric",
+                          })}
+                        </div>
+                        <div className="text-[10.5px] text-[#c8874a] font-medium flex items-center gap-1 mt-0.5">
+                          <Clock size={10} className="opacity-70 flex-shrink-0" />
+                          <span>
+                            {new Date(order.created_at).toLocaleTimeString("en-IN", {
+                              hour: "2-digit",
+                              minute: "2-digit",
+                              hour12: true,
+                            })}
+                          </span>
+                        </div>
                       </td>
                       <td className="px-5 py-4">
                         <StatusBadge status={order.status} />
@@ -362,6 +375,27 @@ export default function OrdersPage() {
                               {order.customer_phone && <p className="text-[12px] text-white/50">{order.customer_phone}</p>}
                               {order.city && <p className="text-[12px] text-white/50">{order.city}</p>}
                               {order.address && <p className="text-[11px] text-white/40 mt-1 max-w-[200px]">{order.address}</p>}
+                            </div>
+                            <div className="min-w-[150px]">
+                              <p className="text-[9px] font-bold text-white/30 uppercase tracking-widest mb-1.5">Order Placed At</p>
+                              <p className="text-[13px] font-bold text-white">
+                                {new Date(order.created_at).toLocaleDateString("en-IN", {
+                                  day: "numeric",
+                                  month: "short",
+                                  year: "numeric",
+                                })}
+                              </p>
+                              <p className="text-[11.5px] text-[#c8874a] font-semibold mt-0.5 flex items-center gap-1.5">
+                                <Clock size={12} className="flex-shrink-0" />
+                                <span>
+                                  {new Date(order.created_at).toLocaleTimeString("en-IN", {
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                    second: "2-digit",
+                                    hour12: true,
+                                  })}
+                                </span>
+                              </p>
                             </div>
                             <div>
                               <p className="text-[9px] font-bold text-white/30 uppercase tracking-widest mb-1.5">Order Total</p>

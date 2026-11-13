@@ -206,7 +206,7 @@ export default async function AdminDashboard() {
               <table className="w-full text-left min-w-[500px]">
                 <thead>
                   <tr className="border-b border-white/[0.06] bg-[#0d0d0d]">
-                    {["Order", "Customer", "Product", "Amount", "Status"].map((h) => (
+                    {["Order", "Customer", "Product", "Amount", "Time", "Status"].map((h) => (
                       <th key={h} className="px-5 py-3 text-[10px] font-bold text-white/30 uppercase tracking-widest">
                         {h}
                       </th>
@@ -227,6 +227,21 @@ export default async function AdminDashboard() {
                       </td>
                       <td className="px-5 py-3.5 text-[12px] font-bold text-white">
                         {fmt(order.amount)}
+                      </td>
+                      <td className="px-5 py-3.5 text-[11px] whitespace-nowrap">
+                        <div className="text-white/70 font-medium">
+                          {new Date(order.created_at).toLocaleDateString("en-IN", {
+                            day: "numeric",
+                            month: "short",
+                          })}
+                        </div>
+                        <div className="text-[10px] text-[#c8874a] font-medium">
+                          {new Date(order.created_at).toLocaleTimeString("en-IN", {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                            hour12: true,
+                          })}
+                        </div>
                       </td>
                       <td className="px-5 py-3.5">
                         <StatusBadge status={order.status} />
