@@ -2,7 +2,32 @@
 
 import React, { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { Save, Loader2, CheckCircle2, Globe, Mail, Phone, Link2, Share2, RefreshCw, MessageCircle } from "lucide-react";
+import {
+  DEFAULT_ELIGIBLE_ITEMS,
+  DEFAULT_NOT_ELIGIBLE_ITEMS,
+  ReturnProcessStep,
+  getDefaultReturnSteps,
+  getStep2ForShippingType,
+  getStep4ForPolicyType,
+  parseReturnList,
+  parseReturnSteps,
+} from "@/lib/returnPolicy";
+import {
+  Save,
+  Loader2,
+  CheckCircle2,
+  Globe,
+  Mail,
+  Phone,
+  Link2,
+  Share2,
+  RefreshCw,
+  MessageCircle,
+  Plus,
+  Trash2,
+  AlertCircle,
+  RotateCcw,
+} from "lucide-react";
 
 interface SettingsForm {
   store_name: string;
@@ -20,6 +45,9 @@ interface SettingsForm {
   return_shipping_type: string;
   return_policy_tagline: string;
   return_policy_conditions: string;
+  return_process_steps: string;
+  return_eligible_items: string;
+  return_not_eligible_items: string;
   tax_included: string;
   cod_advance_enabled: string;
   cod_advance_amount: string;
@@ -40,7 +68,11 @@ const defaults: SettingsForm = {
   return_policy_type: "exchange_and_refund",
   return_shipping_type: "complimentary_pickup",
   return_policy_tagline: "Effortless home exchange & returns",
-  return_policy_conditions: "Items must be in unworn, brand-new condition with all tags, luxury hard case, warranty card, and microfiber cloth included. Reverse pickup is arranged from your doorstep.",
+  return_policy_conditions:
+    "Items must be in unworn, brand-new condition with all tags, luxury hard case, warranty card, and microfiber cloth included.",
+  return_process_steps: "",
+  return_eligible_items: "",
+  return_not_eligible_items: "",
   tax_included: "true",
   cod_advance_enabled: "false",
   cod_advance_amount: "199",
@@ -53,6 +85,13 @@ export default function SettingsPage() {
   const [error, setError] = useState<string | null>(null);
   const [form, setForm] = useState<SettingsForm>(defaults);
 
+  // Structured editors for Return Policy lists & steps
+  const [processSteps, setProcessSteps] = useState<ReturnProcessStep[]>(() =>
+    getDefaultReturnSteps(defaults.return_shipping_type, defaults.return_policy_type)
+  );
+  const [eligibleItems, setEligibleItems] = useState<string[]>(DEFAULT_ELIGIBLE_ITEMS);
+  const [notEligibleItems, setNotEligibleItems] = useState<string[]>(DEFAULT_NOT_ELIGIBLE_ITEMS);
+
   const set = (k: keyof SettingsForm, v: string) =>
     setForm((prev) => ({ ...prev, [k]: v }));
 
@@ -63,6 +102,8 @@ export default function SettingsPage() {
       .from("settings")
       .select("key, value")
       .in("key", Object.keys(defaults));
+
+    let merged: SettingsForm = { ...defaults };
     if (data && data.length > 0) {
       const loaded: Partial<SettingsForm> = {};
       data.forEach((row) => {
@@ -70,12 +111,73 @@ export default function SettingsPage() {
           (loaded as Record<string, string>)[row.key] = row.value ?? "";
         }
       });
-      setForm({ ...defaults, ...loaded });
+      merged = { ...defaults, ...loaded };
     }
+
+    setForm(merged);
+    setProcessSteps(
+      parseReturnSteps(
+        merged.return_process_steps,
+        merged.return_shipping_type,
+        merged.return_policy_type
+      )
+    );
+    setEligibleItems(
+      parseReturnList(merged.return_eligible_items, DEFAULT_ELIGIBLE_ITEMS)
+    );
+    setNotEligibleItems(
+      parseReturnList(merged.return_not_eligible_items, DEFAULT_NOT_ELIGIBLE_ITEMS)
+    );
     setLoading(false);
   };
 
   useEffect(() => { loadSettings(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Auto-sync Step 02 when Reverse Courier Pickup dropdown changes
+  const handleShippingTypeChange = (newShippingType: string) => {
+    set("return_shipping_type", newShippingType);
+    setProcessSteps((prev) => {
+      if (prev.length >= 2) {
+        const next = [...prev];
+        next[1] = getStep2ForShippingType(newShippingType);
+        return next;
+      }
+      return prev;
+    });
+  };
+
+  // Auto-sync Step 04 when Resolution Type dropdown changes
+  const handlePolicyTypeChange = (newPolicyType: string) => {
+    set("return_policy_type", newPolicyType);
+    setProcessSteps((prev) => {
+      if (prev.length >= 4) {
+        const next = [...prev];
+        next[3] = getStep4ForPolicyType(newPolicyType);
+        return next;
+      }
+      return prev;
+    });
+  };
+
+  const handleStepChange = (index: number, field: keyof ReturnProcessStep, value: string) => {
+    setProcessSteps((prev) =>
+      prev.map((step, i) => (i === index ? { ...step, [field]: value } : step))
+    );
+  };
+
+  const handleAddStep = () => {
+    setProcessSteps((prev) => [...prev, { title: "", desc: "" }]);
+  };
+
+  const handleRemoveStep = (index: number) => {
+    setProcessSteps((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleResetSteps = () => {
+    setProcessSteps(
+      getDefaultReturnSteps(form.return_shipping_type, form.return_policy_type)
+    );
+  };
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -83,11 +185,45 @@ export default function SettingsPage() {
     setError(null);
     try {
       const supabase = createClient();
-      const entries = Object.entries(form).map(([key, value]) => ({ key, value: String(value) }));
+
+      const cleanedSteps = processSteps
+        .map((s) => ({ title: s.title.trim(), desc: s.desc.trim() }))
+        .filter((s) => s.title || s.desc);
+
+      const cleanedEligible = eligibleItems.map((item) => item.trim()).filter(Boolean);
+      const cleanedNotEligible = notEligibleItems.map((item) => item.trim()).filter(Boolean);
+
+      const payloadForm: SettingsForm = {
+        ...form,
+        return_process_steps: JSON.stringify(cleanedSteps),
+        return_eligible_items: JSON.stringify(cleanedEligible),
+        return_not_eligible_items: JSON.stringify(cleanedNotEligible),
+      };
+
+      const entries = Object.entries(payloadForm).map(([key, value]) => ({
+        key,
+        value: String(value),
+      }));
+
       const { error: dbError } = await supabase
         .from("settings")
         .upsert(entries, { onConflict: "key" });
+
       if (dbError) throw new Error(dbError.message);
+
+      setForm(payloadForm);
+      setProcessSteps(
+        cleanedSteps.length > 0
+          ? cleanedSteps
+          : getDefaultReturnSteps(form.return_shipping_type, form.return_policy_type)
+      );
+      setEligibleItems(
+        cleanedEligible.length > 0 ? cleanedEligible : DEFAULT_ELIGIBLE_ITEMS
+      );
+      setNotEligibleItems(
+        cleanedNotEligible.length > 0 ? cleanedNotEligible : DEFAULT_NOT_ELIGIBLE_ITEMS
+      );
+
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
     } catch (err) {
@@ -109,7 +245,7 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="space-y-6 max-w-3xl">
+    <div className="space-y-6 max-w-4xl">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -240,7 +376,7 @@ export default function SettingsPage() {
 
         {/* Return & Exchange Policy */}
         <Section title="Return & Exchange Policy" icon={<RefreshCw size={16} />}>
-          <div className="space-y-5">
+          <div className="space-y-6">
             {/* Returns Enabled Toggle */}
             <div className="flex items-center justify-between">
               <div>
@@ -275,7 +411,7 @@ export default function SettingsPage() {
                   <Field label="Resolution Type">
                     <select
                       value={form.return_policy_type}
-                      onChange={(e) => set("return_policy_type", e.target.value)}
+                      onChange={(e) => handlePolicyTypeChange(e.target.value)}
                       className={selectCls}
                     >
                       <option value="exchange_and_refund" className="bg-[#181818] text-white">Exchange & Full Refund</option>
@@ -283,23 +419,23 @@ export default function SettingsPage() {
                       <option value="exchange_only" className="bg-[#181818] text-white">Exchange Only (No Cash Refund)</option>
                       <option value="replacement_only" className="bg-[#181818] text-white">Defective Replacement Only</option>
                     </select>
-                    <p className="text-[10.5px] text-white/30 mt-1">Resolution offered to customers</p>
+                    <p className="text-[10.5px] text-white/30 mt-1">Resolution offered to customers (auto-updates Step 04)</p>
                   </Field>
 
                   <Field label="Reverse Courier Pickup">
                     <select
                       value={form.return_shipping_type}
-                      onChange={(e) => set("return_shipping_type", e.target.value)}
+                      onChange={(e) => handleShippingTypeChange(e.target.value)}
                       className={selectCls}
                     >
                       <option value="complimentary_pickup" className="bg-[#181818] text-white">Complimentary Doorstep Pickup</option>
                       <option value="customer_borne" className="bg-[#181818] text-white">Customer Borne / Self-Ship</option>
                     </select>
-                    <p className="text-[10.5px] text-white/30 mt-1">Shipping cost responsibility</p>
+                    <p className="text-[10.5px] text-white/30 mt-1">Shipping responsibility (auto-updates Step 02)</p>
                   </Field>
                 </div>
 
-                <div className="pt-2">
+                <div className="pt-1">
                   <Field label="Storefront Tagline / Headline">
                     <input
                       type="text"
@@ -312,16 +448,199 @@ export default function SettingsPage() {
                   </Field>
                 </div>
 
+                {/* ── EDITABLE HOW THE RETURN PROCESS WORKS (4 STEPS) ── */}
+                <div className="pt-5 border-t border-white/[0.06] space-y-4">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <div>
+                      <p className="text-[12.5px] font-bold text-white uppercase tracking-wider">
+                        How The Return Process Works (Steps)
+                      </p>
+                      <p className="text-[11px] text-white/40 mt-0.5">
+                        Fully editable steps shown on the /returns page. Changing pickup or resolution above auto-updates Step 02 &amp; Step 04.
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={handleResetSteps}
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-sm text-[11px] font-semibold text-white/60 hover:text-white bg-[#181818] border border-white/[0.08] hover:border-white/[0.2] transition-colors cursor-pointer"
+                        title="Reset steps based on selected dropdowns"
+                      >
+                        <RotateCcw size={12} /> Reset Defaults
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleAddStep}
+                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-sm text-[11px] font-bold text-[#c8874a] bg-[#c8874a]/10 border border-[#c8874a]/30 hover:bg-[#c8874a] hover:text-white transition-colors cursor-pointer"
+                      >
+                        <Plus size={12} /> Add Step
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                    {processSteps.map((step, idx) => (
+                      <div
+                        key={idx}
+                        className="bg-[#161616] border border-white/[0.07] rounded-sm p-3.5 space-y-2.5"
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="font-mono text-[12px] font-bold text-[#c8874a]">
+                            STEP {String(idx + 1).padStart(2, "0")}
+                          </span>
+                          {processSteps.length > 1 && (
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveStep(idx)}
+                              className="p-1 text-white/30 hover:text-red-400 transition-colors cursor-pointer"
+                              title="Remove step"
+                            >
+                              <Trash2 size={13} />
+                            </button>
+                          )}
+                        </div>
+                        <input
+                          type="text"
+                          value={step.title}
+                          onChange={(e) => handleStepChange(idx, "title", e.target.value)}
+                          placeholder="Step title (e.g. Self-Ship Return Parcel)"
+                          className="w-full px-3 py-2 rounded-sm border border-white/[0.08] focus:border-[#c8874a] focus:outline-none text-[12.5px] font-semibold text-white placeholder-white/30 bg-[#111111]"
+                        />
+                        <textarea
+                          rows={3}
+                          value={step.desc}
+                          onChange={(e) => handleStepChange(idx, "desc", e.target.value)}
+                          placeholder="Step description..."
+                          className="w-full px-3 py-2 rounded-sm border border-white/[0.08] focus:border-[#c8874a] focus:outline-none text-[12px] text-neutral-300 placeholder-white/30 bg-[#111111] resize-none"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* ── EDITABLE ELIGIBLE & NOT ELIGIBLE CRITERIA ── */}
+                <div className="pt-5 border-t border-white/[0.06] space-y-3">
+                  <div>
+                    <p className="text-[12.5px] font-bold text-white uppercase tracking-wider">
+                      Return Eligibility Criteria Lists
+                    </p>
+                    <p className="text-[11px] text-white/40 mt-0.5">
+                      Customize the bullet points for Eligible and Not Eligible cards. Use{" "}
+                      <code className="text-[#c8874a] bg-white/[0.06] px-1 py-0.5 rounded">{`{days}`}</code>{" "}
+                      to automatically insert your Return Window ({form.return_window_days || "14"} days).
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Eligible List Editor */}
+                    <div className="bg-[#161616] border border-emerald-500/20 rounded-sm p-4 space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-1.5 text-emerald-400">
+                          <CheckCircle2 size={15} />
+                          <span className="text-[11.5px] font-bold uppercase tracking-wider">
+                            Eligible For Return / Exchange
+                          </span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setEligibleItems((prev) => [...prev, ""])}
+                          className="inline-flex items-center gap-1 px-2 py-1 rounded-sm text-[10.5px] font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/25 hover:bg-emerald-500 hover:text-black transition-colors cursor-pointer"
+                        >
+                          <Plus size={11} /> Add
+                        </button>
+                      </div>
+
+                      <div className="space-y-2">
+                        {eligibleItems.map((item, idx) => (
+                          <div key={idx} className="flex items-center gap-2">
+                            <span className="text-emerald-400 text-xs">•</span>
+                            <input
+                              type="text"
+                              value={item}
+                              onChange={(e) =>
+                                setEligibleItems((prev) =>
+                                  prev.map((v, i) => (i === idx ? e.target.value : v))
+                                )
+                              }
+                              placeholder="Enter eligibility condition..."
+                              className="flex-1 px-2.5 py-1.5 rounded-sm border border-white/[0.08] focus:border-emerald-400/60 focus:outline-none text-[12px] text-white placeholder-white/25 bg-[#111111]"
+                            />
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setEligibleItems((prev) => prev.filter((_, i) => i !== idx))
+                              }
+                              className="p-1 text-white/30 hover:text-red-400 transition-colors cursor-pointer"
+                              title="Remove point"
+                            >
+                              <Trash2 size={13} />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Not Eligible List Editor */}
+                    <div className="bg-[#161616] border border-amber-500/20 rounded-sm p-4 space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-1.5 text-amber-400">
+                          <AlertCircle size={15} />
+                          <span className="text-[11.5px] font-bold uppercase tracking-wider">
+                            Not Eligible For Return
+                          </span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setNotEligibleItems((prev) => [...prev, ""])}
+                          className="inline-flex items-center gap-1 px-2 py-1 rounded-sm text-[10.5px] font-bold text-amber-400 bg-amber-500/10 border border-amber-500/25 hover:bg-amber-500 hover:text-black transition-colors cursor-pointer"
+                        >
+                          <Plus size={11} /> Add
+                        </button>
+                      </div>
+
+                      <div className="space-y-2">
+                        {notEligibleItems.map((item, idx) => (
+                          <div key={idx} className="flex items-center gap-2">
+                            <span className="text-amber-400 text-xs">•</span>
+                            <input
+                              type="text"
+                              value={item}
+                              onChange={(e) =>
+                                setNotEligibleItems((prev) =>
+                                  prev.map((v, i) => (i === idx ? e.target.value : v))
+                                )
+                              }
+                              placeholder="Enter non-eligible condition..."
+                              className="flex-1 px-2.5 py-1.5 rounded-sm border border-white/[0.08] focus:border-amber-400/60 focus:outline-none text-[12px] text-white placeholder-white/25 bg-[#111111]"
+                            />
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setNotEligibleItems((prev) => prev.filter((_, i) => i !== idx))
+                              }
+                              className="p-1 text-white/30 hover:text-red-400 transition-colors cursor-pointer"
+                              title="Remove point"
+                            >
+                              <Trash2 size={13} />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Specific Terms & Conditions */}
                 <div className="pt-2">
-                  <Field label="Eligibility Conditions & Guidelines">
+                  <Field label="Specific Terms & Conditions (Additional Notes)">
                     <textarea
                       rows={3}
                       value={form.return_policy_conditions}
                       onChange={(e) => set("return_policy_conditions", e.target.value)}
                       className="w-full bg-[#161616] border border-white/[0.08] rounded-sm px-3.5 py-2.5 text-[13px] text-white placeholder-white/30 outline-none focus:border-[#c8874a] transition-colors resize-none"
-                      placeholder="List conditions required (tags attached, box intact, etc.)"
+                      placeholder="List any additional return guidelines or studio return address instructions..."
                     />
-                    <p className="text-[10.5px] text-white/30 mt-1">Shown prominently on the customer-facing /returns page</p>
+                    <p className="text-[10.5px] text-white/30 mt-1">Shown in the &quot;Specific Terms &amp; Conditions&quot; box on the customer-facing /returns page</p>
                   </Field>
                 </div>
 
